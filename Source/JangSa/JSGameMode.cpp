@@ -15,16 +15,3 @@ AJSGameMode::AJSGameMode()
 	PlayerControllerClass = AJSPlayerController::StaticClass();
 	GameStateClass = AJSGameState::StaticClass();
 }
-
-void AJSGameMode::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	Cast<AJSGameState>(GameState)->NotifyAddRemainCardTurn.AddDynamic(this, &AJSGameMode::TestBinding);
-
-}
-
-void AJSGameMode::TestBinding(int32 num)
-{
-	UE_LOG(LogTemp, Log, TEXT("HIHIHIHIIHIHIH"));
-}

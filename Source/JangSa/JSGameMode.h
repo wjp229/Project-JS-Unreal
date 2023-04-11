@@ -16,10 +16,6 @@ class JANGSA_API AJSGameMode : public AGameMode
 
 public:
 	AJSGameMode();
-
-	virtual void PostInitializeComponents() override;
 	
 private:
-	UFUNCTION()
-	void TestBinding(int32 num);
 };

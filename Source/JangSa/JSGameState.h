@@ -7,11 +7,7 @@
 #include "JSTypes.h"
 #include "JSGameState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivatePositiveCard, int32, num);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateNegativeCard, int32, num);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateNeutralCard, int32, num);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateSequencialCardChange, int32, num);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateStochasticCardChange, int32, num);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateCardEffect, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddRemainCardTurn, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyCard);
 
@@ -27,58 +23,59 @@ class JANGSA_API AJSGameState : public AGameState
 	GENERATED_BODY()
 
 public:
+	virtual void PostInitializeComponents() override;
+
+private:
+	
+public:
 	AJSGameState();
 
 #pragma region SettleCaratDelegate
 	// Process in Activating Turn
-	FActivatePositiveCard NotifyPositiveCardEffect;
-	FActivateNegativeCard NotifyNegativeCardEffect;
-	FActivateNeutralCard NotifySequencialCardEffect;
-	FActivateSequencialCardChange NotifySequencialCardChange;
-	FActivateStochasticCardChange NotifyStochasticCardChange;
+	FActivateCardEffect NotifyActivateCardEffect;
 	FAddRemainCardTurn NotifyAddRemainCardTurn;
 	FDestroyCard NotifyDestroyCard;
 #pragma endregion 
-	
+
+#pragma region NotifyTurnEvent
 	FNotifyRemainTurn NotifyRemainTurn;
 	FNotifyPayTurn NotifyPayTurn;
 	FNotifyPayCarat NotifyPayCarat;
+#pragma endregion 
 	
-	FORCEINLINE void SetRemainTurn(const int32 InRemainTurn) { RemainTurn = InRemainTurn; NotifyRemainTurn.Broadcast(RemainTurn); }
-	FORCEINLINE void AddRemainTurn(const int32 Value) { SetRemainTurn(RemainTurn + Value); }
-	FORCEINLINE void SetPayTurn(const int32 InPayTurn) { PayTurn = InPayTurn; NotifyRemainTurn.Broadcast(RemainTurn); }
+	FORCEINLINE FPlayerData* GetPlayerData() const { return PlayerData; }
+	
+	void SetRemainTurn(const int32 InRemainTurn);
+	FORCEINLINE void AddRemainTurn(const int32 Value) { SetRemainTurn(GetPlayerData()->RemainTurn + Value); }
+	FORCEINLINE void SetPayTurn(const int32 InPayTurn) { GetPlayerData()->PayTurn = InPayTurn; NotifyRemainTurn.Broadcast(InPayTurn); }
+	FORCEINLINE void SetPayCarat(const int32 InPayCarat) { GetPlayerData()->PayCarat = InPayCarat; NotifyPayCarat.Broadcast(InPayCarat); }
 
-	FORCEINLINE void SetPayCarat(const int32 InPayCarat) { PayCarat = InPayCarat; NotifyPayCarat.Broadcast(PayCarat); }
 	
-	virtual void PostInitializeComponents() override;
 	
+	// Deprecated
+	void SetNextTurn();
+	void SetNextPhase();
+
 private:
-	EGamePhase GamePhase;
-	ECaratSettlePhase CaratSettlePhase;
+	// Data includes Current Carats, Stages and State about Turn
+	FPlayerData* PlayerData;
 
-	int32 CurrentStage;
-	int32 RemainTurn;
-	int32 PayTurn;
-	int32 PayCarat;
-	
+	EGamePlayState GamePlayState;
+
+	// DataTable About Turn
 	TArray<struct FTurnInfoData*> TurnInfoDatas;
-
+	TArray<struct FCardInfoData*> CardInfoDatas;
+	
 	
 	void OnCheckEventQueue();
-
-	// 
+	void CheckSynergy();
 	void OnEnterStartTurn();
-
-	//
 	void OnResetShop();
-
-	//
 	void OnEnterUserControlTurn();
-
+	
 	// Activate each card's effect, reduce turn, and destory when card's remain turn is zero
 	void OnEnterSettleCarat();
-	void CheckSynergy();
-
-	//
 	void OnExitTurn();
+
+private:
 };

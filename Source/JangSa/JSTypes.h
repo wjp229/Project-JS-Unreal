@@ -3,24 +3,44 @@
 #pragma once
 
 UENUM()
-enum class EGamePhase : uint8
+enum class EGameKey
 {
-	StartPhase = 0,
-	ResetShopPhase,
-	UserControllPhase,
-	ExitPhase,
-	SettleCaratPhase
+	Tap,
+	Hold,
+	Swipe,
+	SwipeTwoPoints,
+	Pinch
 };
 
 UENUM()
-enum class ECaratSettlePhase : uint8
+enum class EGamePlayState
 {
-	CheckSynergy = 0,
-	ActivatePositiveEffect,
-	ActivateNegativeEffect,
-	ActivateSequencialEffect,
-	ActivateSequencialChangeEffect,
-	ActivateStochasticChangeEffect,
-	ReduceCardTurns,
-	DestroyCard
+	Waiting,
+	Playing,
+	Finished
+};
+
+struct FCardData
+{
+	FString Name;
+	FString Rank;
+	uint8 bCanControlByUser;
+	int32 InitRemainTurn;
+	uint8 bShowOnShop;
+	int32 Price;
+	int32 Probability;
+	FString Description;
+};
+
+struct FPlayerData
+{
+	int32 CurrentStage;
+
+	int32 RemainTurn;
+
+	int32 PayTurn;
+
+	int32 CurrentOwnedCarat;
+
+	int32 PayCarat;
 };
