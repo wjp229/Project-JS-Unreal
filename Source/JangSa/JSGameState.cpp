@@ -2,11 +2,12 @@
 
 
 #include "JSGameState.h"
-
+#include "UObject/ConstructorHelpers.h"
 #include "CardInfoRowBase.h"
 #include "TurnInfoRowBase.h"
 #include "Engine/DataTable.h"
 #include "JSCard.h"
+#include "JSCardActorFactory.h"
 
 AJSGameState::AJSGameState()
 {
@@ -19,17 +20,16 @@ AJSGameState::AJSGameState()
 		DT_TurnDateTable.Object->GetAllRows<FTurnInfoData>(TEXT("GetAllRows"), TurnInfoDatas);
 	}
 
+
 	SetPayTurn(TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn);
 	SetRemainTurn(GetPlayerData()->PayTurn);
-
-	GetPlayerData()->PayCarat = TurnInfoDatas[GetPlayerData()->CurrentStage]->PayCarat;
-
 	
+	GetPlayerData()->PayCarat = TurnInfoDatas[GetPlayerData()->CurrentStage]->PayCarat;
 }
 
 void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 {
-	// Deprecated Log
+	// Deprecated Logv 
 	UE_LOG(LogTemp, Log, TEXT("CurrentStage : %d"), GetPlayerData()->CurrentStage);
 	UE_LOG(LogTemp, Log, TEXT("Remain Turn : %d // Remain Carat : %d"), InRemainTurn, GetPlayerData()->PayCarat);
 	
@@ -63,6 +63,9 @@ void AJSGameState::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	UE_LOG(LogTemp, Log, TEXT("Total Turn Info : %d"), TurnInfoDatas.Num());
+
+	UE_LOG(LogTemp, Log, TEXT("Actor Factory Created!!"));
+	CardActorFactory = NewObject<UJSCardActorFactory>(this, UJSCardActorFactory::StaticClass());
 
 	// {
 	// 	const ConstructorHelpers::FObjectFinder<UDataTable> DT_CardDataTable(TEXT("/Game/DataTable/DT_CardInfo.DT_CardInfo"));
@@ -118,7 +121,7 @@ void AJSGameState::OnResetShop()
 	// Reset Shop
 	UE_LOG(LogTemp, Log, TEXT("Reset Shop..."));
 
-	GetWorld()->SpawnActor<AJSCard>();
+	CardActorFactory->SpawnCardActorOnShop();
 	
 	OnEnterUserControlTurn();
 }

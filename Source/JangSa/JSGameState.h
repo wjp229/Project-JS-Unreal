@@ -49,8 +49,6 @@ public:
 	FORCEINLINE void AddRemainTurn(const int32 Value) { SetRemainTurn(GetPlayerData()->RemainTurn + Value); }
 	FORCEINLINE void SetPayTurn(const int32 InPayTurn) { GetPlayerData()->PayTurn = InPayTurn; NotifyRemainTurn.Broadcast(InPayTurn); }
 	FORCEINLINE void SetPayCarat(const int32 InPayCarat) { GetPlayerData()->PayCarat = InPayCarat; NotifyPayCarat.Broadcast(InPayCarat); }
-
-	
 	
 	// Deprecated
 	void SetNextTurn();
@@ -62,10 +60,11 @@ private:
 
 	EGamePlayState GamePlayState;
 
+	UPROPERTY()
+	class UJSCardActorFactory* CardActorFactory;
+
 	// DataTable About Turn
 	TArray<struct FTurnInfoData*> TurnInfoDatas;
-	TArray<struct FCardInfoData*> CardInfoDatas;
-	
 	
 	void OnCheckEventQueue();
 	void CheckSynergy();
@@ -77,5 +76,5 @@ private:
 	void OnEnterSettleCarat();
 	void OnExitTurn();
 
-private:
+public:
 };
