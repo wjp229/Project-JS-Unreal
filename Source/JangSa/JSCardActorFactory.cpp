@@ -24,8 +24,6 @@ UJSCardActorFactory::UJSCardActorFactory(const FObjectInitializer& ObjectInitial
 			CardInfoDatasOnShop.Add(CardInfoDatas[i]);
 		}
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("%d CardDataOnShop has made!!"), CardInfoDatasOnShop.Num());
 }
 
 void UJSCardActorFactory::SpawnCardActorOnShop()
@@ -34,7 +32,7 @@ void UJSCardActorFactory::SpawnCardActorOnShop()
 	{
 		int32 TargetNum = FMath::RandRange(0, CardInfoDatasOnShop.Num()-1);
 
-		AJSCard* SpawnedCard = Cast<AJSCard>(SpawnCardActor(TargetNum));
+		Cast<AJSCard>(SpawnCardActor(TargetNum));
 	}
 }
 

@@ -14,4 +14,5 @@ AJSGameMode::AJSGameMode()
 	HUDClass = AJSHUD::StaticClass();
 	PlayerControllerClass = AJSPlayerController::StaticClass();
 	GameStateClass = AJSGameState::StaticClass();
+	SpectatorClass = AJSSpectatorPawn::StaticClass();
 }

@@ -13,5 +13,11 @@ UCLASS()
 class JANGSA_API AJSSpectatorPawn : public ASpectatorPawn
 {
 	GENERATED_BODY()
-	
+
+public:
+	AJSSpectatorPawn(const FObjectInitializer & ObjectInitializer);
+
+private:
+	UPROPERTY(Category = CameraActor, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UJSCameraComponent* JsCameraComponent;
 };
