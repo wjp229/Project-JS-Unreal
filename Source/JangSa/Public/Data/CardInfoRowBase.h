@@ -40,11 +40,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
 	int32 Price;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
-	int32 Probability;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
 	FString Description;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
+	int32 Param1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
+	int32 Param2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
+	int32 Param3;
 };

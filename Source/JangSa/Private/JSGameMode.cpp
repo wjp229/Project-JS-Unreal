@@ -2,11 +2,10 @@
 
 
 #include "JSGameMode.h"
-
 #include "JSGameState.h"
-#include "JSHUD.h"
-#include "JSPlayerController.h"
-#include "JSSpectatorPawn.h"
+#include "Pawns/JSSpectatorPawn.h"
+#include "Player/JSPlayerController.h"
+#include "UI/JSHUD.h"
 
 AJSGameMode::AJSGameMode()
 {

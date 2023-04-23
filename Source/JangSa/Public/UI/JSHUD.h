@@ -3,15 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Camera/CameraComponent.h"
-#include "JSCameraComponent.generated.h"
+#include "Components/WidgetComponent.h"
+#include "GameFramework/HUD.h"
+#include "JSHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class JANGSA_API UJSCameraComponent : public UCameraComponent
+class JANGSA_API AJSHUD : public AHUD
 {
 	GENERATED_BODY()
-	
+
+public:
+	AJSHUD();
 };

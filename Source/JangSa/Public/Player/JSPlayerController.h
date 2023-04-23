@@ -15,19 +15,15 @@ class JANGSA_API AJSPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	virtual void SetupInputComponent() override;
-
-protected:
-
-public:
-
+	AJSPlayerController(const FObjectInitializer& ObjectInitializer);
+	
 protected:
 	UPROPERTY()
 	class UJSInput* InputHandler;
-
-private:
-
+	
 	//Deprecated
 	void OnZKeyPressed();
 	
+public:
+	virtual void SetupInputComponent() override;
 };

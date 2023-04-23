@@ -28,8 +28,10 @@ struct FCardData
 	int32 InitRemainTurn;
 	uint8 bShowOnShop;
 	int32 Price;
-	int32 Probability;
 	FString Description;
+	int32 Param1;
+	int32 Param2;
+	int32 Param3;
 };
 
 struct FPlayerData

@@ -2,12 +2,15 @@
 
 
 #include "JSGameState.h"
+
+#include "JSCardFactory.h"
 #include "UObject/ConstructorHelpers.h"
-#include "CardInfoRowBase.h"
-#include "TurnInfoRowBase.h"
+#include "Data/CardInfoRowBase.h"
+#include "Data/TurnInfoRowBase.h"
 #include "Engine/DataTable.h"
-#include "JSCard.h"
-#include "JSCardActorFactory.h"
+#include "Card/JSCard.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Manager/JSRenderManager.h"
 
 AJSGameState::AJSGameState()
 {
@@ -20,19 +23,18 @@ AJSGameState::AJSGameState()
 		DT_TurnDateTable.Object->GetAllRows<FTurnInfoData>(TEXT("GetAllRows"), TurnInfoDatas);
 	}
 
-
 	SetPayTurn(TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn);
 	SetRemainTurn(GetPlayerData()->PayTurn);
-	
 	GetPlayerData()->PayCarat = TurnInfoDatas[GetPlayerData()->CurrentStage]->PayCarat;
+
+	
 }
 
 void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 {
 	// Deprecated Logv 
 	UE_LOG(LogTemp, Log, TEXT("CurrentStage : %d"), GetPlayerData()->CurrentStage);
-	UE_LOG(LogTemp, Log, TEXT("Remain Turn : %d // Remain Carat : %d"), InRemainTurn, GetPlayerData()->PayCarat);
-	
+
 	if(InRemainTurn <= 0)
 	{
 		// Set To Next Phase
@@ -63,32 +65,10 @@ void AJSGameState::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	UE_LOG(LogTemp, Log, TEXT("Total Turn Info : %d"), TurnInfoDatas.Num());
-
-	UE_LOG(LogTemp, Log, TEXT("Actor Factory Created!!"));
-	CardActorFactory = NewObject<UJSCardActorFactory>(this, UJSCardActorFactory::StaticClass());
-
-	// {
-	// 	const ConstructorHelpers::FObjectFinder<UDataTable> DT_CardDataTable(TEXT("/Game/DataTable/DT_CardInfo.DT_CardInfo"));
-	// 	if (DT_CardDataTable.Succeeded())
-	// 	{
-	// 		DT_CardDataTable.Object->GetAllRows<FCardInfoData>(TEXT("GetAllRows"), CardInfoDatas);
-	// 	}
-	// 	
-	// 	FCardData* CardData = new FCardData();
-	// 	CardData->Name = CardInfoDatas[0]->Name;
-	// 	CardData->Rank = CardInfoDatas[0]->Rank;
-	// 	CardData->bCanControlByUser = CardInfoDatas[0]->CanControlByUser;
-	// 	CardData->InitRemainTurn = CardInfoDatas[0]->InitRemainTurn;
-	// 	CardData->bShowOnShop = CardInfoDatas[0]->ShowOnShop;
-	// 	CardData->Price = CardInfoDatas[0]->Price;
-	// 	CardData->Probability = CardInfoDatas[0]->Probability;
-	// 	CardData->Description = CardInfoDatas[0]->Description;
-	//
-	// 	AJSCard* TempCard = NewObject<AJSCard>(this, AJSCard::StaticClass());
-	// 	TempCard->InitCard(CardData);
-	// 	
-	// 	UE_LOG(LogTemp, Log, TEXT("Card has been created!!"));
-	// }
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Cyan, FString::FromInt(233));
+	
+	CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), UJSCardFactory::StaticClass());
+	RenderManager = NewObject<UJSRenderManager>(GetWorld(), UJSRenderManager::StaticClass());
 }
 
 void AJSGameState::SetNextTurn()
@@ -129,24 +109,18 @@ void AJSGameState::OnResetShop()
 void AJSGameState::OnEnterUserControlTurn()
 {
 	// Keep phase state until TurnEnd button clicked
-	UE_LOG(LogTemp, Log, TEXT("Waiting For User Control..."));
-	
 	OnExitTurn();
 }
 
 void AJSGameState::OnExitTurn()
 {
-	UE_LOG(LogTemp, Log, TEXT("Exit Turn..."));
-
 	OnEnterSettleCarat();
 }
 
 void AJSGameState::OnEnterSettleCarat()
 {
 	CheckSynergy();
-
-	UE_LOG(LogTemp, Log, TEXT("Notifying Card Effects..."));
-
+	
 	// Activate Each Card Effects
 	NotifyActivateCardEffect.Broadcast(0);
 
@@ -163,6 +137,4 @@ void AJSGameState::OnEnterSettleCarat()
 
 void AJSGameState::CheckSynergy()
 {
-	UE_LOG(LogTemp, Log, TEXT("Checking Synergy..."));
-
 }
