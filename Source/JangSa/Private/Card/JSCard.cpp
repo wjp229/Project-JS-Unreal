@@ -36,6 +36,7 @@ void UJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID)
 	// Init Card Renderers
 	// UJSRenderManager* RenderManager = UJSRenderManager::GetInstance();
 	// RenderManager->SpawnCardRenderer(CardObjID, CardRenderState, CardData);
+	
 }
 
 void UJSCard::OnActivateCardEffect(int32 InOrder)
