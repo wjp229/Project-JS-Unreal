@@ -39,7 +39,7 @@ UObject* UJSCardFactory::SpawnCardActor(int CardNum)
 {
 	UObject* SpawnedCard = NewObject<UJSCard>(GetWorld(), UJSCard::StaticClass());
 	
-	Cast<UJSCard>(SpawnedCard)->InitCard(*CardInfoDatas[CardNum], Cast<AJSGameState>(GetWorld()->GetGameState()), 0);
+	Cast<UJSCard>(SpawnedCard)->InitCard(*CardInfoDatas[CardNum], 0);
 
 	return SpawnedCard;
 }

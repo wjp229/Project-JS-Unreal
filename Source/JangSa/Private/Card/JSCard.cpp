@@ -4,10 +4,12 @@
 #include "Card/JSCard.h"
 #include "JSGameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Manager/JSRenderManager.h"
 #include "UObject/ConstructorHelpers.h"
 
 UJSCard::UJSCard()
 {
+	CardRenderState = ECardRenderState::Stone;
 }
 
 FCardInfoData UJSCard::GetCardInfo() const
@@ -15,7 +17,7 @@ FCardInfoData UJSCard::GetCardInfo() const
 	return CardData;
 }
 
-void UJSCard::InitCard(const FCardInfoData& InCardData, AJSGameState* GameState, int32 InObjectID)
+void UJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID)
 {
 	CardData = InCardData;
 	CardObjID = InObjectID;
@@ -30,6 +32,10 @@ void UJSCard::InitCard(const FCardInfoData& InCardData, AJSGameState* GameState,
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("Card %s has Created!!"), *CardData.Name);
+
+	// Init Card Renderers
+	// UJSRenderManager* RenderManager = UJSRenderManager::GetInstance();
+	// RenderManager->SpawnCardRenderer(CardObjID, CardRenderState, CardData);
 }
 
 void UJSCard::OnActivateCardEffect(int32 InOrder)

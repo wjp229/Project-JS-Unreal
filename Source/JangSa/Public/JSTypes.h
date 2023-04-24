@@ -20,6 +20,14 @@ enum class EGamePlayState
 	Finished
 };
 
+UENUM()
+enum class ECardRenderState
+{
+	UMG,
+	Paper,
+	Stone
+};
+
 struct FCardData
 {
 	FString Name;

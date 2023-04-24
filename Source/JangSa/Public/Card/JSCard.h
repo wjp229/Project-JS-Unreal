@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "JSGameState.h"
 #include "Data/CardInfoRowBase.h"
-#include "GameFramework/Actor.h"
+#include "JSTypes.h"
 #include "JSCard.generated.h"
 
 UCLASS()
@@ -18,7 +17,7 @@ public:
 	UJSCard();
 
 	FCardInfoData GetCardInfo() const;
-	void InitCard(const FCardInfoData& InCardData, AJSGameState* GameState, int32 InObjectID);
+	void InitCard(const FCardInfoData& InCardData, int32 InObjectID);
 
 protected:
 	int CardNum;
@@ -29,6 +28,9 @@ protected:
 
 	UPROPERTY()
 	int32 CardObjID;
+
+	UPROPERTY()
+	ECardRenderState CardRenderState;
 
 	UFUNCTION()
 	void OnActivateCardEffect(int32 InOrder);

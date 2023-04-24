@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Data/CardInfoRowBase.h"
 #include "JSCardRenderInterface.generated.h"
 
 // This class does not need to be modified.
@@ -22,4 +23,5 @@ class JANGSA_API IJSCardRenderInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual void UpdateCardInfo(const FCardInfoData InData) = 0;
 };
