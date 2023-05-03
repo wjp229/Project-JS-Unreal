@@ -2,8 +2,6 @@
 
 
 #include "Manager/JSRenderManager.h"
-
-#include "JSTypes.h"
 #include "Card/JSCardPaperRenderer.h"
 #include "Card/JSCardStoneRenderer.h"
 

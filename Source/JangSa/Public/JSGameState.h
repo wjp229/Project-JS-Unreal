@@ -77,6 +77,9 @@ private:
 	
 	// DataTable About Turn
 	TArray<struct FTurnInfoData*> TurnInfoDatas;
+	
+	TArray<class UJSCard> ActivatedCards;
+	TArray<UJSCard> HoldingCards;
 
 	void OnCheckEventQueue();
 	void CheckSynergy();

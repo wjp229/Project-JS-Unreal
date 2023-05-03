@@ -25,14 +25,19 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	}
 }
 
-void UJSCardFactory::SpawnCardActorOnShop()
+TArray<UJSCard> UJSCardFactory::SpawnCardActorOnShop()
 {
+	TArray<UJSCard> Cards;
+	
 	for (int ix = 0; ix < 4; ix++)
 	{
 		int32 TargetNum = FMath::RandRange(0, CardInfoDatasOnShop.Num()-1);
 
-		Cast<UJSCard>(SpawnCardActor(TargetNum));
+		UJSCard* NewCard = Cast<UJSCard>(SpawnCardActor(TargetNum));
+		Cards.Add(*NewCard);
 	}
+
+	return Cards;
 }
 
 UObject* UJSCardFactory::SpawnCardActor(int CardNum)

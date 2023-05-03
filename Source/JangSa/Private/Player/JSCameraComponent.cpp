@@ -2,8 +2,6 @@
 
 
 #include "Player/JSCameraComponent.h"
-#include "Pawns/JSSpectatorPawn.h"
-#include "UObject/ConstructorHelpers.h"
 
 
 UJSCameraComponent::UJSCameraComponent(const FObjectInitializer& ObjectInitializer)
@@ -13,7 +11,7 @@ UJSCameraComponent::UJSCameraComponent(const FObjectInitializer& ObjectInitializ
 
 	UCameraComponent::SetFieldOfView(InitFOV);
 
-	FVector InitLocation = FVector(375.0f, 420.0f, 143.0f);
+	FVector InitLocation = FVector(375.0f, 440.0f, 143.0f);
 	FRotator InitRotation = FRotator(-15.0f, 180.0f, 0.0f);
 	SetRelativeLocation(InitLocation);
 	SetRelativeRotation(InitRotation);

@@ -2,14 +2,10 @@
 
 
 #include "JSGameState.h"
-
 #include "JSCardFactory.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Data/CardInfoRowBase.h"
-#include "Data/TurnInfoRowBase.h"
 #include "Engine/DataTable.h"
 #include "Card/JSCard.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Manager/JSRenderManager.h"
 
 AJSGameState::AJSGameState()
@@ -101,7 +97,9 @@ void AJSGameState::OnResetShop()
 	// Reset Shop
 	UE_LOG(LogTemp, Log, TEXT("Reset Shop..."));
 
-	CardActorFactory->SpawnCardActorOnShop();
+	TArray<UJSCard> NewCardsOnShop = CardActorFactory->SpawnCardActorOnShop();
+
+	// Spawn Button Dynamically Here
 	
 	OnEnterUserControlTurn();
 }

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Data/CardInfoRowBase.h"
-#include "Interfaces/JSCardRenderInterface.h"
 #include "JSTypes.h"
 #include "UObject/NoExportTypes.h"
 #include "JSRenderManager.generated.h"
@@ -27,5 +26,5 @@ public:
 
 private:
 	UPROPERTY()
-	TMap<int32, TObjectPtr<IJSCardRenderInterface>> CardRenders;
+	TMap<int32, TObjectPtr<class IJSCardRenderInterface>> CardRenders;
 };

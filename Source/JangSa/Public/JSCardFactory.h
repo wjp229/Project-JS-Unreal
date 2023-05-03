@@ -17,7 +17,7 @@ class JANGSA_API UJSCardFactory : public UObject
 public:
 	UJSCardFactory(const FObjectInitializer& ObjectInitializer);
 
-	void SpawnCardActorOnShop();
+	TArray<class UJSCard> SpawnCardActorOnShop();
 
 	UFUNCTION()
 	UObject* SpawnCardActor(int CardNum);

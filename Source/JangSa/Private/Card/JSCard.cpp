@@ -5,7 +5,6 @@
 #include "JSGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Manager/JSRenderManager.h"
-#include "UObject/ConstructorHelpers.h"
 
 UJSCard::UJSCard()
 {
