@@ -66,20 +66,19 @@ public:
 private:
 	// Data includes Current Carats, Stages and State about Turn
 	FPlayerData* PlayerData;
-
 	EGamePlayState GamePlayState;
 
 	UPROPERTY()
-	TObjectPtr<class UJSCardFactory> CardActorFactory;
+	TArray<TObjectPtr<class UJSCard>> HoldingCards;
 
 	UPROPERTY()
-	TObjectPtr<class UJSRenderManager> RenderManager;
+	TArray<TObjectPtr<UJSCard>> ActivatedCards;
+	
+	UPROPERTY()
+	TObjectPtr<class UJSCardFactory> CardActorFactory;
 	
 	// DataTable About Turn
 	TArray<struct FTurnInfoData*> TurnInfoDatas;
-	
-	TArray<class UJSCard> ActivatedCards;
-	TArray<UJSCard> HoldingCards;
 
 	void OnCheckEventQueue();
 	void CheckSynergy();

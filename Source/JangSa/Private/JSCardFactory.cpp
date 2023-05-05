@@ -25,19 +25,22 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	}
 }
 
-TArray<UJSCard> UJSCardFactory::SpawnCardActorOnShop()
+TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
 {
-	TArray<UJSCard> Cards;
+	TempCardInfoDatas.Empty();
 	
 	for (int ix = 0; ix < 4; ix++)
 	{
 		int32 TargetNum = FMath::RandRange(0, CardInfoDatasOnShop.Num()-1);
+		
+		// UJSCard* NewCard = Cast<UJSCard>(SpawnCardActor(TargetNum));
 
-		UJSCard* NewCard = Cast<UJSCard>(SpawnCardActor(TargetNum));
-		Cards.Add(*NewCard);
+		FCardInfoData* InCardInfoData(SpawnCardData(TargetNum));
+		
+		TempCardInfoDatas.Emplace(InCardInfoData);
 	}
 
-	return Cards;
+	return TempCardInfoDatas;
 }
 
 UObject* UJSCardFactory::SpawnCardActor(int CardNum)
@@ -47,4 +50,15 @@ UObject* UJSCardFactory::SpawnCardActor(int CardNum)
 	Cast<UJSCard>(SpawnedCard)->InitCard(*CardInfoDatas[CardNum], 0);
 
 	return SpawnedCard;
+}
+
+FCardInfoData* UJSCardFactory::SpawnCardData(int CardNum, bool IsRandom)
+{
+	int32 TargetNum = CardNum;
+	if(IsRandom)
+	{
+		TargetNum = FMath::RandRange(0, CardInfoDatasOnShop.Num()-1);
+	}
+
+	return CardInfoDatas[TargetNum];
 }

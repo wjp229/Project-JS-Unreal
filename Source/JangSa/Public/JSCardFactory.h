@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/CardInfoRowBase.h"
 #include "UObject/NoExportTypes.h"
 #include "JSCardFactory.generated.h"
 
@@ -14,15 +15,20 @@ class JANGSA_API UJSCardFactory : public UObject
 {
 	GENERATED_BODY()
 
+
+	
 public:
 	UJSCardFactory(const FObjectInitializer& ObjectInitializer);
 
-	TArray<class UJSCard> SpawnCardActorOnShop();
+	TArray<struct FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop();
 
 	UFUNCTION()
 	UObject* SpawnCardActor(int CardNum);
+	FCardInfoData* SpawnCardData(int CardNum, bool IsRandom = false);
 
 private:
-	TArray<struct FCardInfoData*> CardInfoDatas;
+	TArray<FCardInfoData*> CardInfoDatas;
 	TArray<FCardInfoData*> CardInfoDatasOnShop;
+
+	TArray<FCardInfoData*> TempCardInfoDatas;
 };

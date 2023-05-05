@@ -16,4 +16,16 @@ class JANGSA_API AJSHUD : public AHUD
 
 public:
 	AJSHUD();
+
+	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo);
+	
+private:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UJSShopWidget> JSShopWidget;
+
+	
+protected:
+	virtual void BeginPlay() override;
+	virtual void DrawHUD() override;
+	
 };
