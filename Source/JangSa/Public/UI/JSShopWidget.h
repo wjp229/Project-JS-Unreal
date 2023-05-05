@@ -27,7 +27,4 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Card)
 	TArray<FCardInfoData> ShopCards;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Card)
-	TArray<FString> CardNames;
 };
