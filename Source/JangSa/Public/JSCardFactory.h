@@ -26,6 +26,8 @@ public:
 	UObject* SpawnCardActor(int CardNum);
 	FCardInfoData* SpawnCardData(int CardNum, bool IsRandom = false);
 
+	const int32 CheckCardPrice(const int CardNum);
+
 private:
 	TArray<FCardInfoData*> CardInfoDatas;
 	TArray<FCardInfoData*> CardInfoDatasOnShop;

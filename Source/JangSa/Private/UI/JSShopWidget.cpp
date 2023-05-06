@@ -3,6 +3,7 @@
 
 #include "UI/JSShopWidget.h"
 
+#include "JSGameState.h"
 #include "Data/CardInfoRowBase.h"
 
 void UJSShopWidget::InitShop(TArray<FCardInfoData*> InShopCards)
@@ -18,10 +19,16 @@ void UJSShopWidget::InitShop(TArray<FCardInfoData*> InShopCards)
 	InitCardInfoInShop();
 }
 
-void UJSShopWidget::InitCardInfoInShop_Implementation()
+void UJSShopWidget::ClickPurchaseCardButton(int32 InButtonNum)
 {
+	AJSGameState* JSGameState = Cast<AJSGameState>(GetWorld()->GetGameState());
+	if(JSGameState != nullptr)
+	{
+		// Logic about Purchase
+		JSGameState->PurchaseCard(ShopCards[InButtonNum].Id);
+	}
 }
 
-void UJSShopWidget::ClickPurchaseCardButton()
+void UJSShopWidget::InitCardInfoInShop_Implementation()
 {
 }

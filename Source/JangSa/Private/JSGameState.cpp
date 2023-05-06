@@ -79,6 +79,28 @@ void AJSGameState::SetNextPhase()
 {
 }
 
+bool AJSGameState::PurchaseCard(int32 InCardNum)
+{
+	UE_LOG(LogTemp, Log, TEXT("Purchased!!"));
+
+	int32 CardPrice = CardActorFactory->CheckCardPrice(InCardNum);
+
+	// To Do : if(GetPlayerData()->CurrentCarat >= CardPrice);
+	if(CardPrice > 0)
+	{
+		// To Do : Pay Owning Carat
+
+
+		CardActorFactory->SpawnCardActor(InCardNum);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void AJSGameState::OnCheckEventQueue()
 {
 }

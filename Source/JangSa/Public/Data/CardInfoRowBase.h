@@ -24,6 +24,9 @@ struct FCardInfoData : public FTableRowBase
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
+	int32 Id;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
 	FString Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")

@@ -28,15 +28,18 @@ enum class ECardRenderState
 	Stone
 };
 
+USTRUCT()
 struct FPlayerData
 {
+	GENERATED_BODY()
+
 	int32 CurrentStage;
 
 	int32 RemainTurn;
 
 	int32 PayTurn;
 
-	int32 CurrentOwnedCarat;
+	int32 CurrentCarat;
 
 	int32 PayCarat;
 };

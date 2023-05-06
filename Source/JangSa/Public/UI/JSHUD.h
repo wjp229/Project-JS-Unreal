@@ -21,6 +21,9 @@ public:
 	
 private:
 	UPROPERTY(EditAnywhere)
+	TObjectPtr<UUserWidget> MainHUDWidget;
+	
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSShopWidget> JSShopWidget;
 
 	

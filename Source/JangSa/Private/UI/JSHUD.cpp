@@ -8,6 +8,12 @@
 
 AJSHUD::AJSHUD()
 {
+	const ConstructorHelpers::FClassFinder<UUserWidget> HUDWidgetRef(TEXT("/Game/UI/HUD.HUD_C"));
+	if(HUDWidgetRef.Class != nullptr)
+	{
+		MainHUDWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetRef.Class);
+	}
+	
 	const ConstructorHelpers::FClassFinder<UJSShopWidget> ShopWidgetRef(TEXT("/Game/UI/BP_JSShop.BP_JSShop_C"));
 	if(ShopWidgetRef.Class != nullptr)
 	{
@@ -24,6 +30,7 @@ void AJSHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
+	MainHUDWidget->AddToViewport();
 	JSShopWidget->AddToViewport();
 }
 

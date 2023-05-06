@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
 #include "JSTypes.h"
+#include "Data/CardInfoRowBase.h"
 #include "JSGameState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateCardEffect, int32, num);
@@ -31,15 +32,21 @@ public:
 
 #pragma region SettleCaratDelegate
 	// Process in Activating Turn
+	UPROPERTY(BlueprintAssignable)
 	FActivateCardEffect NotifyActivateCardEffect;
+	UPROPERTY(BlueprintAssignable)
 	FAddRemainCardTurn NotifyAddRemainCardTurn;
+	UPROPERTY(BlueprintAssignable)
 	FDestroyCard NotifyDestroyCard;
 #pragma endregion
 
 	// Delegate로 안해도 될듯
 #pragma region NotifyTurnEvent
+	UPROPERTY(BlueprintAssignable)
 	FNotifyRemainTurn NotifyRemainTurn;
+	UPROPERTY(BlueprintAssignable)
 	FNotifyPayTurn NotifyPayTurn;
+	UPROPERTY(BlueprintAssignable)
 	FNotifyPayCarat NotifyPayCarat;
 #pragma endregion
 
@@ -52,7 +59,6 @@ public:
 		GetPlayerData()->PayTurn = InPayTurn;
 		NotifyRemainTurn.Broadcast(InPayTurn);
 	}
-
 	FORCEINLINE void SetPayCarat(const int32 InPayCarat)
 	{
 		GetPlayerData()->PayCarat = InPayCarat;
@@ -62,6 +68,8 @@ public:
 	// Deprecated
 	void SetNextTurn();
 	void SetNextPhase();
+
+	bool PurchaseCard(int32 InCardNum);
 
 private:
 	// Data includes Current Carats, Stages and State about Turn

@@ -21,8 +21,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void InitCardInfoInShop();
 	
-	UFUNCTION()
-	void ClickPurchaseCardButton();
+	UFUNCTION(BlueprintCallable)
+	void ClickPurchaseCardButton(int32 InButtonNum);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Card)
