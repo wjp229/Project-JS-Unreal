@@ -23,12 +23,12 @@ void AJSGameMode::StartGame()
 	
 	if(JSGameState != nullptr)
 	{
-		JSGameState->DprGameStart();
-		
 		AJSHUD* JSHud = Cast<AJSHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
 		if(JSHud != nullptr)
 		{
 			JSHud->DrawMainHUD();
 		}
+
+		JSGameState->DprGameStart();
 	}
 }

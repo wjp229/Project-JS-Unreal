@@ -71,7 +71,7 @@ void AJSGameState::DprGameStart()
 {
 	UE_LOG(LogTemp, Log, TEXT("======================================="));
 
-	//RefreshPlayerInfo();
+	RefreshPlayerInfo();
 
 	OnEnterStartTurn();
 }
@@ -107,7 +107,6 @@ void AJSGameState::OnEnterStartTurn()
 	OnCheckEventQueue();
 }
 
-
 void AJSGameState::OnCheckEventQueue()
 {
 	OnResetShop();
@@ -132,11 +131,11 @@ void AJSGameState::OnResetShop(bool bIsInitTurn)
 	
 }
 
-void AJSGameState::RefreshPlayerInfo()
+void AJSGameState::RefreshPlayerInfo() const
 {
 	NotifyPayCarat.Broadcast(GetPlayerData()->PayCarat);
 	NotifyPayTurn.Broadcast(GetPlayerData()->PayTurn);
-	NotifyCurrentCarat.Broadcast(GetPlayerData()->CurrentCarat);
+	NotifyCurrentCarat.Broadcast(0);
 	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
 }
 

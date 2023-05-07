@@ -82,8 +82,7 @@ public:
 
 	bool PurchaseCard(int32 InCardNum);
 	void OnResetShop(bool bIsInitTurn = true);
-
-	void RefreshPlayerInfo();
+	void RefreshPlayerInfo() const;
 
 	UFUNCTION(BlueprintCallable)
 	void OnExitTurn();
