@@ -42,11 +42,11 @@ TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
 	return TempCardInfoDatas;
 }
 
-UObject* UJSCardFactory::SpawnCardActor(int CardNum)
+AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 {
-	UObject* SpawnedCard = NewObject<UJSCard>(GetWorld(), UJSCard::StaticClass(), FName(TEXT("CardObj")));
+	AActor* SpawnedCard = GetWorld()->SpawnActor(AJSCard::StaticClass(), InLocation);
 	
-	Cast<UJSCard>(SpawnedCard)->InitCard(*CardInfoDatas[CardNum], 0);
+	Cast<AJSCard>(SpawnedCard)->InitCard(*CardInfoDatas[CardNum], 0);
 
 	return SpawnedCard;
 }

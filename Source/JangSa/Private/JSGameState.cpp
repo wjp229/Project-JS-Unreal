@@ -48,14 +48,14 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 		}
 
 		SetPayTurn(TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn);
-		GetPlayerData()->PayCarat = TurnInfoDatas[GetPlayerData()->CurrentStage]->PayCarat;
-
+		SetPayCarat(TurnInfoDatas[GetPlayerData()->CurrentStage]->PayCarat);
 		GetPlayerData()->RemainTurn = TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn;
 
 		return;
 	}
 
 	GetPlayerData()->RemainTurn = InRemainTurn;
+	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
 }
 
 void AJSGameState::PostInitializeComponents()
@@ -63,14 +63,15 @@ void AJSGameState::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	UE_LOG(LogTemp, Log, TEXT("Total Turn Info : %d"), TurnInfoDatas.Num());
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Cyan, FString::FromInt(233));
 
 	CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), UJSCardFactory::StaticClass());
 }
 
-void AJSGameState::SetNextTurn()
+void AJSGameState::DprGameStart()
 {
 	UE_LOG(LogTemp, Log, TEXT("======================================="));
+
+	//RefreshPlayerInfo();
 
 	OnEnterStartTurn();
 }
@@ -86,12 +87,12 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 	int32 CardPrice = CardActorFactory->CheckCardPrice(InCardNum);
 
 	// To Do : if(GetPlayerData()->CurrentCarat >= CardPrice);
-	if(CardPrice > 0)
+	if (CardPrice > 0)
 	{
 		// To Do : Pay Owning Carat
+		FVector SpawnLocation(280.0f, 410.0f, 102.3f);
 
-
-		CardActorFactory->SpawnCardActor(InCardNum);
+		CardActorFactory->SpawnCardActor(InCardNum, &SpawnLocation);
 
 		return true;
 	}
@@ -101,19 +102,26 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 	}
 }
 
-void AJSGameState::OnCheckEventQueue()
+void AJSGameState::OnEnterStartTurn()
 {
+	OnCheckEventQueue();
 }
 
 
-void AJSGameState::OnEnterStartTurn()
+void AJSGameState::OnCheckEventQueue()
 {
 	OnResetShop();
 }
 
-
-void AJSGameState::OnResetShop()
+void AJSGameState::OnResetShop(bool bIsInitTurn)
 {
+	if (!bIsInitTurn)
+	{
+		// To do : Check to pay
+
+		//return;
+	}
+
 	// Reset Shop
 	UE_LOG(LogTemp, Log, TEXT("Reset Shop..."));
 
@@ -121,15 +129,17 @@ void AJSGameState::OnResetShop()
 
 	AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	JSHud->InitializeShop(CardInfoDatas);
-
-	OnEnterUserControlTurn();
+	
 }
 
-void AJSGameState::OnEnterUserControlTurn()
+void AJSGameState::RefreshPlayerInfo()
 {
-	// Keep phase state until TurnEnd button clicked
-	OnExitTurn();
+	NotifyPayCarat.Broadcast(GetPlayerData()->PayCarat);
+	NotifyPayTurn.Broadcast(GetPlayerData()->PayTurn);
+	NotifyCurrentCarat.Broadcast(GetPlayerData()->CurrentCarat);
+	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
 }
+
 
 void AJSGameState::OnExitTurn()
 {
@@ -138,8 +148,6 @@ void AJSGameState::OnExitTurn()
 
 void AJSGameState::OnEnterSettleCarat()
 {
-	CheckSynergy();
-
 	// Activate Each Card Effects
 	NotifyActivateCardEffect.Broadcast(0);
 
@@ -151,9 +159,5 @@ void AJSGameState::OnEnterSettleCarat()
 	// If Each Card's remain turn come to zero, Destroy
 	NotifyDestroyCard.Broadcast();
 
-	//OnEnterStartTurn();
-}
-
-void AJSGameState::CheckSynergy()
-{
+	OnEnterStartTurn();
 }

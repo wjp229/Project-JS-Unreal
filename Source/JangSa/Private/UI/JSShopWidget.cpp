@@ -19,6 +19,16 @@ void UJSShopWidget::InitShop(TArray<FCardInfoData*> InShopCards)
 	InitCardInfoInShop();
 }
 
+void UJSShopWidget::RerollShop()
+{
+	AJSGameState* JSGameState = Cast<AJSGameState>(GetWorld()->GetGameState());
+	if(JSGameState != nullptr)
+	{
+		// Logic about Purchase
+		JSGameState->OnResetShop(false);
+	}
+}
+
 void UJSShopWidget::ClickPurchaseCardButton(int32 InButtonNum)
 {
 	AJSGameState* JSGameState = Cast<AJSGameState>(GetWorld()->GetGameState());

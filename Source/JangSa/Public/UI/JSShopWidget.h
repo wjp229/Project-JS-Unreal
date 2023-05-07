@@ -20,11 +20,14 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void InitCardInfoInShop();
-	
-	UFUNCTION(BlueprintCallable)
-	void ClickPurchaseCardButton(int32 InButtonNum);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Card)
 	TArray<FCardInfoData> ShopCards;
+	
+	UFUNCTION(BlueprintCallable)
+	void RerollShop();
+
+	UFUNCTION(BlueprintCallable)
+	void ClickPurchaseCardButton(int32 InButtonNum);
 };

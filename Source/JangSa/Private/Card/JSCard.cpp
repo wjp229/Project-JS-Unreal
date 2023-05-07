@@ -5,18 +5,29 @@
 #include "JSGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Manager/JSRenderManager.h"
+#include "UObject/ConstructorHelpers.h"
 
-UJSCard::UJSCard()
+AJSCard::AJSCard()
 {
-	CardRenderState = ECardRenderState::Stone;
+	KeycapMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("KeycapMesh"));
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> KeycapMeshRef(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+	if(KeycapMeshRef.Succeeded())
+	{
+		KeycapMesh->SetStaticMesh(KeycapMeshRef.Object);
+	}
+
+	RootComponent = KeycapMesh;
+	KeycapMesh->SetRelativeScale3D(FVector(.05f, .05f, .05f));
+	KeycapMesh->SetSimulatePhysics(true);
 }
 
-FCardInfoData UJSCard::GetCardInfo() const
+FCardInfoData AJSCard::GetCardInfo() const
 {
 	return CardData;
 }
 
-void UJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID)
+void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID)
 {
 	CardData = InCardData;
 	CardObjID = InObjectID;
@@ -25,31 +36,27 @@ void UJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID)
 	AJSGameState* NewGameState = Cast<AJSGameState>(GetWorld()->GetGameState());
 	if (nullptr != NewGameState)
 	{
-		NewGameState->NotifyActivateCardEffect.AddDynamic(this, &UJSCard::OnActivateCardEffect);
-		NewGameState->NotifyDestroyCard.AddDynamic(this, &UJSCard::OnDestroyCard);
-		NewGameState->NotifyAddRemainCardTurn.AddDynamic(this, &UJSCard::AddRemainTurn);
+		NewGameState->NotifyActivateCardEffect.AddDynamic(this, &AJSCard::OnActivateCardEffect);
+		NewGameState->NotifyDestroyCard.AddDynamic(this, &AJSCard::OnDestroyCard);
+		NewGameState->NotifyAddRemainCardTurn.AddDynamic(this, &AJSCard::AddRemainTurn);
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("Card %s has Created!!"), *CardData.Name);
 
-	// Init Card Renderers
-	// UJSRenderManager* RenderManager = UJSRenderManager::GetInstance();
-	// RenderManager->SpawnCardRenderer(CardObjID, CardRenderState, CardData);
-	
 }
 
-void UJSCard::OnActivateCardEffect(int32 InOrder)
+void AJSCard::OnActivateCardEffect_Implementation(int32 InOrder)
 {
 }
 
-void UJSCard::AddRemainTurn(int32 Value)
+void AJSCard::AddRemainTurn(int32 Value)
 {
 	RemainTurn += Value;
 
 	// Set GUI For Remain Turn
 }
 
-void UJSCard::OnDestroyCard()
+void AJSCard::OnDestroyCard()
 {
 	//this->Destroy();
 }

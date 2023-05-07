@@ -8,13 +8,13 @@
 #include "JSCard.generated.h"
 
 UCLASS()
-class JANGSA_API UJSCard : public UObject
+class JANGSA_API AJSCard : public AActor
 {
 	GENERATED_BODY()
 	
 public:
 	// Sets default values for this actor's properties
-	UJSCard();
+	AJSCard();
 
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID);
@@ -22,17 +22,17 @@ public:
 protected:
 	int CardNum;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category=CardInfo)
 	FCardInfoData CardData;
 	int32 RemainTurn;
 
 	UPROPERTY()
 	int32 CardObjID;
 
-	UPROPERTY()
-	ECardRenderState CardRenderState;
+	UPROPERTY(VisibleAnywhere, Category=CardRender)
+	TObjectPtr<UStaticMeshComponent> KeycapMesh;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintNativeEvent)
 	void OnActivateCardEffect(int32 InOrder);
 	UFUNCTION()
 	void AddRemainTurn(int32 Value);

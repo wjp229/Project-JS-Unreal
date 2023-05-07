@@ -26,6 +26,6 @@ void AJSPlayerController::OnZKeyPressed()
 
 	if(MyGameState != nullptr)
 	{
-		MyGameState->SetNextTurn();
+		MyGameState->DprGameStart();
 	}
 }

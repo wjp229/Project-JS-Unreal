@@ -18,8 +18,15 @@ public:
 	AJSHUD();
 
 	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo);
+
+	
+	UFUNCTION(BlueprintCallable)
+	void DrawMainHUD();
 	
 private:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UUserWidget> StartMenuWidget;
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UUserWidget> MainHUDWidget;
 	
@@ -28,6 +35,7 @@ private:
 
 	
 protected:
+	
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;
 	

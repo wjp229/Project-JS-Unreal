@@ -8,14 +8,21 @@
 
 AJSHUD::AJSHUD()
 {
+	const ConstructorHelpers::FClassFinder<UUserWidget> StartWidgetRef(TEXT("/Game/UI/StartMenu.StartMenu_C"));
+	if (StartWidgetRef.Class != nullptr)
+	{
+		StartMenuWidget = CreateWidget<UUserWidget>(GetWorld(), StartWidgetRef.Class);
+	}
+
+
 	const ConstructorHelpers::FClassFinder<UUserWidget> HUDWidgetRef(TEXT("/Game/UI/HUD.HUD_C"));
-	if(HUDWidgetRef.Class != nullptr)
+	if (HUDWidgetRef.Class != nullptr)
 	{
 		MainHUDWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetRef.Class);
 	}
-	
+
 	const ConstructorHelpers::FClassFinder<UJSShopWidget> ShopWidgetRef(TEXT("/Game/UI/BP_JSShop.BP_JSShop_C"));
-	if(ShopWidgetRef.Class != nullptr)
+	if (ShopWidgetRef.Class != nullptr)
 	{
 		JSShopWidget = CreateWidget<UJSShopWidget>(GetWorld(), ShopWidgetRef.Class);
 	}
@@ -23,15 +30,24 @@ AJSHUD::AJSHUD()
 
 void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo)
 {
+	if (!JSShopWidget->IsInViewport())
+		JSShopWidget->AddToViewport();
+
 	JSShopWidget->InitShop(InCardInfo);
+}
+
+void AJSHUD::DrawMainHUD()
+{
+	UE_LOG(LogTemp,Log, TEXT("MainHUD has  created!!"));
+	
+	MainHUDWidget->AddToViewport();
 }
 
 void AJSHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MainHUDWidget->AddToViewport();
-	JSShopWidget->AddToViewport();
+	StartMenuWidget->AddToViewport();
 }
 
 void AJSHUD::DrawHUD()

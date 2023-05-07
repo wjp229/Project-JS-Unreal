@@ -16,6 +16,9 @@ class JANGSA_API AJSGameMode : public AGameMode
 
 public:
 	AJSGameMode();
+
+	UFUNCTION(BlueprintCallable)
+	void StartGame();
 	
 private:
 };

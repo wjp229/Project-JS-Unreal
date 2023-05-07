@@ -21,9 +21,9 @@ public:
 	UJSCardFactory(const FObjectInitializer& ObjectInitializer);
 
 	TArray<struct FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop();
-
-	UFUNCTION()
-	UObject* SpawnCardActor(int CardNum);
+	
+	AActor* SpawnCardActor(int CardNum, FVector const* InLocation = 0);
+	
 	FCardInfoData* SpawnCardData(int CardNum, bool IsRandom = false);
 
 	const int32 CheckCardPrice(const int CardNum);
