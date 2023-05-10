@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Data/CardInfoRowBase.h"
-#include "JSTypes.h"
+#include "Interfaces/CardEffectInterface.h"
 #include "JSCard.generated.h"
 
 UCLASS()
-class JANGSA_API AJSCard : public AActor
+class JANGSA_API AJSCard : public AActor, public ICardEffectInterface
 {
 	GENERATED_BODY()
 	
@@ -17,8 +17,12 @@ public:
 	AJSCard();
 
 	FCardInfoData GetCardInfo() const;
-	void InitCard(const FCardInfoData& InCardData, int32 InObjectID);
+	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardEffectComponent* InEffectComponent);
 
+	virtual void OnActivateCardEffect(int32 InOrder) override;
+
+	//void SetEffectComponent()
+	
 protected:
 	int CardNum;
 
@@ -32,8 +36,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category=CardRender)
 	TObjectPtr<UStaticMeshComponent> KeycapMesh;
 
-	UFUNCTION(BlueprintNativeEvent)
-	void OnActivateCardEffect(int32 InOrder);
+	UPROPERTY(VisibleAnywhere, Category=Effect)
+	TObjectPtr<UJSCardEffectComponent> EffectComponent;
+
 	UFUNCTION()
 	void AddRemainTurn(int32 Value);
 	UFUNCTION()

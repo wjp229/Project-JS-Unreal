@@ -2,7 +2,9 @@
 
 
 #include "JSCardFactory.h"
+#include "JSCardEffectComponent.h"
 #include "Card/JSCard.h"
+#include "UnrealEd/Private/Toolkits/SStandaloneAssetEditorToolkitHost.h"
 #include "UObject/ConstructorHelpers.h"
 
 UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
@@ -15,13 +17,46 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 		DT_CardDataInfo.Object->GetAllRows<FCardInfoData>(TEXT("GetAllRows"), CardInfoDatas);
 	}
 	
-	for (int i = 0; i < CardInfoDatas.Num(); i++)
+	for (int32 i = 0; i < CardInfoDatas.Num(); i++)
 	{
 		CardInfoDatas[i]->Id = i;
 		
 		if (CardInfoDatas[i]->ShowOnShop == 1)
 		{
 			CardInfoDatasOnShop.Add(CardInfoDatas[i]);
+		}
+	}
+
+	for(int32 i = 0; i < 2/*CardInfoDatas.Num()*/; i++)
+	{
+		FString PreTargetAddress = TEXT("/Game/Card/CE_JSCard_");
+		FString ProTargetAddress = TEXT(".CE_JSCard_");
+
+		FString TargetAddress;
+		TargetAddress.Append(PreTargetAddress);
+		TargetAddress.Append(FString::FromInt(i));
+		TargetAddress.Append(ProTargetAddress);
+		TargetAddress.Append(FString::FromInt(i));
+		TargetAddress.Append(TEXT("_C"));
+
+		const ConstructorHelpers::FClassFinder<UJSCardEffectComponent> CardEffectRef(*TargetAddress);
+		if(nullptr != CardEffectRef.Class)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Load Succeed!!"));
+
+			TSubclassOf<UJSCardEffectComponent> Effect = CardEffectRef.Class;
+			
+			if(nullptr != Effect)
+			{
+				EffectComponents.Emplace(Effect);
+
+				UE_LOG(LogTemp, Log, TEXT("Casting Succeed!!"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("Casting Failed!!"));
+
+			}
 		}
 	}
 }
@@ -45,9 +80,16 @@ TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
 AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 {
 	AActor* SpawnedCard = GetWorld()->SpawnActor(AJSCard::StaticClass(), InLocation);
+	AJSCard* JSSpawnedCard = Cast<AJSCard>(SpawnedCard);
 	
-	Cast<AJSCard>(SpawnedCard)->InitCard(*CardInfoDatas[CardNum], 0);
-
+	if(nullptr != JSSpawnedCard)// || CardNum > EffectComponents.Num())
+	{
+		UE_LOG(LogTemp, Log, TEXT("%d"), EffectComponents.Num());
+		UJSCardEffectComponent* EffectComponent = NewObject<UJSCardEffectComponent>(JSSpawnedCard, EffectComponents[0]);
+		
+		JSSpawnedCard->InitCard(*CardInfoDatas[CardNum], 0, EffectComponent);
+	}
+	
 	return SpawnedCard;
 }
 

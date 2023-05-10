@@ -2,6 +2,8 @@
 
 
 #include "Card/JSCard.h"
+
+#include "JSCardEffectComponent.h"
 #include "JSGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Manager/JSRenderManager.h"
@@ -27,7 +29,7 @@ FCardInfoData AJSCard::GetCardInfo() const
 	return CardData;
 }
 
-void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID)
+void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCardEffectComponent* InEffectComponent)
 {
 	CardData = InCardData;
 	CardObjID = InObjectID;
@@ -41,13 +43,21 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID)
 		NewGameState->NotifyAddRemainCardTurn.AddDynamic(this, &AJSCard::AddRemainTurn);
 	}
 
+	EffectComponent = InEffectComponent;
+	EffectComponent->RegisterComponent();
+	
 	UE_LOG(LogTemp, Log, TEXT("Card %s has Created!!"), *CardData.Name);
 
 }
 
-void AJSCard::OnActivateCardEffect_Implementation(int32 InOrder)
+void AJSCard::OnActivateCardEffect(int32 InOrder)
 {
+	if(EffectComponent != nullptr)
+	{
+		EffectComponent->OnActivateEffect();
+	}
 }
+
 
 void AJSCard::AddRemainTurn(int32 Value)
 {

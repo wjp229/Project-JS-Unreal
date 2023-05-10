@@ -127,8 +127,10 @@ void AJSGameState::OnResetShop(bool bIsInitTurn)
 	TArray<FCardInfoData*> CardInfoDatas = CardActorFactory->SpawnCardActorOnShop();
 
 	AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	JSHud->InitializeShop(CardInfoDatas);
-	
+	if(nullptr != JSHud)
+	{
+		JSHud->InitializeShop(CardInfoDatas);
+	}
 }
 
 void AJSGameState::RefreshPlayerInfo() const

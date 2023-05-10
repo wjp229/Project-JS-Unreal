@@ -31,6 +31,7 @@ public:
 private:
 	TArray<FCardInfoData*> CardInfoDatas;
 	TArray<FCardInfoData*> CardInfoDatasOnShop;
+	TArray<TSubclassOf<class UJSCardEffectComponent>> EffectComponents;
 
 	TArray<FCardInfoData*> TempCardInfoDatas;
 };

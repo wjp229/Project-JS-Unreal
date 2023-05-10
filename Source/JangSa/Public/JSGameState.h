@@ -55,21 +55,30 @@ public:
 
 	FORCEINLINE FPlayerData* GetPlayerData() const { return PlayerData; }
 
+	UFUNCTION(BlueprintCallable)
 	void SetRemainTurn(const int32 InRemainTurn);
+
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void AddRemainTurn(const int32 Value)
 	{
 		SetRemainTurn(GetPlayerData()->RemainTurn + Value);
 	}
+
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetPayTurn(const int32 InPayTurn)
 	{
 		GetPlayerData()->PayTurn = InPayTurn;
 		NotifyPayTurn.Broadcast(InPayTurn);
 	}
+
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetPayCarat(const int32 InPayCarat)
 	{
 		GetPlayerData()->PayCarat = InPayCarat;
 		NotifyPayCarat.Broadcast(InPayCarat);
 	}
+
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void AddCurrentCarat(const int32 Value)
 	{
 		GetPlayerData()->CurrentCarat += Value;
