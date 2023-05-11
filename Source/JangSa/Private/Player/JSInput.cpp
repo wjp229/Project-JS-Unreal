@@ -3,7 +3,10 @@
 
 #include "Player/JSInput.h"
 
+#include "UObject/ConstructorHelpers.h"
+
 UJSInput::UJSInput(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer)
 {
+	
 }

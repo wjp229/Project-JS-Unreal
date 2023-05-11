@@ -20,10 +20,13 @@ public:
 protected:
 	UPROPERTY()
 	class UJSInput* InputHandler;
-	
-	//Deprecated
-	void OnZKeyPressed();
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TSoftObjectPtr<class UInputMappingContext> InputMapping;
 	
 public:
 	virtual void SetupInputComponent() override;
+
+	void OnTapPressed(const FVector2D& ScreenPosition, float DownTime);
+	AActor* GetHitActor(const FVector2d& ScreenPosition);
 };

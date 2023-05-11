@@ -43,3 +43,6 @@ struct FPlayerData
 
 	int32 PayCarat;
 };
+
+const FString BP_CardEffectPrefixPath = TEXT("/Game/Card/CardEffect/CE_JSCard_");
+const FString BP_CardEffectSuffixPath = TEXT(".CE_JSCard_");

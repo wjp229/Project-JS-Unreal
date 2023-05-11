@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "Data/CardInfoRowBase.h"
 #include "Interfaces/CardEffectInterface.h"
+#include "Interfaces/JSInputInterface.h"
 #include "JSCard.generated.h"
 
 UCLASS()
-class JANGSA_API AJSCard : public AActor, public ICardEffectInterface
+class JANGSA_API AJSCard : public AActor, public IJSCardEffectInterface, public IJSInputInterface
 {
 	GENERATED_BODY()
-	
+
 public:
 	// Sets default values for this actor's properties
 	AJSCard();
@@ -19,9 +20,7 @@ public:
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardEffectComponent* InEffectComponent);
 
-	virtual void OnActivateCardEffect(int32 InOrder) override;
-
-	//void SetEffectComponent()
+	void OnInputTab_Implementation() override;
 	
 protected:
 	int CardNum;
@@ -43,5 +42,8 @@ protected:
 	void AddRemainTurn(int32 Value);
 	UFUNCTION()
 	void OnDestroyCard();
-	
+
+public:
+	UFUNCTION()
+	virtual void OnActivateCardEffect(int32 InOrder) override;
 };

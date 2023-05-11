@@ -8,7 +8,6 @@
 #include "Engine/DataTable.h"
 #include "Card/JSCard.h"
 #include "Kismet/GameplayStatics.h"
-#include "Manager/JSRenderManager.h"
 #include "UI/JSHUD.h"
 
 AJSGameState::AJSGameState()
@@ -90,16 +89,20 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 	if (CardPrice > 0)
 	{
 		// To Do : Pay Owning Carat
-		FVector SpawnLocation(280.0f, 410.0f, 102.3f);
+		FVector SpawnLocation(265.0f, 400.0f, 93.1f);
 
-		CardActorFactory->SpawnCardActor(InCardNum, &SpawnLocation);
+		AJSCard* NewCardActor = Cast<AJSCard>(CardActorFactory->SpawnCardActor(InCardNum, &SpawnLocation));
 
-		return true;
+		if (NewCardActor != nullptr)
+		{
+			HoldingCards.Emplace(NewCardActor);
+			
+			return true;
+		}
+
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 void AJSGameState::OnEnterStartTurn()
@@ -127,7 +130,7 @@ void AJSGameState::OnResetShop(bool bIsInitTurn)
 	TArray<FCardInfoData*> CardInfoDatas = CardActorFactory->SpawnCardActorOnShop();
 
 	AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	if(nullptr != JSHud)
+	if (nullptr != JSHud)
 	{
 		JSHud->InitializeShop(CardInfoDatas);
 	}
@@ -149,6 +152,8 @@ void AJSGameState::OnExitTurn()
 
 void AJSGameState::OnEnterSettleCarat()
 {
+	UE_LOG(LogTemp, Log, TEXT("Acitvation On Card State"));
+
 	// Activate Each Card Effects
 	NotifyActivateCardEffect.Broadcast(0);
 

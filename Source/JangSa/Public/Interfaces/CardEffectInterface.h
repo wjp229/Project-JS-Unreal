@@ -8,7 +8,7 @@
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UCardEffectInterface : public UInterface
+class UJSCardEffectInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UCardEffectInterface : public UInterface
 /**
  * 
  */
-class JANGSA_API ICardEffectInterface
+class JANGSA_API IJSCardEffectInterface
 {
 	GENERATED_BODY()
 

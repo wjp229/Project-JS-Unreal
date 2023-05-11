@@ -78,6 +78,8 @@ class JANGSA_API UJSInput : public UObject
 	GENERATED_UCLASS_BODY()
 
 public:
+	UJSInput();
+
 	
 	//
 	// /** bindings for custom game events */
@@ -92,6 +94,7 @@ public:
 	
 	
 protected:
+
 	
 	// /** game key states */
 	// TMap<EGameKey, FSimpleKeyState> KeyStateMap;

@@ -4,8 +4,8 @@
 #include "JSCardFactory.h"
 #include "JSCardEffectComponent.h"
 #include "Card/JSCard.h"
-#include "UnrealEd/Private/Toolkits/SStandaloneAssetEditorToolkitHost.h"
 #include "UObject/ConstructorHelpers.h"
+#include "JSTypes.h"
 
 UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -16,21 +16,21 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	{
 		DT_CardDataInfo.Object->GetAllRows<FCardInfoData>(TEXT("GetAllRows"), CardInfoDatas);
 	}
-	
+
 	for (int32 i = 0; i < CardInfoDatas.Num(); i++)
 	{
 		CardInfoDatas[i]->Id = i;
-		
+
 		if (CardInfoDatas[i]->ShowOnShop == 1)
 		{
 			CardInfoDatasOnShop.Add(CardInfoDatas[i]);
 		}
 	}
 
-	for(int32 i = 0; i < 2/*CardInfoDatas.Num()*/; i++)
+	for (int32 i = 0; i < CardInfoDatas.Num()-1; i++)
 	{
-		FString PreTargetAddress = TEXT("/Game/Card/CE_JSCard_");
-		FString ProTargetAddress = TEXT(".CE_JSCard_");
+		FString PreTargetAddress = BP_CardEffectPrefixPath;
+		FString ProTargetAddress = BP_CardEffectSuffixPath;
 
 		FString TargetAddress;
 		TargetAddress.Append(PreTargetAddress);
@@ -40,22 +40,15 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 		TargetAddress.Append(TEXT("_C"));
 
 		const ConstructorHelpers::FClassFinder<UJSCardEffectComponent> CardEffectRef(*TargetAddress);
-		if(nullptr != CardEffectRef.Class)
+		if (nullptr != CardEffectRef.Class)
 		{
 			UE_LOG(LogTemp, Log, TEXT("Load Succeed!!"));
 
 			TSubclassOf<UJSCardEffectComponent> Effect = CardEffectRef.Class;
-			
-			if(nullptr != Effect)
+
+			if (nullptr != Effect)
 			{
 				EffectComponents.Emplace(Effect);
-
-				UE_LOG(LogTemp, Log, TEXT("Casting Succeed!!"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("Casting Failed!!"));
-
 			}
 		}
 	}
@@ -64,13 +57,13 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
 {
 	TempCardInfoDatas.Empty();
-	
+
 	for (int ix = 0; ix < 4; ix++)
 	{
-		int32 TargetNum = FMath::RandRange(0, CardInfoDatasOnShop.Num()-1);
-		
+		int32 TargetNum = FMath::RandRange(0, CardInfoDatasOnShop.Num() - 1);
+
 		FCardInfoData* InCardInfoData(SpawnCardData(TargetNum));
-		
+
 		TempCardInfoDatas.Emplace(InCardInfoData);
 	}
 
@@ -79,32 +72,36 @@ TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
 
 AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 {
+	if(CardNum >= EffectComponents.Num()) return nullptr;
+	
 	AActor* SpawnedCard = GetWorld()->SpawnActor(AJSCard::StaticClass(), InLocation);
 	AJSCard* JSSpawnedCard = Cast<AJSCard>(SpawnedCard);
-	
-	if(nullptr != JSSpawnedCard)// || CardNum > EffectComponents.Num())
+
+	if (nullptr != JSSpawnedCard)
 	{
-		UE_LOG(LogTemp, Log, TEXT("%d"), EffectComponents.Num());
-		UJSCardEffectComponent* EffectComponent = NewObject<UJSCardEffectComponent>(JSSpawnedCard, EffectComponents[0]);
-		
+		UJSCardEffectComponent* EffectComponent = NewObject<UJSCardEffectComponent>(
+			JSSpawnedCard, EffectComponents[CardNum]);
+
 		JSSpawnedCard->InitCard(*CardInfoDatas[CardNum], 0, EffectComponent);
+
+		return SpawnedCard;
 	}
-	
-	return SpawnedCard;
+
+	return nullptr;
 }
 
 FCardInfoData* UJSCardFactory::SpawnCardData(int CardNum, bool IsRandom)
 {
 	int32 TargetNum = CardNum;
-	if(IsRandom)
+	if (IsRandom)
 	{
-		TargetNum = FMath::RandRange(0, CardInfoDatasOnShop.Num()-1);
+		TargetNum = FMath::RandRange(0, CardInfoDatasOnShop.Num() - 1);
 	}
 
 	return CardInfoDatas[TargetNum];
 }
 
-const int32 UJSCardFactory::CheckCardPrice(const int InCardNum) 
+const int32 UJSCardFactory::CheckCardPrice(const int InCardNum)
 {
 	return CardInfoDatas[InCardNum]->Price;
 }
