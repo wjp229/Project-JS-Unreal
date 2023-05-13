@@ -21,6 +21,11 @@ AJSCard::AJSCard()
 	RootComponent = KeycapMesh;
 	KeycapMesh->SetRelativeScale3D(FVector(.05f, .05f, .05f));
 	KeycapMesh->SetSimulatePhysics(true);
+
+	// On Click Actions
+	OnClicked.AddUniqueDynamic(this, &AJSCard::OnInputTab);
+
+
 }
 
 FCardInfoData AJSCard::GetCardInfo() const
@@ -49,9 +54,9 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 
 }
 
-void AJSCard::OnInputTab_Implementation()
+void AJSCard::OnInputTab_Implementation(AActor* Target, FKey ButtonPressed)
 {
-	IJSInputInterface::OnInputTab_Implementation();
+	UE_LOG(LogTemp, Log, TEXT("On Clicked %s"), *GetName());
 }
 
 void AJSCard::OnActivateCardEffect(int32 InOrder)
@@ -61,6 +66,13 @@ void AJSCard::OnActivateCardEffect(int32 InOrder)
 	{
 		EffectComponent->OnActivateEffect();
 	}
+}
+
+void AJSCard::NotifyActorOnClicked(FKey ButtonPressed)
+{
+	Super::NotifyActorOnClicked(ButtonPressed);
+
+	UE_LOG(LogTemp, Log, TEXT("On Clicked %s"), *GetName());
 }
 
 void AJSCard::AddRemainTurn(int32 Value)

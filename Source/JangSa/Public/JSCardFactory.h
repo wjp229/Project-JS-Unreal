@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Card/JSCard.h"
 #include "Data/CardInfoRowBase.h"
 #include "UObject/NoExportTypes.h"
 #include "JSCardFactory.generated.h"
@@ -34,4 +35,6 @@ private:
 	TArray<TSubclassOf<class UJSCardEffectComponent>> EffectComponents;
 
 	TArray<FCardInfoData*> TempCardInfoDatas;
+
+	TSubclassOf<class AJSCard> DEPRECATED_JsCard;
 };

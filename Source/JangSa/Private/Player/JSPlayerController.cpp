@@ -12,8 +12,8 @@ AJSPlayerController::AJSPlayerController(const FObjectInitializer& ObjectInitial
 	: Super(ObjectInitializer)
 {
 	bShowMouseCursor = true;
-
-
+	bEnableClickEvents = true;
+	bEnableTouchEvents = true;
 }
 
 void AJSPlayerController::SetupInputComponent()
@@ -25,12 +25,7 @@ void AJSPlayerController::SetupInputComponent()
 
 void AJSPlayerController::OnTapPressed(const FVector2D& ScreenPosition, float DownTime)
 {
-	AActor* HitActor = GetHitActor(ScreenPosition);
 
-	if (HitActor && HitActor->GetClass()->ImplementsInterface(UJSInputInterface::StaticClass()))
-	{
-		IJSInputInterface::Execute_OnInputTab(HitActor);
-	}
 }
 
 AActor* AJSPlayerController::GetHitActor(const FVector2d& ScreenPosition)

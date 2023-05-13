@@ -20,7 +20,8 @@ public:
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardEffectComponent* InEffectComponent);
 
-	void OnInputTab_Implementation() override;
+	//UFUNCTION(BlueprintNativeEvent)
+	virtual void OnInputTab_Implementation(AActor* Target, FKey ButtonPressed) override;
 	
 protected:
 	int CardNum;
@@ -46,4 +47,6 @@ protected:
 public:
 	UFUNCTION()
 	virtual void OnActivateCardEffect(int32 InOrder) override;
+
+	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
 };

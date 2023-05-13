@@ -52,6 +52,13 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 			}
 		}
 	}
+
+	static ConstructorHelpers::FClassFinder<AJSCard> JsCardRef(TEXT("/Game/Card/BP_JSCard.BP_JSCard_C"));
+	if(JsCardRef.Succeeded())
+	{
+		DEPRECATED_JsCard = JsCardRef.Class;
+	}
+	//DEPRECATED_JsCard
 }
 
 TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
@@ -74,7 +81,7 @@ AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 {
 	if(CardNum >= EffectComponents.Num()) return nullptr;
 	
-	AActor* SpawnedCard = GetWorld()->SpawnActor(AJSCard::StaticClass(), InLocation);
+	AActor* SpawnedCard = GetWorld()->SpawnActor(DEPRECATED_JsCard, InLocation);
 	AJSCard* JSSpawnedCard = Cast<AJSCard>(SpawnedCard);
 
 	if (nullptr != JSSpawnedCard)
