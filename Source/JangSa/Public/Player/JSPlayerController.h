@@ -18,15 +18,26 @@ public:
 	AJSPlayerController(const FObjectInitializer& ObjectInitializer);
 	
 protected:
-	UPROPERTY()
-	class UJSInput* InputHandler;
-
-	UPROPERTY(EditAnywhere, Category="Input")
-	TSoftObjectPtr<class UInputMappingContext> InputMapping;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Action, meta=(AllowPrivateAccess="true"))
+	TObjectPtr<class UJSControlData> ControlData;
 	
-public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Action, meta=(AllowPrivateAccess="true"))
+	TObjectPtr<class UInputAction> ClickAction;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Action, meta=(AllowPrivateAccess="true"))
+	TObjectPtr<class UInputAction> DragAction;
+
+private:
 	virtual void SetupInputComponent() override;
 
-	void OnTapPressed(const FVector2D& ScreenPosition, float DownTime);
-	AActor* GetHitActor(const FVector2d& ScreenPosition);
+	void OnTapPressed();
+	void OnDrag();
+	
+	void GetHitActor(const FVector2d& ScreenPosition);
+	void SetMappingContext() const;
+
+	TObjectPtr<AActor> SelectedObject;
+
+private:
+	FVector2d GetCurrentMousePosition();
 };

@@ -101,15 +101,16 @@ private:
 	FPlayerData* PlayerData;
 	EGamePlayState GamePlayState;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TArray<TObjectPtr<class AJSCard>> HoldingCards;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TArray<TObjectPtr<AJSCard>> ActivatedCards;
 	
 	UPROPERTY()
 	TObjectPtr<class UJSCardFactory> CardActorFactory;
-	
+
+
 	// DataTable About Turn
 	TArray<struct FTurnInfoData*> TurnInfoDatas;
 
@@ -119,5 +120,11 @@ private:
 	// Activate each card's effect, reduce turn, and destory when card's remain turn is zero
 	void OnEnterSettleCarat();
 
+	//Card Selecting Section
 public:
+	UPROPERTY(VisibleAnywhere, Category="Card")
+	TObjectPtr<class AJSCard> SelectedCard;
+	
+private:
+	void SelectCard(AJSCard* InCard);
 };

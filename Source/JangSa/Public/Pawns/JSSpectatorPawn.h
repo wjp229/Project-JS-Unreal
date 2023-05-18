@@ -21,16 +21,7 @@ private:
 	UPROPERTY(Category = CameraActor, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UJSCameraComponent> JsCameraComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Action, meta=(AllowPrivateAccess="true"))
-	TObjectPtr<class UJSControlData> ControlData;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Action, meta=(AllowPrivateAccess="true"))
-	TObjectPtr<class UInputAction> ClickAction;
-
-	
 protected:
 	virtual void BeginPlay() override;
-	void SetMappingContext();
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-	void Test();
+
 };

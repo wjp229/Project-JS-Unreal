@@ -22,10 +22,7 @@ AJSCard::AJSCard()
 	KeycapMesh->SetRelativeScale3D(FVector(.05f, .05f, .05f));
 	KeycapMesh->SetSimulatePhysics(true);
 
-	// On Click Actions
-	OnClicked.AddUniqueDynamic(this, &AJSCard::OnInputTab);
-
-
+	KeycapMesh->BodyInstance.bLockRotation = true;
 }
 
 FCardInfoData AJSCard::GetCardInfo() const
@@ -49,30 +46,26 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 
 	EffectComponent = InEffectComponent;
 	EffectComponent->RegisterComponent();
-	
-	UE_LOG(LogTemp, Log, TEXT("Card %s has Created!!"), *CardData.Name);
-
-}
-
-void AJSCard::OnInputTab_Implementation(AActor* Target, FKey ButtonPressed)
-{
-	UE_LOG(LogTemp, Log, TEXT("On Clicked %s"), *GetName());
 }
 
 void AJSCard::OnActivateCardEffect(int32 InOrder)
 {
-	UE_LOG(LogTemp, Log, TEXT("Acitvation On Card"));
 	if(EffectComponent != nullptr)
 	{
 		EffectComponent->OnActivateEffect();
 	}
 }
 
-void AJSCard::NotifyActorOnClicked(FKey ButtonPressed)
+void AJSCard::OnInputTab()
 {
-	Super::NotifyActorOnClicked(ButtonPressed);
+	UE_LOG(LogTemp, Log, TEXT("%s Card Selected!"), *GetName());
 
-	UE_LOG(LogTemp, Log, TEXT("On Clicked %s"), *GetName());
+	KeycapMesh->BodyInstance.SetEnableGravity(false);
+}
+
+void AJSCard::SetPossessCard(bool isPossessed)
+{
+	bIsSelected = isPossessed;
 }
 
 void AJSCard::AddRemainTurn(int32 Value)

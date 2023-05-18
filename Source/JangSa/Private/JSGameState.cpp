@@ -167,3 +167,14 @@ void AJSGameState::OnEnterSettleCarat()
 
 	OnEnterStartTurn();
 }
+
+void AJSGameState::SelectCard(AJSCard* InCard)
+{
+	if(SelectedCard != nullptr)
+	{
+		SelectedCard->SetPossessCard(false);
+	}
+	
+	SelectedCard = InCard;
+	SelectedCard->SetPossessCard(true);
+}

@@ -22,6 +22,6 @@ class JANGSA_API IJSInputInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintNativeEvent)
-	void OnInputTab(AActor* Target, FKey ButtonPressed);
+	//UFUNCTION(BlueprintCallable)
+	virtual void OnInputTab() = 0;
 };
