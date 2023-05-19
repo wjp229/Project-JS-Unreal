@@ -27,7 +27,13 @@ AJSPlayerController::AJSPlayerController(const FObjectInitializer& ObjectInitial
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionClickRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IJS_Click.IJS_Click'"));
 	if(InputActionClickRef.Succeeded())
 	{
-		ClickAction = InputActionClickRef.Object;
+		PressAction = InputActionClickRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionReleaseRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IJS_Release.IJS_Release'"));
+	if(InputActionReleaseRef.Succeeded())
+	{
+		ReleaseAction = InputActionReleaseRef.Object;
 	}
 	
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionDragRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IJS_Drag.IJS_Drag'"));
@@ -45,17 +51,32 @@ void AJSPlayerController::SetupInputComponent()
 	
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 	
-	EnhancedInputComponent->BindAction(ClickAction, ETriggerEvent::Triggered, this, &AJSPlayerController::OnTapPressed);
+	EnhancedInputComponent->BindAction(PressAction, ETriggerEvent::Triggered, this, &AJSPlayerController::OnTapPressed);
+	EnhancedInputComponent->BindAction(ReleaseAction, ETriggerEvent::Completed, this, &AJSPlayerController::OnTapReleased);
 	EnhancedInputComponent->BindAction(DragAction, ETriggerEvent::Triggered, this, &AJSPlayerController::OnDrag);
 }
 
 void AJSPlayerController::OnTapPressed()
 {
+	UE_LOG(LogTemp, Log, TEXT("On Tap Pressed"));
+	
 	const FVector2d CurrentMousePosition = GetCurrentMousePosition();
 	GetHitActor(CurrentMousePosition);
 }
 
-void AJSPlayerController::GetHitActor(const FVector2d& ScreenPosition)
+void AJSPlayerController::OnTapReleased()
+{
+	UE_LOG(LogTemp, Log, TEXT("On Tap Released"));
+	
+	IJSInputInterface* InputInterface = Cast<IJSInputInterface>(SelectedObject);
+	if(nullptr != InputInterface)
+	{
+		InputInterface->OnReleaseActor();
+		SelectedObject = nullptr;
+	}
+}
+
+AActor* AJSPlayerController::GetHitActor(const FVector2d& ScreenPosition)
 {
 	FHitResult Hit;
 	
@@ -65,18 +86,26 @@ void AJSPlayerController::GetHitActor(const FVector2d& ScreenPosition)
 		
 		if(nullptr == InputInterface)
 		{
-			return ;
+			return nullptr;
 		}
 		
-		InputInterface->OnInputTab();
+		if(!InputInterface->OnSelectActor())
+			return nullptr;
+		
 		SelectedObject = Hit.GetActor();
+
+		return SelectedObject;
 	}
+
+	return nullptr;
 }
 
 void AJSPlayerController::OnDrag()
 {
 	if(SelectedObject == nullptr)
+	{
 		return;
+	}
 	
 	const FVector2d CurrentMousePosition = GetCurrentMousePosition();
 
@@ -84,8 +113,6 @@ void AJSPlayerController::OnDrag()
 	
 	if (GetHitResultAtScreenPosition(CurrentMousePosition, ECC_GameTraceChannel2, false, Hit))
 	{
-		UE_LOG(LogTemp, Log, TEXT("Hit X : %f, Hit Y : %f"), Hit.Location.X, Hit.Location.Y);
-
 		FVector OffsetVector = FVector(.0f, .0f, 5.0f);
 		
 		SelectedObject->SetActorLocation(Hit.Location + OffsetVector);

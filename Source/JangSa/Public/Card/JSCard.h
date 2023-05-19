@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "JSTypes.h"
 #include "Data/CardInfoRowBase.h"
 #include "Interfaces/CardEffectInterface.h"
 #include "Interfaces/JSInputInterface.h"
@@ -20,6 +21,7 @@ public:
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardEffectComponent* InEffectComponent);
 
+	
 protected:
 	int CardNum;
 
@@ -45,9 +47,12 @@ public:
 	UFUNCTION()
 	virtual void OnActivateCardEffect(int32 InOrder) override;
 
-	virtual void OnInputTab() override;
+	virtual bool OnSelectActor() override;
+	virtual void OnReleaseActor() override;
 	
 	void SetPossessCard(bool isPossessed);
+
+	ECardState CardState;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category="Interaction")

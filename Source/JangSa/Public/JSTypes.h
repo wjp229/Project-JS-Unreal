@@ -21,11 +21,12 @@ enum class EGamePlayState
 };
 
 UENUM()
-enum class ECardRenderState
+enum class ECardState
 {
-	UMG,
-	Paper,
-	Stone
+	Inventory,
+	Holding,
+	Activated,
+	Disabled
 };
 
 USTRUCT()

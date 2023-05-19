@@ -23,6 +23,7 @@ AJSCard::AJSCard()
 	KeycapMesh->SetSimulatePhysics(true);
 
 	KeycapMesh->BodyInstance.bLockRotation = true;
+	UE_LOG(LogTemp, Log, TEXT("Mesh Rotation Constraint %d"), KeycapMesh->BodyInstance.bLockRotation);
 }
 
 FCardInfoData AJSCard::GetCardInfo() const
@@ -34,7 +35,8 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 {
 	CardData = InCardData;
 	CardObjID = InObjectID;
-
+	CardState = ECardState::Inventory;
+	
 	// Bind Delegate to GameState
 	AJSGameState* const NewGameState = GetWorld()->GetGameState<AJSGameState>();
 	if (nullptr != NewGameState)
@@ -56,11 +58,23 @@ void AJSCard::OnActivateCardEffect(int32 InOrder)
 	}
 }
 
-void AJSCard::OnInputTab()
+bool AJSCard::OnSelectActor()
 {
-	UE_LOG(LogTemp, Log, TEXT("%s Card Selected!"), *GetName());
+	if(CardState == ECardState::Inventory)
+		return false;
+	
+	KeycapMesh->GetBodyInstance()->bLockTranslation = false;
 
 	KeycapMesh->BodyInstance.SetEnableGravity(false);
+
+	return true;
+}
+
+void AJSCard::OnReleaseActor()
+{
+	KeycapMesh->BodyInstance.SetEnableGravity(true);
+
+	KeycapMesh->GetBodyInstance()->bLockTranslation = true;
 }
 
 void AJSCard::SetPossessCard(bool isPossessed)

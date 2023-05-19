@@ -79,10 +79,18 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE void AddCurrentCarat(const int32 Value)
+	FORCEINLINE bool AddCurrentCarat(const int32 Value)
 	{
+		if(GetPlayerData()->CurrentCarat + Value < 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("More Money Required"));
+			
+			return false;
+		}
+		
 		GetPlayerData()->CurrentCarat += Value;
 		NotifyCurrentCarat.Broadcast(GetPlayerData()->CurrentCarat);
+		return true;
 	}
 
 	// Deprecated
@@ -93,6 +101,8 @@ public:
 	void OnResetShop(bool bIsInitTurn = true);
 	void RefreshPlayerInfo() const;
 
+	void ArrangeCard();
+
 	UFUNCTION(BlueprintCallable)
 	void OnExitTurn();
 
@@ -100,22 +110,16 @@ private:
 	// Data includes Current Carats, Stages and State about Turn
 	FPlayerData* PlayerData;
 	EGamePlayState GamePlayState;
-
-	UPROPERTY(VisibleAnywhere, Category="Inventory")
-	TArray<TObjectPtr<class AJSCard>> HoldingCards;
-
-	UPROPERTY(VisibleAnywhere, Category="Inventory")
-	TArray<TObjectPtr<AJSCard>> ActivatedCards;
 	
 	UPROPERTY()
 	TObjectPtr<class UJSCardFactory> CardActorFactory;
-
-
+	
 	// DataTable About Turn
 	TArray<struct FTurnInfoData*> TurnInfoDatas;
 
 	void OnCheckEventQueue();
 	void OnEnterStartTurn();
+	void ShuffleHoldingCards();
 
 	// Activate each card's effect, reduce turn, and destory when card's remain turn is zero
 	void OnEnterSettleCarat();
@@ -127,4 +131,19 @@ public:
 	
 private:
 	void SelectCard(AJSCard* InCard);
+
+	// Card Managing Section
+public:
+	UFUNCTION(BlueprintCallable)
+	TArray<class AJSCard*> CardsInCondition(const FString InRank);
+
+private:
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TArray<TObjectPtr<class AJSCard>> InventoryCards;
+
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TArray<TObjectPtr<class AJSCard>> HoldingCards;
+	
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TArray<TObjectPtr<class AJSCard>> ActivatedCards;
 };

@@ -16,26 +16,34 @@ class JANGSA_API AJSPlayerController : public APlayerController
 
 public:
 	AJSPlayerController(const FObjectInitializer& ObjectInitializer);
-	
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Action, meta=(AllowPrivateAccess="true"))
-	TObjectPtr<class UJSControlData> ControlData;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Action, meta=(AllowPrivateAccess="true"))
-	TObjectPtr<class UInputAction> ClickAction;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Action, meta=(AllowPrivateAccess="true"))
+	// Input Action Section
+protected:
+	UPROPERTY()
+	TObjectPtr<class UJSControlData> ControlData;
+
+	UPROPERTY()
+	TObjectPtr<class UInputAction> PressAction;
+
+	UPROPERTY()
+	TObjectPtr<class UInputAction> ReleaseAction;
+
+	UPROPERTY()
 	TObjectPtr<class UInputAction> DragAction;
 
 private:
 	virtual void SetupInputComponent() override;
 
 	void OnTapPressed();
+	void OnTapReleased();
 	void OnDrag();
 	
-	void GetHitActor(const FVector2d& ScreenPosition);
+	AActor* GetHitActor(const FVector2d& ScreenPosition);
 	void SetMappingContext() const;
 
+	// Interaction Section
+private:
+	UPROPERTY(VisibleAnywhere, Category="Interaction")
 	TObjectPtr<AActor> SelectedObject;
 
 private:

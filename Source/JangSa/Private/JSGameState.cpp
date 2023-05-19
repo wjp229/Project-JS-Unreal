@@ -9,6 +9,7 @@
 #include "Card/JSCard.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/JSHUD.h"
+#include "Math/UnrealMathUtility.h"
 
 AJSGameState::AJSGameState()
 {
@@ -64,14 +65,16 @@ void AJSGameState::PostInitializeComponents()
 	UE_LOG(LogTemp, Log, TEXT("Total Turn Info : %d"), TurnInfoDatas.Num());
 
 	CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), UJSCardFactory::StaticClass());
+
 }
 
 void AJSGameState::DprGameStart()
 {
 	UE_LOG(LogTemp, Log, TEXT("======================================="));
-
 	RefreshPlayerInfo();
 
+	AddCurrentCarat(15);
+	
 	OnEnterStartTurn();
 }
 
@@ -81,12 +84,10 @@ void AJSGameState::SetNextPhase()
 
 bool AJSGameState::PurchaseCard(int32 InCardNum)
 {
-	UE_LOG(LogTemp, Log, TEXT("Purchased!!"));
-
 	int32 CardPrice = CardActorFactory->CheckCardPrice(InCardNum);
 
 	// To Do : if(GetPlayerData()->CurrentCarat >= CardPrice);
-	if (CardPrice > 0)
+	if (AddCurrentCarat(-CardPrice))
 	{
 		// To Do : Pay Owning Carat
 		FVector SpawnLocation(265.0f, 400.0f, 93.1f);
@@ -95,19 +96,52 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 
 		if (NewCardActor != nullptr)
 		{
-			HoldingCards.Emplace(NewCardActor);
+			InventoryCards.Emplace(NewCardActor);
+
+			ArrangeCard();
 			
 			return true;
 		}
-
 	}
-
 	return false;
 }
 
 void AJSGameState::OnEnterStartTurn()
 {
+	ShuffleHoldingCards();
+	
 	OnCheckEventQueue();
+}
+
+void AJSGameState::ShuffleHoldingCards()
+{
+	int32 MaxHoldingPack = 10;
+
+	// Send Holding Cards to Inventory
+	while(HoldingCards.Num() > 0)
+	{
+		AJSCard* CardActor = HoldingCards[0];
+		HoldingCards.RemoveAt(0);
+		InventoryCards.Emplace(CardActor);
+		CardActor->CardState = ECardState::Inventory;
+	}
+
+	// Send Inventory Cards to hold
+	for(int ix = 0; ix < MaxHoldingPack; ix++)
+	{
+		if(InventoryCards.Num() <= 0)
+		{
+			break;
+		}
+
+		int InCardIndex = FMath::RandRange(0, InventoryCards.Num() - 1);
+		AJSCard* CardActor = InventoryCards[InCardIndex];
+		InventoryCards.RemoveAt(InCardIndex);
+		HoldingCards.Emplace(CardActor);
+		CardActor->CardState = ECardState::Holding;
+	}
+	
+	ArrangeCard();
 }
 
 void AJSGameState::OnCheckEventQueue()
@@ -144,6 +178,27 @@ void AJSGameState::RefreshPlayerInfo() const
 	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
 }
 
+void AJSGameState::ArrangeCard()
+{
+	// Arrange Holding Cards
+	FVector HoldingSpawnLocation(265.0f, 440.0f, 95.f);
+	HoldingSpawnLocation += FVector(.0, 3.0f, .0f) * (HoldingCards.Num() - 1); 
+	for(int ix = 0; ix < HoldingCards.Num(); ix++)
+	{
+		HoldingCards[ix]->SetActorLocation(HoldingSpawnLocation + (FVector(.0, -6.0f, .0f) * ix));
+	}
+
+	// Arrange Inventory Cards
+	const FVector InventorySpawnLocation(265.0f, 400.0f, 93.1f);
+	const int32 InventoryRow = 3;
+	for(int ix = 0; ix < InventoryCards.Num(); ix++)
+	{
+		FVector OffsetVector = (ix / InventoryRow) * FVector(-6.f, 0.f, 0.f);
+		OffsetVector += (ix % InventoryRow) * FVector(.0f, -6.f, .0f);
+		InventoryCards[ix]->SetActorLocation(InventorySpawnLocation + OffsetVector);
+	}
+}
+
 
 void AJSGameState::OnExitTurn()
 {
@@ -177,4 +232,19 @@ void AJSGameState::SelectCard(AJSCard* InCard)
 	
 	SelectedCard = InCard;
 	SelectedCard->SetPossessCard(true);
+}
+
+TArray<AJSCard*> AJSGameState::CardsInCondition(const FString InRank)
+{
+	TArray<AJSCard*> CardArray;
+
+	for(auto CardActor : ActivatedCards)
+	{
+		if(CardActor->GetCardInfo().Rank.Contains(InRank))
+		{
+			CardArray.Emplace(CardActor);
+		}
+	}
+
+	return CardArray;
 }

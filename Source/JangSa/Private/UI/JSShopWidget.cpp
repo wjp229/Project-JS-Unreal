@@ -29,14 +29,17 @@ void UJSShopWidget::RerollShop()
 	}
 }
 
-void UJSShopWidget::ClickPurchaseCardButton(int32 InButtonNum)
+bool UJSShopWidget::ClickPurchaseCardButton(int32 InButtonNum)
 {
 	AJSGameState* JSGameState = Cast<AJSGameState>(GetWorld()->GetGameState());
 	if(JSGameState != nullptr)
 	{
 		// Logic about Purchase
-		JSGameState->PurchaseCard(ShopCards[InButtonNum].Id);
+		if(JSGameState->PurchaseCard(ShopCards[InButtonNum].Id))
+			return true;
 	}
+
+	return false;
 }
 
 void UJSShopWidget::InitCardInfoInShop_Implementation()

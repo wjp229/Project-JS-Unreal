@@ -29,5 +29,5 @@ protected:
 	void RerollShop();
 
 	UFUNCTION(BlueprintCallable)
-	void ClickPurchaseCardButton(int32 InButtonNum);
+	bool ClickPurchaseCardButton(int32 InButtonNum);
 };
