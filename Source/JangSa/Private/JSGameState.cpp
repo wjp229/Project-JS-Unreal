@@ -62,10 +62,7 @@ void AJSGameState::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	UE_LOG(LogTemp, Log, TEXT("Total Turn Info : %d"), TurnInfoDatas.Num());
-
 	CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), UJSCardFactory::StaticClass());
-
 }
 
 void AJSGameState::DprGameStart()
@@ -178,6 +175,15 @@ void AJSGameState::RefreshPlayerInfo() const
 	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
 }
 
+void AJSGameState::RegisterCard(AJSCard* InCard)
+{
+	if(!HoldingCards.Contains(InCard))
+		return;
+
+	HoldingCards.Remove(InCard);
+	ActivatedCards.Emplace(InCard);
+}
+
 void AJSGameState::ArrangeCard()
 {
 	// Arrange Holding Cards
@@ -199,21 +205,21 @@ void AJSGameState::ArrangeCard()
 	}
 }
 
-
 void AJSGameState::OnExitTurn()
 {
-	OnEnterSettleCarat();
+	OnEnterSettleCaratPhase();
 }
 
-void AJSGameState::OnEnterSettleCarat()
+void AJSGameState::OnEnterSettleCaratPhase()
 {
 	UE_LOG(LogTemp, Log, TEXT("Acitvation On Card State"));
 
 	// Activate Each Card Effects
-	NotifyActivateCardEffect.Broadcast(0);
-
-	// Reduce Each Activated Card Turns
-	NotifyAddRemainCardTurn.Broadcast(-1);
+	for(auto Card : ActivatedCards)
+	{
+		Card->ActivateCardEffect(0);
+		Card->AddRemainTurn(-1);
+	}
 
 	AddRemainTurn(-1);
 

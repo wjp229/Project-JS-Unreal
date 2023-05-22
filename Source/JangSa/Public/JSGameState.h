@@ -9,11 +9,17 @@
 #include "JSGameState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateCardEffect, int32, num);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddRemainCardTurn, int32, num);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyCard);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyRemainTurn, int32, num);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPayTurn, int32, num);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPayCarat, int32, num);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyCurrentCarat, int32, num);
 
 /**
@@ -81,13 +87,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool AddCurrentCarat(const int32 Value)
 	{
-		if(GetPlayerData()->CurrentCarat + Value < 0)
+		if (GetPlayerData()->CurrentCarat + Value < 0)
 		{
 			UE_LOG(LogTemp, Log, TEXT("More Money Required"));
-			
+
 			return false;
 		}
-		
+
 		GetPlayerData()->CurrentCarat += Value;
 		NotifyCurrentCarat.Broadcast(GetPlayerData()->CurrentCarat);
 		return true;
@@ -95,47 +101,17 @@ public:
 
 	// Deprecated
 	void DprGameStart();
-	void SetNextPhase();
 
-	bool PurchaseCard(int32 InCardNum);
-	void OnResetShop(bool bIsInitTurn = true);
 	void RefreshPlayerInfo() const;
 
+
+	// Card purchase & register Section
+public:
+	void RegisterCard(class AJSCard* InCard);
+	bool PurchaseCard(int32 InCardNum);
 	void ArrangeCard();
 
-	UFUNCTION(BlueprintCallable)
-	void OnExitTurn();
-
-private:
-	// Data includes Current Carats, Stages and State about Turn
-	FPlayerData* PlayerData;
-	EGamePlayState GamePlayState;
-	
-	UPROPERTY()
-	TObjectPtr<class UJSCardFactory> CardActorFactory;
-	
-	// DataTable About Turn
-	TArray<struct FTurnInfoData*> TurnInfoDatas;
-
-	void OnCheckEventQueue();
-	void OnEnterStartTurn();
-	void ShuffleHoldingCards();
-
-	// Activate each card's effect, reduce turn, and destory when card's remain turn is zero
-	void OnEnterSettleCarat();
-
-	//Card Selecting Section
-public:
-	UPROPERTY(VisibleAnywhere, Category="Card")
-	TObjectPtr<class AJSCard> SelectedCard;
-	
-private:
-	void SelectCard(AJSCard* InCard);
-
-	// Card Managing Section
-public:
-	UFUNCTION(BlueprintCallable)
-	TArray<class AJSCard*> CardsInCondition(const FString InRank);
+	void OnResetShop(bool bIsInitTurn = true);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
@@ -143,7 +119,46 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TArray<TObjectPtr<class AJSCard>> HoldingCards;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TArray<TObjectPtr<class AJSCard>> ActivatedCards;
+
+	// Game Flow Section
+private:
+	void OnEnterSettleCaratPhase();
+	void OnCheckEventQueue();
+
+	void SetNextPhase();
+	UFUNCTION(BlueprintCallable)
+	void OnExitTurn();
+
+	void OnEnterStartTurn();
+	void ShuffleHoldingCards();
+
+	// Activate each card's effect, reduce turn, and destory when card's remain turn is zero
+
+	// Player Data Section
+private:
+	// Data includes Current Carats, Stages and State about Turn
+	FPlayerData* PlayerData;
+	EGamePlayState GamePlayState;
+
+	UPROPERTY()
+	TObjectPtr<class UJSCardFactory> CardActorFactory;
+
+	// DataTable About Turn
+	TArray<struct FTurnInfoData*> TurnInfoDatas;
+
+	//Card Selecting Section
+public:
+	UPROPERTY(VisibleAnywhere, Category="Card")
+	TObjectPtr<class AJSCard> SelectedCard;
+
+private:
+	void SelectCard(AJSCard* InCard);
+
+	// Card Managing Section
+public:
+	UFUNCTION(BlueprintCallable)
+	TArray<class AJSCard*> CardsInCondition(const FString InRank);
 };

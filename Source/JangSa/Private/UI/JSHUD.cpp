@@ -15,7 +15,6 @@ AJSHUD::AJSHUD()
 		StartMenuWidget = CreateWidget<UUserWidget>(GetWorld(), StartWidgetRef.Class);
 	}
 
-
 	const ConstructorHelpers::FClassFinder<UUserWidget> HUDWidgetRef(TEXT("/Game/UI/HUD.HUD_C"));
 	if (HUDWidgetRef.Class != nullptr)
 	{
@@ -39,8 +38,13 @@ AJSHUD::AJSHUD()
 void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo)
 {
 	if (!JSShopWidget->IsInViewport())
+	{
 		JSShopWidget->AddToViewport();
-
+	}
+	else
+	{
+		JSShopWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 	JSShopWidget->InitShop(InCardInfo);
 }
 

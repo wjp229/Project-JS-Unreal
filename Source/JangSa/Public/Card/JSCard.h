@@ -21,13 +21,15 @@ public:
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardEffectComponent* InEffectComponent);
 
-	
+
 protected:
+	UFUNCTION()
+	void OnDestroyCard();
+
 	int CardNum;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=CardInfo)
 	FCardInfoData CardData;
-	int32 RemainTurn;
 
 	UPROPERTY()
 	int32 CardObjID;
@@ -38,14 +40,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category=Effect)
 	TObjectPtr<UJSCardEffectComponent> EffectComponent;
 
-	UFUNCTION()
-	void AddRemainTurn(int32 Value);
-	UFUNCTION()
-	void OnDestroyCard();
+	int32 RemainTurn;
 
+	// Card Activating Effect Section
 public:
 	UFUNCTION()
-	virtual void OnActivateCardEffect(int32 InOrder) override;
+	virtual void ActivateCardEffect(int32 InOrder) override;
+
+	UFUNCTION()
+	void AddRemainTurn(int32 Value);
 
 	virtual void SetCardStateActive(bool Active);
 
@@ -60,7 +63,7 @@ public:
 
 	void ActivateCardInfoHUD();
 
-	
+
 	void SetPossessCard(bool IsPossessed);
 
 	ECardState CardState;
@@ -76,8 +79,6 @@ private:
 
 	// Card Cursor Overlap Section
 public:
-
-	
 private:
 	float InfoShowDelayTime = 2.0f;
 	FTimerHandle CardInfoTimerHandler;

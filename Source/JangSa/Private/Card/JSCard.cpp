@@ -22,6 +22,9 @@ AJSCard::AJSCard()
 	KeycapMesh->SetSimulatePhysics(true);
 
 	KeycapMesh->BodyInstance.bLockRotation = true;
+
+	RemainTurn = GetCardInfo().InitRemainTurn;
+	CardState = ECardState::Holding;
 }
 
 FCardInfoData AJSCard::GetCardInfo() const
@@ -40,34 +43,47 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	if (nullptr != NewGameState)
 	{
 		NewGameState->NotifyDestroyCard.AddDynamic(this, &AJSCard::OnDestroyCard);
-		NewGameState->NotifyAddRemainCardTurn.AddDynamic(this, &AJSCard::AddRemainTurn);
 	}
 
 	EffectComponent = InEffectComponent;
 	EffectComponent->RegisterComponent();
 }
 
-void AJSCard::OnActivateCardEffect(int32 InOrder)
+void AJSCard::ActivateCardEffect(int32 InOrder)
 {
 	if(EffectComponent != nullptr)
 	{
 		EffectComponent->OnActivateEffect();
+		RemainTurn -= 1;
 	}
 }
 
 void AJSCard::SetCardStateActive(bool Active)
 {
+	if(Active && CardState == ECardState::Activated)
+	{
+		return;
+	}
+	else if(!Active && CardState == ECardState::Holding)
+	{
+		return;
+	}
+	
 	// Bind Delegate to GameState
-	AJSGameState* const NewGameState = GetWorld()->GetGameState<AJSGameState>();
-	if (nullptr != NewGameState)
+	AJSGameState* const GameState = GetWorld()->GetGameState<AJSGameState>();
+	if (nullptr != GameState)
 	{
 		if(Active)
 		{
-			NewGameState->NotifyActivateCardEffect.AddDynamic(this, &AJSCard::OnActivateCardEffect);
+			//NewGameState->NotifyActivateCardEffect.AddDynamic(this, &AJSCard::ActivateCardEffect);
+			GameState->RegisterCard(this);
+			CardState = ECardState::Activated;
 		}
 		else
 		{
-			NewGameState->NotifyActivateCardEffect.RemoveDynamic(this, &AJSCard::OnActivateCardEffect);
+			//NewGameState->NotifyActivateCardEffect.RemoveDynamic(this, &AJSCard::ActivateCardEffect);
+			CardState = ECardState::Holding;
+
 		}
 	}
 }
@@ -80,7 +96,6 @@ bool AJSCard::OnSelectActor()
 	OriginPosition = GetActorLocation();
 	
 	KeycapMesh->GetBodyInstance()->bLockTranslation = false;
-
 	KeycapMesh->BodyInstance.SetEnableGravity(false);
 
 	return true;
@@ -95,11 +110,10 @@ void AJSCard::OnReleaseActor()
 	}
 	else
 	{
-		
+		SetCardStateActive(true);
 	}
 	
 	KeycapMesh->BodyInstance.SetEnableGravity(true);
-
 	KeycapMesh->GetBodyInstance()->bLockTranslation = true;
 }
 
@@ -121,7 +135,6 @@ void AJSCard::OnMouseEnterActor()
 {
 	// To do : Activate Info HUD After few seconds
 }
-
 
 void AJSCard::OnMouseExitActor()
 {
@@ -147,5 +160,9 @@ void AJSCard::AddRemainTurn(int32 Value)
 
 void AJSCard::OnDestroyCard()
 {
+	if(RemainTurn == 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Destroy"));
+	}
 	//this->Destroy();
 }
