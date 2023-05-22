@@ -26,4 +26,8 @@ public:
 	virtual bool OnSelectActor() = 0;
 
 	virtual void OnReleaseActor() = 0;
+
+	virtual void OnMouseEnterActor() = 0;
+
+	virtual void OnMouseExitActor() = 0;
 };

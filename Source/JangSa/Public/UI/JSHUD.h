@@ -17,11 +17,14 @@ class JANGSA_API AJSHUD : public AHUD
 public:
 	AJSHUD();
 
-	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo);
-
-	
 	UFUNCTION(BlueprintCallable)
 	void DrawMainHUD();
+	
+	// Interaction about Shop
+	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo);
+
+	// Interaction about Card Info
+	void ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float MousePositionX, const float MousePositionY);
 	
 private:
 	UPROPERTY(EditAnywhere)
@@ -33,9 +36,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSShopWidget> JSShopWidget;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UJSCardInfoWidget> CardInfoWidget;
+
 	
 protected:
-	
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;
 	

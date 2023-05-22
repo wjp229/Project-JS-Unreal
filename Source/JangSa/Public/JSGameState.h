@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
-#include "JSTypes.h"
+#include "Data/JSTypes.h"
 #include "Data/CardInfoRowBase.h"
 #include "JSGameState.generated.h"
 

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "JSTypes.h"
+#include "Data/JSTypes.h"
 #include "Data/CardInfoRowBase.h"
 #include "Interfaces/CardEffectInterface.h"
 #include "Interfaces/JSInputInterface.h"
@@ -25,7 +25,7 @@ public:
 protected:
 	int CardNum;
 
-	UPROPERTY(VisibleAnywhere, Category=CardInfo)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=CardInfo)
 	FCardInfoData CardData;
 	int32 RemainTurn;
 
@@ -47,14 +47,38 @@ public:
 	UFUNCTION()
 	virtual void OnActivateCardEffect(int32 InOrder) override;
 
+	virtual void SetCardStateActive(bool Active);
+
+	// Mouse Interaction with actor
 	virtual bool OnSelectActor() override;
 	virtual void OnReleaseActor() override;
+
+	virtual void NotifyActorBeginCursorOver() override;
+	virtual void NotifyActorEndCursorOver() override;
+	virtual void OnMouseEnterActor() override;
+	virtual void OnMouseExitActor() override;
+
+	void ActivateCardInfoHUD();
+
 	
-	void SetPossessCard(bool isPossessed);
+	void SetPossessCard(bool IsPossessed);
 
 	ECardState CardState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Placeable");
+	uint8 bIsPlaceable : 1;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category="Interaction")
 	uint8 bIsSelected;
+
+	FVector OriginPosition;
+
+	// Card Cursor Overlap Section
+public:
+
+	
+private:
+	float InfoShowDelayTime = 2.0f;
+	FTimerHandle CardInfoTimerHandler;
 };

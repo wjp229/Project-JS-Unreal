@@ -36,5 +36,5 @@ private:
 
 	TArray<FCardInfoData*> TempCardInfoDatas;
 
-	TSubclassOf<class AJSCard> DEPRECATED_JsCard;
+	TSubclassOf<class AJSCard> CardBP;
 };

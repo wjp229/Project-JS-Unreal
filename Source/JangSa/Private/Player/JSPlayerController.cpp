@@ -3,13 +3,14 @@
 
 #include "Player/JSPlayerController.h"
 #include "JSGameState.h"
-#include "Player/JSInput.h"
 #include "UObject/ConstructorHelpers.h"
-#include "JSControlData.h"
+#include "Data/JSControlData.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Card/JSCard.h"
 #include "Engine/LocalPlayer.h"
 #include "Interfaces/JSInputInterface.h"
+#include "UI/JSHUD.h"
 
 AJSPlayerController::AJSPlayerController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -58,16 +59,12 @@ void AJSPlayerController::SetupInputComponent()
 
 void AJSPlayerController::OnTapPressed()
 {
-	UE_LOG(LogTemp, Log, TEXT("On Tap Pressed"));
-	
 	const FVector2d CurrentMousePosition = GetCurrentMousePosition();
 	GetHitActor(CurrentMousePosition);
 }
 
 void AJSPlayerController::OnTapReleased()
 {
-	UE_LOG(LogTemp, Log, TEXT("On Tap Released"));
-	
 	IJSInputInterface* InputInterface = Cast<IJSInputInterface>(SelectedObject);
 	if(nullptr != InputInterface)
 	{
@@ -93,7 +90,7 @@ AActor* AJSPlayerController::GetHitActor(const FVector2d& ScreenPosition)
 			return nullptr;
 		
 		SelectedObject = Hit.GetActor();
-
+		
 		return SelectedObject;
 	}
 

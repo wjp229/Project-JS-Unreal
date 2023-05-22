@@ -3,6 +3,7 @@
 
 #include "UI/JSHUD.h"
 #include "Components/WidgetComponent.h"
+#include "UI/JSCardInfoWidget.h"
 #include "UI/JSShopWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -26,6 +27,13 @@ AJSHUD::AJSHUD()
 	{
 		JSShopWidget = CreateWidget<UJSShopWidget>(GetWorld(), ShopWidgetRef.Class);
 	}
+
+	const ConstructorHelpers::FClassFinder<UJSCardInfoWidget> CardInfoWidgetRef(TEXT("/Game/UI/BW_JSCardInfo.BW_JSCardInfo_C"));
+	if (ShopWidgetRef.Class != nullptr)
+	{
+		CardInfoWidget = CreateWidget<UJSCardInfoWidget>(GetWorld(), CardInfoWidgetRef.Class);
+	}
+	
 }
 
 void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo)
@@ -36,10 +44,21 @@ void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo)
 	JSShopWidget->InitShop(InCardInfo);
 }
 
+void AJSHUD::ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float MousePositionX, const float MousePositionY)
+{
+	if(nullptr != CardInfoWidget)
+	{
+		if (!CardInfoWidget->IsInViewport())
+		{
+			CardInfoWidget->AddToViewport();
+
+		}
+		CardInfoWidget->InitCardInfoWidget(InCardInfo, MousePositionX, MousePositionY);
+	}
+}
+
 void AJSHUD::DrawMainHUD()
 {
-	UE_LOG(LogTemp,Log, TEXT("MainHUD has  created!!"));
-	
 	MainHUDWidget->AddToViewport();
 }
 

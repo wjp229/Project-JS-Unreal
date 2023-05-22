@@ -1,15 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "JSCardFactory.h"
-#include "JSCardEffectComponent.h"
+#include "Card/JSCardFactory.h"
+#include "Card/JSCardEffectComponent.h"
 #include "Card/JSCard.h"
 #include "UObject/ConstructorHelpers.h"
-#include "JSTypes.h"
+#include "Data/JSTypes.h"
 
 UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	// Get All Card Data in Data Table
 	const ConstructorHelpers::FObjectFinder<UDataTable>
 		DT_CardDataInfo(TEXT("/Game/DataTable/DT_CardInfo.DT_CardInfo"));
 	if (DT_CardDataInfo.Succeeded())
@@ -17,6 +18,7 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 		DT_CardDataInfo.Object->GetAllRows<FCardInfoData>(TEXT("GetAllRows"), CardInfoDatas);
 	}
 
+	// Data Parsing Cards on shop
 	for (int32 i = 0; i < CardInfoDatas.Num(); i++)
 	{
 		CardInfoDatas[i]->Id = i;
@@ -27,6 +29,7 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 		}
 	}
 
+	// Collect Card Effects
 	for (int32 i = 0; i < CardInfoDatas.Num()-1; i++)
 	{
 		FString PreTargetAddress = BP_CardEffectPrefixPath;
@@ -53,10 +56,11 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 		}
 	}
 
+	// 
 	static ConstructorHelpers::FClassFinder<AJSCard> JsCardRef(TEXT("/Game/Card/BP_JSCard.BP_JSCard_C"));
 	if(JsCardRef.Succeeded())
 	{
-		DEPRECATED_JsCard = JsCardRef.Class;
+		CardBP = JsCardRef.Class;
 	}
 	//DEPRECATED_JsCard
 }
@@ -81,7 +85,7 @@ AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 {
 	if(CardNum >= EffectComponents.Num()) return nullptr;
 	
-	AActor* SpawnedCard = GetWorld()->SpawnActor(DEPRECATED_JsCard, InLocation);
+	AActor* SpawnedCard = GetWorld()->SpawnActor(CardBP, InLocation);
 	AJSCard* JSSpawnedCard = Cast<AJSCard>(SpawnedCard);
 
 	if (nullptr != JSSpawnedCard)

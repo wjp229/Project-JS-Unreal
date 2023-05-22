@@ -2,10 +2,9 @@
 
 
 #include "Card/JSCard.h"
-
-#include "JSCardEffectComponent.h"
+#include "Card/JSCardEffectComponent.h"
 #include "JSGameState.h"
-#include "Kismet/GameplayStatics.h"
+#include "UI/JSHUD.h"
 #include "UObject/ConstructorHelpers.h"
 
 AJSCard::AJSCard()
@@ -23,7 +22,6 @@ AJSCard::AJSCard()
 	KeycapMesh->SetSimulatePhysics(true);
 
 	KeycapMesh->BodyInstance.bLockRotation = true;
-	UE_LOG(LogTemp, Log, TEXT("Mesh Rotation Constraint %d"), KeycapMesh->BodyInstance.bLockRotation);
 }
 
 FCardInfoData AJSCard::GetCardInfo() const
@@ -41,7 +39,6 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	AJSGameState* const NewGameState = GetWorld()->GetGameState<AJSGameState>();
 	if (nullptr != NewGameState)
 	{
-		NewGameState->NotifyActivateCardEffect.AddDynamic(this, &AJSCard::OnActivateCardEffect);
 		NewGameState->NotifyDestroyCard.AddDynamic(this, &AJSCard::OnDestroyCard);
 		NewGameState->NotifyAddRemainCardTurn.AddDynamic(this, &AJSCard::AddRemainTurn);
 	}
@@ -58,10 +55,29 @@ void AJSCard::OnActivateCardEffect(int32 InOrder)
 	}
 }
 
+void AJSCard::SetCardStateActive(bool Active)
+{
+	// Bind Delegate to GameState
+	AJSGameState* const NewGameState = GetWorld()->GetGameState<AJSGameState>();
+	if (nullptr != NewGameState)
+	{
+		if(Active)
+		{
+			NewGameState->NotifyActivateCardEffect.AddDynamic(this, &AJSCard::OnActivateCardEffect);
+		}
+		else
+		{
+			NewGameState->NotifyActivateCardEffect.RemoveDynamic(this, &AJSCard::OnActivateCardEffect);
+		}
+	}
+}
+
 bool AJSCard::OnSelectActor()
 {
 	if(CardState == ECardState::Inventory)
 		return false;
+
+	OriginPosition = GetActorLocation();
 	
 	KeycapMesh->GetBodyInstance()->bLockTranslation = false;
 
@@ -72,14 +88,54 @@ bool AJSCard::OnSelectActor()
 
 void AJSCard::OnReleaseActor()
 {
+	// Check If Card is on right place else go back to origin Place
+	if(!bIsPlaceable)
+	{
+		SetActorLocation(OriginPosition);
+	}
+	else
+	{
+		
+	}
+	
 	KeycapMesh->BodyInstance.SetEnableGravity(true);
 
 	KeycapMesh->GetBodyInstance()->bLockTranslation = true;
 }
 
-void AJSCard::SetPossessCard(bool isPossessed)
+void AJSCard::NotifyActorBeginCursorOver()
 {
-	bIsSelected = isPossessed;
+	Super::NotifyActorBeginCursorOver();
+
+	OnMouseEnterActor();
+}
+
+void AJSCard::NotifyActorEndCursorOver()
+{
+	Super::NotifyActorEndCursorOver();
+
+	OnMouseExitActor();
+}
+
+void AJSCard::OnMouseEnterActor()
+{
+	// To do : Activate Info HUD After few seconds
+}
+
+
+void AJSCard::OnMouseExitActor()
+{
+	// To do : Deactivate Info HUD After few Seconds
+}
+
+void AJSCard::ActivateCardInfoHUD()
+{
+	
+}
+
+void AJSCard::SetPossessCard(bool IsPossessed)
+{
+	bIsSelected = IsPossessed;
 }
 
 void AJSCard::AddRemainTurn(int32 Value)

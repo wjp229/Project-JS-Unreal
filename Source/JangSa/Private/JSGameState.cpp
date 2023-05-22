@@ -2,11 +2,11 @@
 
 
 #include "JSGameState.h"
-#include "JSCardFactory.h"
-#include "JSGameMode.h"
+#include "Card/JSCardFactory.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/DataTable.h"
 #include "Card/JSCard.h"
+#include "Data/JSTypes.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/JSHUD.h"
 #include "Math/UnrealMathUtility.h"
