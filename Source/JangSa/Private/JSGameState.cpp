@@ -28,6 +28,13 @@ AJSGameState::AJSGameState()
 	GetPlayerData()->PayCarat = TurnInfoDatas[GetPlayerData()->CurrentStage]->PayCarat;
 }
 
+void AJSGameState::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), UJSCardFactory::StaticClass());
+}
+
 void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 {
 	// Deprecated Logv 
@@ -58,11 +65,12 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
 }
 
-void AJSGameState::PostInitializeComponents()
+void AJSGameState::RefreshPlayerInfo() const
 {
-	Super::PostInitializeComponents();
-
-	CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), UJSCardFactory::StaticClass());
+	NotifyPayCarat.Broadcast(GetPlayerData()->PayCarat);
+	NotifyPayTurn.Broadcast(GetPlayerData()->PayTurn);
+	NotifyCurrentCarat.Broadcast(0);
+	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
 }
 
 void AJSGameState::DprGameStart()
@@ -72,35 +80,13 @@ void AJSGameState::DprGameStart()
 
 	AddCurrentCarat(15);
 
+	SpawnInitCard();
+	
 	OnEnterStartTurn();
 }
 
-void AJSGameState::SetNextPhase()
+void AJSGameState::SpawnInitCard()
 {
-}
-
-bool AJSGameState::PurchaseCard(int32 InCardNum)
-{
-	int32 CardPrice = CardActorFactory->CheckCardPrice(InCardNum);
-
-	// To Do : if(GetPlayerData()->CurrentCarat >= CardPrice);
-	if (AddCurrentCarat(-CardPrice))
-	{
-		// To Do : Pay Owning Carat
-		FVector SpawnLocation(265.0f, 400.0f, 93.1f);
-
-		AJSCard* NewCardActor = Cast<AJSCard>(CardActorFactory->SpawnCardActor(InCardNum, &SpawnLocation));
-
-		if (NewCardActor != nullptr)
-		{
-			InventoryCards.Emplace(NewCardActor);
-
-			ArrangeCard();
-
-			return true;
-		}
-	}
-	return false;
 }
 
 void AJSGameState::OnEnterStartTurn()
@@ -141,6 +127,7 @@ void AJSGameState::ShuffleHoldingCards()
 	ArrangeCard();
 }
 
+
 void AJSGameState::OnCheckEventQueue()
 {
 	OnResetShop();
@@ -164,15 +151,52 @@ void AJSGameState::OnResetShop(bool bIsInitTurn)
 	}
 }
 
-void AJSGameState::RefreshPlayerInfo() const
+bool AJSGameState::PurchaseCard(int32 InCardNum)
 {
-	NotifyPayCarat.Broadcast(GetPlayerData()->PayCarat);
-	NotifyPayTurn.Broadcast(GetPlayerData()->PayTurn);
-	NotifyCurrentCarat.Broadcast(0);
-	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
+	int32 CardPrice = CardActorFactory->CheckCardPrice(InCardNum);
+
+	// To Do : if(GetPlayerData()->CurrentCarat >= CardPrice);
+	if (AddCurrentCarat(-CardPrice))
+	{
+		// To Do : Pay Owning Carat
+		FVector SpawnLocation(265.0f, 400.0f, 93.1f);
+
+		AJSCard* NewCardActor = Cast<AJSCard>(CardActorFactory->SpawnCardActor(InCardNum, &SpawnLocation));
+
+		if (NewCardActor != nullptr)
+		{
+			InventoryCards.Emplace(NewCardActor);
+
+			ArrangeCard();
+
+			return true;
+		}
+	}
+	return false;
 }
 
-void AJSGameState::RegisterCard(AJSCard* InCard)
+void AJSGameState::OnExitTurn()
+{
+	OnEnterSettleCaratPhase();
+}
+
+void AJSGameState::OnEnterSettleCaratPhase()
+{
+	UE_LOG(LogTemp, Log, TEXT("Acitvation On Card State"));
+
+	// Activate Each Card Effects
+	for (auto Card : ActivatedCards)
+	{
+		Card->ActivateCardEffect(0);
+		Card->AddRemainTurn(-1);
+	}
+
+	AddRemainTurn(-1);
+
+	OnEnterStartTurn();
+}
+
+void AJSGameState::RegisterActivateCard(AJSCard* InCard)
 {
 	if (!HoldingCards.Contains(InCard))
 		return;
@@ -200,41 +224,6 @@ void AJSGameState::ArrangeCard()
 		OffsetVector += (ix % InventoryRow) * FVector(.0f, -6.f, .0f);
 		InventoryCards[ix]->SetActorLocation(InventorySpawnLocation + OffsetVector);
 	}
-}
-
-void AJSGameState::OnExitTurn()
-{
-	OnEnterSettleCaratPhase();
-}
-
-void AJSGameState::OnEnterSettleCaratPhase()
-{
-	UE_LOG(LogTemp, Log, TEXT("Acitvation On Card State"));
-
-	// Activate Each Card Effects
-	for (auto Card : ActivatedCards)
-	{
-		Card->ActivateCardEffect(0);
-		Card->AddRemainTurn(-1);
-	}
-
-	AddRemainTurn(-1);
-
-	// If Each Card's remain turn come to zero, Destroy
-	NotifyDestroyCard.Broadcast();
-
-	OnEnterStartTurn();
-}
-
-void AJSGameState::SelectCard(AJSCard* InCard)
-{
-	if (SelectedCard != nullptr)
-	{
-		SelectedCard->SetPossessCard(false);
-	}
-
-	SelectedCard = InCard;
-	SelectedCard->SetPossessCard(true);
 }
 
 TArray<AJSCard*> AJSGameState::CardsInCondition(const FString InRank)

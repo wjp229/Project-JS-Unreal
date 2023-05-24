@@ -8,18 +8,9 @@
 #include "Data/CardInfoRowBase.h"
 #include "JSGameState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateCardEffect, int32, num);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddRemainCardTurn, int32, num);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyCard);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyRemainTurn, int32, num);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPayTurn, int32, num);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPayCarat, int32, num);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyCurrentCarat, int32, num);
 
 /**
@@ -31,21 +22,9 @@ class JANGSA_API AJSGameState : public AGameState
 	GENERATED_BODY()
 
 public:
-	virtual void PostInitializeComponents() override;
-
-private:
-public:
 	AJSGameState();
 
-#pragma region SettleCaratDelegate
-	// Process in Activating Turn
-	UPROPERTY(BlueprintAssignable)
-	FActivateCardEffect NotifyActivateCardEffect;
-	UPROPERTY(BlueprintAssignable)
-	FAddRemainCardTurn NotifyAddRemainCardTurn;
-	UPROPERTY(BlueprintAssignable)
-	FDestroyCard NotifyDestroyCard;
-#pragma endregion
+	virtual void PostInitializeComponents() override;
 
 	// Delegate로 안해도 될듯
 #pragma region NotifyTurnEvent
@@ -59,6 +38,8 @@ public:
 	FNotifyCurrentCarat NotifyCurrentCarat;
 #pragma endregion
 
+# pragma region Player / Turn Data Section
+public:
 	FORCEINLINE FPlayerData* GetPlayerData() const { return PlayerData; }
 
 	UFUNCTION(BlueprintCallable)
@@ -99,19 +80,40 @@ public:
 		return true;
 	}
 
-	// Deprecated
-	void DprGameStart();
-
 	void RefreshPlayerInfo() const;
 
+private:
+	// Data includes Current Carats, Stages and State about Turn
+	FPlayerData* PlayerData;
+	EGamePlayState GamePlayState;
 
-	// Card purchase & register Section
+	UPROPERTY()
+	TObjectPtr<class UJSCardFactory> CardActorFactory;
+
+	TArray<struct FTurnInfoData*> TurnInfoDatas;
+#pragma endregion 
+
+#pragma region Phase Flow Section
+	//Phase Flow Section
 public:
-	void RegisterCard(class AJSCard* InCard);
-	bool PurchaseCard(int32 InCardNum);
-	void ArrangeCard();
-
+	// Deprecated
+	void DprGameStart();
 	void OnResetShop(bool bIsInitTurn = true);
+
+	UFUNCTION(BlueprintCallable)
+	void OnExitTurn();
+
+private:
+	void SpawnInitCard();
+
+	void OnEnterStartTurn();
+	void ShuffleHoldingCards();
+	void OnCheckEventQueue();
+	void OnEnterSettleCaratPhase();
+
+#pragma endregion 
+
+#pragma region Progress Flow Section
 
 private:
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
@@ -122,42 +124,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TArray<TObjectPtr<class AJSCard>> ActivatedCards;
+#pragma endregion 
 
-	// Game Flow Section
-private:
-	void OnEnterSettleCaratPhase();
-	void OnCheckEventQueue();
-
-	void SetNextPhase();
-	UFUNCTION(BlueprintCallable)
-	void OnExitTurn();
-
-	void OnEnterStartTurn();
-	void ShuffleHoldingCards();
-
-	// Activate each card's effect, reduce turn, and destory when card's remain turn is zero
-
-	// Player Data Section
-private:
-	// Data includes Current Carats, Stages and State about Turn
-	FPlayerData* PlayerData;
-	EGamePlayState GamePlayState;
-
-	UPROPERTY()
-	TObjectPtr<class UJSCardFactory> CardActorFactory;
-
-	// DataTable About Turn
-	TArray<struct FTurnInfoData*> TurnInfoDatas;
-
-	//Card Selecting Section
-public:
-	UPROPERTY(VisibleAnywhere, Category="Card")
-	TObjectPtr<class AJSCard> SelectedCard;
-
-private:
-	void SelectCard(AJSCard* InCard);
-
-	// Card Managing Section
+	// Card Managing / Counting Section
 public:
 	UFUNCTION(BlueprintCallable)
 	TArray<class AJSCard*> CardsInCondition(const FString InRank);
@@ -170,5 +139,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	int32 CountCardInCardRank(FString InCardRank);
-	
+
+	void RegisterActivateCard(class AJSCard* InCard);
+	bool PurchaseCard(int32 InCardNum);
+	void ArrangeCard();
 };

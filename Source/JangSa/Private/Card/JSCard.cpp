@@ -38,13 +38,6 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	CardObjID = InObjectID;
 	CardState = ECardState::Inventory;
 	
-	// Bind Delegate to GameState
-	AJSGameState* const NewGameState = GetWorld()->GetGameState<AJSGameState>();
-	if (nullptr != NewGameState)
-	{
-		NewGameState->NotifyDestroyCard.AddDynamic(this, &AJSCard::OnDestroyCard);
-	}
-
 	EffectComponent = InEffectComponent;
 	EffectComponent->RegisterComponent();
 }
@@ -76,7 +69,7 @@ void AJSCard::SetCardStateActive(bool Active)
 		if(Active)
 		{
 			//NewGameState->NotifyActivateCardEffect.AddDynamic(this, &AJSCard::ActivateCardEffect);
-			GameState->RegisterCard(this);
+			GameState->RegisterActivateCard(this);
 			CardState = ECardState::Activated;
 		}
 		else
