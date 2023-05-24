@@ -29,6 +29,14 @@ enum class ECardState
 	Disabled
 };
 
+UENUM()
+enum class ECardRank
+{
+	Common,
+	Rare,
+	Special
+};
+
 USTRUCT()
 struct FPlayerData
 {

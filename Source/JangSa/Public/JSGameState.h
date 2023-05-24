@@ -161,4 +161,14 @@ private:
 public:
 	UFUNCTION(BlueprintCallable)
 	TArray<class AJSCard*> CardsInCondition(const FString InRank);
+
+	UFUNCTION(BlueprintCallable)
+	int32 CountCardInCardNum(int32 InCardNum);
+
+	UFUNCTION(BlueprintCallable)
+	int32 CountCardInCardCharacteristics(FString CardCharacteristics);
+
+	UFUNCTION(BlueprintCallable)
+	int32 CountCardInCardRank(FString InCardRank);
+	
 };

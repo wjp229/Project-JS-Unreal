@@ -71,7 +71,7 @@ void AJSGameState::DprGameStart()
 	RefreshPlayerInfo();
 
 	AddCurrentCarat(15);
-	
+
 	OnEnterStartTurn();
 }
 
@@ -96,7 +96,7 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 			InventoryCards.Emplace(NewCardActor);
 
 			ArrangeCard();
-			
+
 			return true;
 		}
 	}
@@ -106,7 +106,7 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 void AJSGameState::OnEnterStartTurn()
 {
 	ShuffleHoldingCards();
-	
+
 	OnCheckEventQueue();
 }
 
@@ -115,7 +115,7 @@ void AJSGameState::ShuffleHoldingCards()
 	int32 MaxHoldingPack = 10;
 
 	// Send Holding Cards to Inventory
-	while(HoldingCards.Num() > 0)
+	while (HoldingCards.Num() > 0)
 	{
 		AJSCard* CardActor = HoldingCards[0];
 		HoldingCards.RemoveAt(0);
@@ -124,9 +124,9 @@ void AJSGameState::ShuffleHoldingCards()
 	}
 
 	// Send Inventory Cards to hold
-	for(int ix = 0; ix < MaxHoldingPack; ix++)
+	for (int ix = 0; ix < MaxHoldingPack; ix++)
 	{
-		if(InventoryCards.Num() <= 0)
+		if (InventoryCards.Num() <= 0)
 		{
 			break;
 		}
@@ -137,7 +137,7 @@ void AJSGameState::ShuffleHoldingCards()
 		HoldingCards.Emplace(CardActor);
 		CardActor->CardState = ECardState::Holding;
 	}
-	
+
 	ArrangeCard();
 }
 
@@ -154,9 +154,6 @@ void AJSGameState::OnResetShop(bool bIsInitTurn)
 
 		//return;
 	}
-
-	// Reset Shop
-	UE_LOG(LogTemp, Log, TEXT("Reset Shop..."));
 
 	TArray<FCardInfoData*> CardInfoDatas = CardActorFactory->SpawnCardActorOnShop();
 
@@ -177,7 +174,7 @@ void AJSGameState::RefreshPlayerInfo() const
 
 void AJSGameState::RegisterCard(AJSCard* InCard)
 {
-	if(!HoldingCards.Contains(InCard))
+	if (!HoldingCards.Contains(InCard))
 		return;
 
 	HoldingCards.Remove(InCard);
@@ -188,8 +185,8 @@ void AJSGameState::ArrangeCard()
 {
 	// Arrange Holding Cards
 	FVector HoldingSpawnLocation(265.0f, 440.0f, 95.f);
-	HoldingSpawnLocation += FVector(.0, 3.0f, .0f) * (HoldingCards.Num() - 1); 
-	for(int ix = 0; ix < HoldingCards.Num(); ix++)
+	HoldingSpawnLocation += FVector(.0, 3.0f, .0f) * (HoldingCards.Num() - 1);
+	for (int ix = 0; ix < HoldingCards.Num(); ix++)
 	{
 		HoldingCards[ix]->SetActorLocation(HoldingSpawnLocation + (FVector(.0, -6.0f, .0f) * ix));
 	}
@@ -197,7 +194,7 @@ void AJSGameState::ArrangeCard()
 	// Arrange Inventory Cards
 	const FVector InventorySpawnLocation(265.0f, 400.0f, 93.1f);
 	const int32 InventoryRow = 3;
-	for(int ix = 0; ix < InventoryCards.Num(); ix++)
+	for (int ix = 0; ix < InventoryCards.Num(); ix++)
 	{
 		FVector OffsetVector = (ix / InventoryRow) * FVector(-6.f, 0.f, 0.f);
 		OffsetVector += (ix % InventoryRow) * FVector(.0f, -6.f, .0f);
@@ -215,7 +212,7 @@ void AJSGameState::OnEnterSettleCaratPhase()
 	UE_LOG(LogTemp, Log, TEXT("Acitvation On Card State"));
 
 	// Activate Each Card Effects
-	for(auto Card : ActivatedCards)
+	for (auto Card : ActivatedCards)
 	{
 		Card->ActivateCardEffect(0);
 		Card->AddRemainTurn(-1);
@@ -231,11 +228,11 @@ void AJSGameState::OnEnterSettleCaratPhase()
 
 void AJSGameState::SelectCard(AJSCard* InCard)
 {
-	if(SelectedCard != nullptr)
+	if (SelectedCard != nullptr)
 	{
 		SelectedCard->SetPossessCard(false);
 	}
-	
+
 	SelectedCard = InCard;
 	SelectedCard->SetPossessCard(true);
 }
@@ -244,13 +241,44 @@ TArray<AJSCard*> AJSGameState::CardsInCondition(const FString InRank)
 {
 	TArray<AJSCard*> CardArray;
 
-	for(auto CardActor : ActivatedCards)
+	for (auto CardActor : ActivatedCards)
 	{
-		if(CardActor->GetCardInfo().Rank.Contains(InRank))
+		if (CardActor->GetCardInfo().Rank.Contains(InRank))
 		{
 			CardArray.Emplace(CardActor);
 		}
 	}
 
 	return CardArray;
+}
+
+int32 AJSGameState::CountCardInCardNum(int32 InCardNum)
+{
+	int32 Count = 0;
+	for (auto Card : ActivatedCards)
+	{
+		if (Card->GetCardInfo().Id == InCardNum)
+		{
+			Count += 1;
+		}
+	}
+	return Count;
+}
+
+int32 AJSGameState::CountCardInCardCharacteristics(FString CardCharacteristics)
+{
+	return 0;
+}
+
+int32 AJSGameState::CountCardInCardRank(FString InCardRank)
+{
+	int32 Count = 0;
+	for (auto Card : ActivatedCards)
+	{
+		if (Card->GetCardInfo().Rank.Contains(InCardRank))
+		{
+			Count += 1;
+		}
+	}
+	return Count;
 }

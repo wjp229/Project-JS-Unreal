@@ -45,8 +45,6 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 		const ConstructorHelpers::FClassFinder<UJSCardEffectComponent> CardEffectRef(*TargetAddress);
 		if (nullptr != CardEffectRef.Class)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Load Succeed!!"));
-
 			TSubclassOf<UJSCardEffectComponent> Effect = CardEffectRef.Class;
 
 			if (nullptr != Effect)
