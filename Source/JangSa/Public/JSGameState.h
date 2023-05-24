@@ -83,14 +83,23 @@ public:
 	void RefreshPlayerInfo() const;
 
 private:
+	TArray<struct FTurnInfoData*> TurnInfoDatas;
+
 	// Data includes Current Carats, Stages and State about Turn
 	FPlayerData* PlayerData;
 	EGamePlayState GamePlayState;
 
 	UPROPERTY()
 	TObjectPtr<class UJSCardFactory> CardActorFactory;
+	
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TArray<TObjectPtr<class AJSCard>> InventoryCards;
 
-	TArray<struct FTurnInfoData*> TurnInfoDatas;
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TArray<TObjectPtr<class AJSCard>> HoldingCards;
+
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TArray<TObjectPtr<class AJSCard>> ActivatedCards;
 #pragma endregion 
 
 #pragma region Phase Flow Section
@@ -113,20 +122,7 @@ private:
 
 #pragma endregion 
 
-#pragma region Progress Flow Section
-
-private:
-	UPROPERTY(VisibleAnywhere, Category="Inventory")
-	TArray<TObjectPtr<class AJSCard>> InventoryCards;
-
-	UPROPERTY(VisibleAnywhere, Category="Inventory")
-	TArray<TObjectPtr<class AJSCard>> HoldingCards;
-
-	UPROPERTY(VisibleAnywhere, Category="Inventory")
-	TArray<TObjectPtr<class AJSCard>> ActivatedCards;
-#pragma endregion 
-
-	// Card Managing / Counting Section
+#pragma region Card Managing / Counting Section
 public:
 	UFUNCTION(BlueprintCallable)
 	TArray<class AJSCard*> CardsInCondition(const FString InRank);
@@ -143,4 +139,5 @@ public:
 	void RegisterActivateCard(class AJSCard* InCard);
 	bool PurchaseCard(int32 InCardNum);
 	void ArrangeCard();
+#pragma endregion 
 };
