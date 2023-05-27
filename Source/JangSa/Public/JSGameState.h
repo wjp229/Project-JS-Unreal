@@ -6,6 +6,7 @@
 #include "GameFramework/GameState.h"
 #include "Data/JSTypes.h"
 #include "Data/CardInfoRowBase.h"
+#include "Data/StartCardInfoRowBase.h"
 #include "JSGameState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyRemainTurn, int32, num);
@@ -84,6 +85,7 @@ public:
 
 private:
 	TArray<struct FTurnInfoData*> TurnInfoDatas;
+	TArray<struct FStartCardInfoData*> StartCardInfoDatas;
 
 	// Data includes Current Carats, Stages and State about Turn
 	FPlayerData* PlayerData;
@@ -91,6 +93,12 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UJSCardFactory> CardActorFactory;
+
+	UPROPERTY()
+	TSubclassOf<class AJSCardSlot> CardSlot;
+
+	UPROPERTY(VisibleAnywhere, Category="Slot")
+	TArray<TObjectPtr<AJSCardSlot>> CardSlots;
 	
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TArray<TObjectPtr<class AJSCard>> InventoryCards;
@@ -131,12 +139,12 @@ public:
 	int32 CountCardInCardNum(int32 InCardNum);
 
 	UFUNCTION(BlueprintCallable)
-	int32 CountCardInCardCharacteristics(FString CardCharacteristics);
+	int32 CountCardInCardCharacteristics(FString InCharacteristics);
 
 	UFUNCTION(BlueprintCallable)
 	int32 CountCardInCardRank(FString InCardRank);
 
-	void RegisterActivateCard(class AJSCard* InCard);
+	void RegisterActivateCard(class AJSCard* InCard, int32 SlotNum);
 	bool PurchaseCard(int32 InCardNum);
 	void ArrangeCard();
 #pragma endregion 

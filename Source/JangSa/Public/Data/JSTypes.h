@@ -2,6 +2,8 @@
 
 #pragma once
 
+#define MAX_SLOT_NUM 7
+
 UENUM()
 enum class EGameKey
 {

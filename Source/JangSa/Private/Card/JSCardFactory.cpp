@@ -92,7 +92,7 @@ AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 			JSSpawnedCard, EffectComponents[CardNum]);
 
 		JSSpawnedCard->InitCard(*CardInfoDatas[CardNum], 0, EffectComponent);
-
+		
 		return SpawnedCard;
 	}
 

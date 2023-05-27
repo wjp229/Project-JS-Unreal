@@ -48,6 +48,12 @@ public:
 	FString Description;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
+	FString Characteristic1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
+	FString Characteristic2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
 	int32 Param1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")

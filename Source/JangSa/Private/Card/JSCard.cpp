@@ -40,6 +40,8 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	
 	EffectComponent = InEffectComponent;
 	EffectComponent->RegisterComponent();
+
+	SetActorLabel(*GetCardInfo().Name);
 }
 
 void AJSCard::ActivateCardEffect(int32 InOrder)
@@ -68,13 +70,12 @@ void AJSCard::SetCardStateActive(bool Active)
 	{
 		if(Active)
 		{
-			//NewGameState->NotifyActivateCardEffect.AddDynamic(this, &AJSCard::ActivateCardEffect);
-			GameState->RegisterActivateCard(this);
+			// To do : Set Slot Num
+			GameState->RegisterActivateCard(this, 0);
 			CardState = ECardState::Activated;
 		}
 		else
 		{
-			//NewGameState->NotifyActivateCardEffect.RemoveDynamic(this, &AJSCard::ActivateCardEffect);
 			CardState = ECardState::Holding;
 
 		}

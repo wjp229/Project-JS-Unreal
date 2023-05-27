@@ -6,6 +6,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/DataTable.h"
 #include "Card/JSCard.h"
+#include "Card/JSCardSlot.h"
 #include "Data/JSTypes.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/JSHUD.h"
@@ -16,12 +17,26 @@ AJSGameState::AJSGameState()
 	PlayerData = new FPlayerData();
 	GetPlayerData()->CurrentStage = 0;
 
-	const ConstructorHelpers::FObjectFinder<UDataTable> DT_TurnDateTable(
+	const ConstructorHelpers::FObjectFinder<UDataTable> DT_TurnDataTableRef(
 		TEXT("/Game/DataTable/DT_TurnInfo.DT_TurnInfo"));
-	if (DT_TurnDateTable.Succeeded())
+	if (DT_TurnDataTableRef.Succeeded())
 	{
-		DT_TurnDateTable.Object->GetAllRows<FTurnInfoData>(TEXT("GetAllRows"), TurnInfoDatas);
+		DT_TurnDataTableRef.Object->GetAllRows<FTurnInfoData>(TEXT("GetAllRows"), TurnInfoDatas);
 	}
+
+	const ConstructorHelpers::FObjectFinder<UDataTable> DT_StartCardInfoTableRef(
+		TEXT("/Script/Engine.DataTable'/Game/DataTable/DT_StartCardInfo.DT_StartCardInfo'"));
+	if (DT_StartCardInfoTableRef.Succeeded())
+	{
+		DT_StartCardInfoTableRef.Object->GetAllRows<FStartCardInfoData>(TEXT("GetAllRows"), StartCardInfoDatas);
+	}
+
+	const ConstructorHelpers::FClassFinder<AJSCardSlot> CardSlotRef(TEXT("/Script/JangSa.JSCardSlot"));
+	if(nullptr != CardSlotRef.Class)
+	{
+		CardSlot = CardSlotRef.Class;
+	}
+	
 
 	SetPayTurn(TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn);
 	SetRemainTurn(GetPlayerData()->PayTurn);
@@ -80,13 +95,44 @@ void AJSGameState::DprGameStart()
 
 	AddCurrentCarat(15);
 
+	FVector StartSlotSpawnPosition(255.0f,470.0f,93.5f);
+	// Spawn Slot
+	for(int ix = 0; ix < (MAX_SLOT_NUM * MAX_SLOT_NUM); ix++)
+	{
+		FVector CurSlotSpawnPosition = StartSlotSpawnPosition;
+		CurSlotSpawnPosition += FVector(0.f, -10.f, 0.f) * (ix % MAX_SLOT_NUM);
+		CurSlotSpawnPosition += FVector(-10.f, 0.f, 0.f) * (ix / MAX_SLOT_NUM);
+		
+		AJSCardSlot* NewSlot = Cast<AJSCardSlot>(GetWorld()->SpawnActor(CardSlot, &CurSlotSpawnPosition));
+		NewSlot->InitSlot(ix);
+
+		CardSlots.Emplace(NewSlot);
+	}
+
 	SpawnInitCard();
-	
+
 	OnEnterStartTurn();
 }
 
 void AJSGameState::SpawnInitCard()
 {
+	for(auto StartCardInfo : StartCardInfoDatas)
+	{
+		FVector SpawnLocation(265.0f, 400.0f, 93.1f);
+
+		AJSCard* NewCardActor = Cast<AJSCard>(CardActorFactory->SpawnCardActor(StartCardInfo->Id, &SpawnLocation));
+
+		if(StartCardInfo->FieldNum >= 0)
+		{
+			ActivatedCards.Emplace(NewCardActor);
+		}
+		else
+		{
+			InventoryCards.Emplace(NewCardActor);
+		}
+	}
+
+	ArrangeCard();
 }
 
 void AJSGameState::OnEnterStartTurn()
@@ -196,13 +242,15 @@ void AJSGameState::OnEnterSettleCaratPhase()
 	OnEnterStartTurn();
 }
 
-void AJSGameState::RegisterActivateCard(AJSCard* InCard)
+void AJSGameState::RegisterActivateCard(AJSCard* InCard, int32 SlotNum)
 {
 	if (!HoldingCards.Contains(InCard))
 		return;
 
 	HoldingCards.Remove(InCard);
 	ActivatedCards.Emplace(InCard);
+
+	// Set to SlotNum
 }
 
 void AJSGameState::ArrangeCard()
@@ -224,6 +272,16 @@ void AJSGameState::ArrangeCard()
 		OffsetVector += (ix % InventoryRow) * FVector(.0f, -6.f, .0f);
 		InventoryCards[ix]->SetActorLocation(InventorySpawnLocation + OffsetVector);
 	}
+
+	// Arrange File Cards
+	// const FVector FieldSpawnLocation(265.0f, 400.0f, 93.1f);
+	// const int32 InventoryRow = 3;
+	// for (int ix = 0; ix < InventoryCards.Num(); ix++)
+	// {
+	// 	FVector OffsetVector = (ix / InventoryRow) * FVector(-6.f, 0.f, 0.f);
+	// 	OffsetVector += (ix % InventoryRow) * FVector(.0f, -6.f, .0f);
+	// 	InventoryCards[ix]->SetActorLocation(InventorySpawnLocation + OffsetVector);
+	// }
 }
 
 TArray<AJSCard*> AJSGameState::CardsInCondition(const FString InRank)
@@ -254,9 +312,18 @@ int32 AJSGameState::CountCardInCardNum(int32 InCardNum)
 	return Count;
 }
 
-int32 AJSGameState::CountCardInCardCharacteristics(FString CardCharacteristics)
+int32 AJSGameState::CountCardInCardCharacteristics(FString InCharacteristics)
 {
-	return 0;
+	int32 Count = 0;
+	for (auto Card : ActivatedCards)
+	{
+		if (Card->GetCardInfo().Characteristic1.Contains(InCharacteristics) || Card->GetCardInfo().Characteristic2.
+			Contains(InCharacteristics))
+		{
+			Count += 1;
+		}
+	}
+	return Count;
 }
 
 int32 AJSGameState::CountCardInCardRank(FString InCardRank)
