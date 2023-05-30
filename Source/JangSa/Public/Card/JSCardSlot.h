@@ -18,7 +18,10 @@ public:
 	void InitSlot(int32 InSlotNum);
 
 private:
+	UFUNCTION()
 	void OnCardBeginOverlap(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
 	void OnCardEndOverlap(AActor* OverlappedActor, AActor* OtherActor);
 	
 	int32 SlotNum;

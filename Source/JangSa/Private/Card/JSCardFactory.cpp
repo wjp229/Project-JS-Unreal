@@ -83,7 +83,7 @@ AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 {
 	if(CardNum >= EffectComponents.Num()) return nullptr;
 	
-	AActor* SpawnedCard = GetWorld()->SpawnActor(CardBP, InLocation);
+	AActor* SpawnedCard = GetWorld()->SpawnActor(CardBP, InLocation);//, InLocation);
 	AJSCard* JSSpawnedCard = Cast<AJSCard>(SpawnedCard);
 
 	if (nullptr != JSSpawnedCard)

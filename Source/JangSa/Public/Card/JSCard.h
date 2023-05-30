@@ -34,7 +34,7 @@ protected:
 	UPROPERTY()
 	int32 CardObjID;
 
-	UPROPERTY(VisibleAnywhere, Category=CardRender)
+	UPROPERTY(EditAnywhere, Category=CardRender)
 	TObjectPtr<UStaticMeshComponent> KeycapMesh;
 
 	UPROPERTY(VisibleAnywhere, Category=Effect)
@@ -70,6 +70,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Placeable");
 	uint8 bIsPlaceable : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Slot");
+	int32 SlotNum;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category="Interaction")

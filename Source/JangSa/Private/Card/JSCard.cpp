@@ -21,10 +21,9 @@ AJSCard::AJSCard()
 	KeycapMesh->SetRelativeScale3D(FVector(.05f, .05f, .05f));
 	KeycapMesh->SetSimulatePhysics(true);
 
-	KeycapMesh->BodyInstance.bLockRotation = true;
-
 	RemainTurn = GetCardInfo().InitRemainTurn;
 	CardState = ECardState::Holding;
+	
 }
 
 FCardInfoData AJSCard::GetCardInfo() const
@@ -71,8 +70,10 @@ void AJSCard::SetCardStateActive(bool Active)
 		if(Active)
 		{
 			// To do : Set Slot Num
-			GameState->RegisterActivateCard(this, 0);
-			CardState = ECardState::Activated;
+			if(GameState->RegisterActivateCard(this, SlotNum))
+			{
+				CardState = ECardState::Activated;
+			}
 		}
 		else
 		{
@@ -89,7 +90,6 @@ bool AJSCard::OnSelectActor()
 
 	OriginPosition = GetActorLocation();
 	
-	KeycapMesh->GetBodyInstance()->bLockTranslation = false;
 	KeycapMesh->BodyInstance.SetEnableGravity(false);
 
 	return true;
@@ -108,7 +108,6 @@ void AJSCard::OnReleaseActor()
 	}
 	
 	KeycapMesh->BodyInstance.SetEnableGravity(true);
-	KeycapMesh->GetBodyInstance()->bLockTranslation = true;
 }
 
 void AJSCard::NotifyActorBeginCursorOver()
