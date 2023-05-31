@@ -57,3 +57,6 @@ struct FPlayerData
 
 const FString BP_CardEffectPrefixPath = TEXT("/Game/Card/CardEffect/CE_JSCard_");
 const FString BP_CardEffectSuffixPath = TEXT(".CE_JSCard_");
+
+const FString DA_CardDataPrefixPath = TEXT("/Game/Card/CardData/DA_JSCard_");
+const FString DA_CardDataSuffixPath = TEXT(".DA_JSCard_");

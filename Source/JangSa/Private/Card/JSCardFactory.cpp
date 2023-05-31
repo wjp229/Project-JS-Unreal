@@ -4,6 +4,7 @@
 #include "Card/JSCardFactory.h"
 #include "Card/JSCardEffectComponent.h"
 #include "Card/JSCard.h"
+#include "Data/JSCardDataAsset.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Data/JSTypes.h"
 
@@ -32,24 +33,24 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	// Collect Card Effects
 	for (int32 i = 0; i < CardInfoDatas.Num()-1; i++)
 	{
-		FString PreTargetAddress = BP_CardEffectPrefixPath;
-		FString ProTargetAddress = BP_CardEffectSuffixPath;
+		FString PreTargetAddress = DA_CardDataPrefixPath;
+		FString ProTargetAddress = DA_CardDataSuffixPath;
 
 		FString TargetAddress;
 		TargetAddress.Append(PreTargetAddress);
 		TargetAddress.Append(FString::FromInt(i));
 		TargetAddress.Append(ProTargetAddress);
 		TargetAddress.Append(FString::FromInt(i));
-		TargetAddress.Append(TEXT("_C"));
+//		TargetAddress.Append(TEXT("_C"));
 
-		const ConstructorHelpers::FClassFinder<UJSCardEffectComponent> CardEffectRef(*TargetAddress);
-		if (nullptr != CardEffectRef.Class)
+		const ConstructorHelpers::FObjectFinder<UJSCardDataAsset> CardDataRef(*TargetAddress);
+		if (nullptr != CardDataRef.Object)
 		{
-			TSubclassOf<UJSCardEffectComponent> Effect = CardEffectRef.Class;
+			UJSCardDataAsset* Data = CardDataRef.Object;
 
-			if (nullptr != Effect)
+			if (nullptr != Data)
 			{
-				EffectComponents.Emplace(Effect);
+				CardDataAssets.Emplace(Data);
 			}
 		}
 	}
@@ -81,17 +82,14 @@ TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
 
 AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 {
-	if(CardNum >= EffectComponents.Num()) return nullptr;
+	if(CardNum >= CardDataAssets.Num()) return nullptr;
 	
 	AActor* SpawnedCard = GetWorld()->SpawnActor(CardBP, InLocation);//, InLocation);
 	AJSCard* JSSpawnedCard = Cast<AJSCard>(SpawnedCard);
 
 	if (nullptr != JSSpawnedCard)
 	{
-		UJSCardEffectComponent* EffectComponent = NewObject<UJSCardEffectComponent>(
-			JSSpawnedCard, EffectComponents[CardNum]);
-
-		JSSpawnedCard->InitCard(*CardInfoDatas[CardNum], 0, EffectComponent);
+		JSSpawnedCard->InitCard(*CardInfoDatas[CardNum], 0, Cast<UJSCardDataAsset>(CardDataAssets[CardNum]));
 		
 		return SpawnedCard;
 	}

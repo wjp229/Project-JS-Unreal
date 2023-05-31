@@ -19,7 +19,7 @@ public:
 	AJSCard();
 
 	FCardInfoData GetCardInfo() const;
-	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardEffectComponent* InEffectComponent);
+	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardDataAsset* InDataAsset);
 
 
 protected:
@@ -34,11 +34,11 @@ protected:
 	UPROPERTY()
 	int32 CardObjID;
 
-	UPROPERTY(EditAnywhere, Category=CardRender)
-	TObjectPtr<UStaticMeshComponent> KeycapMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=CardRender)
+	TObjectPtr<USkeletalMeshComponent> Keycap;
 
 	UPROPERTY(VisibleAnywhere, Category=Effect)
-	TObjectPtr<UJSCardEffectComponent> EffectComponent;
+	TObjectPtr<class UJSCardEffectComponent> EffectComponent;
 
 	int32 RemainTurn;
 

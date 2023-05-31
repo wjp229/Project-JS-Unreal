@@ -4,26 +4,20 @@
 #include "Card/JSCard.h"
 #include "Card/JSCardEffectComponent.h"
 #include "JSGameState.h"
+#include "Data/JSCardDataAsset.h"
 #include "UI/JSHUD.h"
 #include "UObject/ConstructorHelpers.h"
 
 AJSCard::AJSCard()
 {
-	KeycapMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("KeycapMesh"));
-
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> KeycapMeshRef(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
-	if(KeycapMeshRef.Succeeded())
-	{
-		KeycapMesh->SetStaticMesh(KeycapMeshRef.Object);
-	}
-
-	RootComponent = KeycapMesh;
-	KeycapMesh->SetRelativeScale3D(FVector(.05f, .05f, .05f));
-	KeycapMesh->SetSimulatePhysics(true);
+	Keycap = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Keycap Mesh"));
+	
+	RootComponent = Keycap;
+	Keycap->SetRelativeScale3D(FVector(.05f, .05f, .05f));
+	Keycap->SetSimulatePhysics(false);
 
 	RemainTurn = GetCardInfo().InitRemainTurn;
 	CardState = ECardState::Holding;
-	
 }
 
 FCardInfoData AJSCard::GetCardInfo() const
@@ -31,21 +25,38 @@ FCardInfoData AJSCard::GetCardInfo() const
 	return CardData;
 }
 
-void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCardEffectComponent* InEffectComponent)
+void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCardDataAsset* InDataAsset)
 {
 	CardData = InCardData;
 	CardObjID = InObjectID;
 	CardState = ECardState::Inventory;
+
+	if(nullptr == InDataAsset)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Null Data Asset "));
+		return;
+	}
 	
-	EffectComponent = InEffectComponent;
+	UJSCardEffectComponent* CardEffectComponent = NewObject<UJSCardEffectComponent>(this, InDataAsset->EffectComponent);
+	EffectComponent = CardEffectComponent;
 	EffectComponent->RegisterComponent();
+
+	// if(nullptr == KeycapMesh)
+	// {
+	// 	UE_LOG(LogTemp, Log, TEXT("Null Keycap Mesh "));
+	// 	return;
+	// }
+	// USkeletalMeshComponent* CardEffectComponent = NewObject<USkeletalMeshComponent>(this, InDataAsset->EffectComponent);
+	// EffectComponent = CardEffectComponent;
+	// EffectComponent->RegisterComponent();
+	Keycap->SetSkeletalMesh(InDataAsset->Mesh);
 
 	SetActorLabel(*GetCardInfo().Name);
 }
 
 void AJSCard::ActivateCardEffect(int32 InOrder)
 {
-	if(EffectComponent != nullptr)
+	if (EffectComponent != nullptr)
 	{
 		EffectComponent->OnActivateEffect();
 		RemainTurn -= 1;
@@ -54,43 +65,46 @@ void AJSCard::ActivateCardEffect(int32 InOrder)
 
 void AJSCard::SetCardStateActive(bool Active)
 {
-	if(Active && CardState == ECardState::Activated)
+	if (Active && CardState == ECardState::Activated)
 	{
 		return;
 	}
-	else if(!Active && CardState == ECardState::Holding)
+	else if (!Active && CardState == ECardState::Holding)
 	{
 		return;
 	}
-	
+
 	// Bind Delegate to GameState
 	AJSGameState* const GameState = GetWorld()->GetGameState<AJSGameState>();
 	if (nullptr != GameState)
 	{
-		if(Active)
+		if (Active)
 		{
 			// To do : Set Slot Num
-			if(GameState->RegisterActivateCard(this, SlotNum))
+			if (GameState->RegisterActivateCard(this, SlotNum))
 			{
 				CardState = ECardState::Activated;
+			}
+			else
+			{
+				SetActorLocation(OriginPosition);
 			}
 		}
 		else
 		{
 			CardState = ECardState::Holding;
-
 		}
 	}
 }
 
 bool AJSCard::OnSelectActor()
 {
-	if(CardState == ECardState::Inventory)
+	if (CardState == ECardState::Inventory)
 		return false;
 
 	OriginPosition = GetActorLocation();
-	
-	KeycapMesh->BodyInstance.SetEnableGravity(false);
+
+	Keycap->BodyInstance.SetEnableGravity(false);
 
 	return true;
 }
@@ -98,7 +112,7 @@ bool AJSCard::OnSelectActor()
 void AJSCard::OnReleaseActor()
 {
 	// Check If Card is on right place else go back to origin Place
-	if(!bIsPlaceable)
+	if (!bIsPlaceable)
 	{
 		SetActorLocation(OriginPosition);
 	}
@@ -106,8 +120,8 @@ void AJSCard::OnReleaseActor()
 	{
 		SetCardStateActive(true);
 	}
-	
-	KeycapMesh->BodyInstance.SetEnableGravity(true);
+
+	Keycap->BodyInstance.SetEnableGravity(true);
 }
 
 void AJSCard::NotifyActorBeginCursorOver()
@@ -136,7 +150,6 @@ void AJSCard::OnMouseExitActor()
 
 void AJSCard::ActivateCardInfoHUD()
 {
-	
 }
 
 void AJSCard::SetPossessCard(bool IsPossessed)
@@ -153,7 +166,7 @@ void AJSCard::AddRemainTurn(int32 Value)
 
 void AJSCard::OnDestroyCard()
 {
-	if(RemainTurn == 0)
+	if (RemainTurn == 0)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Destroy"));
 	}

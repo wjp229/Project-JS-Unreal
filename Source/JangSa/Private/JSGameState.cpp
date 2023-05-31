@@ -224,6 +224,7 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 			return true;
 		}
 	}
+	
 	return false;
 }
 
