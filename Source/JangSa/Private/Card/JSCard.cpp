@@ -177,7 +177,10 @@ void AJSCard::SetActiveCardInfoHUD(bool InActive)
 	{
 		if (InActive)
 		{
-			JSHud->ShowCardInfoWidget(CardData, 0.f, 0.f, true);
+			FVector2D NewScreenPosition = FVector2D(0.f, 0.f);
+			
+			GetWorld()->GetFirstPlayerController()->ProjectWorldLocationToScreen(GetActorLocation(), NewScreenPosition);
+			JSHud->ShowCardInfoWidget(CardData, NewScreenPosition.X, NewScreenPosition.Y, true);
 		}
 		else
 		{
