@@ -4,6 +4,7 @@
 #include "UI/JSHUD.h"
 #include "Components/WidgetComponent.h"
 #include "UI/JSCardInfoWidget.h"
+#include "UI/JSResultWidget.h"
 #include "UI/JSShopWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -32,6 +33,12 @@ AJSHUD::AJSHUD()
 	{
 		CardInfoWidget = CreateWidget<UJSCardInfoWidget>(GetWorld(), CardInfoWidgetRef.Class);
 	}
+
+	const ConstructorHelpers::FClassFinder<UJSResultWidget> ResultWidgetRef(TEXT("/Game/UI/BP_ResultWidget.BP_ResultWidget_C"));
+	if (ResultWidgetRef.Class != nullptr)
+	{
+		ResultWidget = CreateWidget<UJSResultWidget>(GetWorld(), ResultWidgetRef.Class);
+	}
 	
 }
 
@@ -48,17 +55,39 @@ void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo)
 	JSShopWidget->InitShop(InCardInfo);
 }
 
-void AJSHUD::ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float MousePositionX, const float MousePositionY)
+void AJSHUD::ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float MousePositionX, const float MousePositionY, const bool InActive)
 {
 	if(nullptr != CardInfoWidget)
 	{
-		if (!CardInfoWidget->IsInViewport())
+		if(InActive)
 		{
-			CardInfoWidget->AddToViewport();
+			if (!CardInfoWidget->IsInViewport())
+			{
+				CardInfoWidget->AddToViewport();
+			}
+			else
+			{
+				CardInfoWidget->SetVisibility(ESlateVisibility::Visible);
 
+			}
+			CardInfoWidget->InitCardInfoWidget(InCardInfo, MousePositionX, MousePositionY);
 		}
-		CardInfoWidget->InitCardInfoWidget(InCardInfo, MousePositionX, MousePositionY);
+		else
+		{
+			CardInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
+}
+
+void AJSHUD::ShowDefeatWidget()
+{
+	ResultWidget->AddToViewport();
+	
+	ResultWidget->ShowDefeatWidget();
+}
+
+void AJSHUD::ShowResultInfoWidget()
+{
 }
 
 void AJSHUD::DrawMainHUD()

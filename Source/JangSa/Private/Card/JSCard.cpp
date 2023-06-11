@@ -5,19 +5,54 @@
 #include "Card/JSCardEffectComponent.h"
 #include "JSGameState.h"
 #include "Data/JSCardDataAsset.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/JSHUD.h"
 #include "UObject/ConstructorHelpers.h"
 
 AJSCard::AJSCard()
 {
-	Keycap = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Keycap Mesh"));
-	
-	RootComponent = Keycap;
-	Keycap->SetRelativeScale3D(FVector(.05f, .05f, .05f));
-	Keycap->SetSimulatePhysics(false);
+	CaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Case Mesh"));
+	KeycapMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Keycap Mesh"));
+
+	PrimaryActorTick.bCanEverTick = true;
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>
+		CaseMeshRef(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+	if (CaseMeshRef.Succeeded())
+	{
+		CaseMesh->SetStaticMesh(CaseMeshRef.Object);
+	}
+
+	RootComponent = CaseMesh;
+	CaseMesh->SetRelativeScale3D(FVector(.05f, .05f, .01f));
+	CaseMesh->SetSimulatePhysics(true);
+
+	KeycapMesh->SetupAttachment(CaseMesh);
+	KeycapMesh->SetRelativeScale3D(FVector(.7f, .7f, 3.5f));
+	KeycapMesh->SetRelativeRotation(FRotator(.0f, 270.0f, 0.f));
+	KeycapMesh->SetRelativeLocation(FVector(.0f, .0f, 50.f));
+	KeycapMesh->SetSimulatePhysics(false);
 
 	RemainTurn = GetCardInfo().InitRemainTurn;
+	InfoShowDelayTime = .7f;
+	bIsShowingInfo = false;
+	bIsDetected = false;
 	CardState = ECardState::Holding;
+}
+
+void AJSCard::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (!bIsDetected || bIsShowingInfo) return;
+
+	CurrentDetectingTime += DeltaSeconds;
+
+	if (CurrentDetectingTime > InfoShowDelayTime)
+	{
+		bIsShowingInfo = true;
+		SetActiveCardInfoHUD(true);
+	}
 }
 
 FCardInfoData AJSCard::GetCardInfo() const
@@ -31,25 +66,17 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	CardObjID = InObjectID;
 	CardState = ECardState::Inventory;
 
-	if(nullptr == InDataAsset)
+	if (nullptr == InDataAsset)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Null Data Asset "));
 		return;
 	}
-	
+
 	UJSCardEffectComponent* CardEffectComponent = NewObject<UJSCardEffectComponent>(this, InDataAsset->EffectComponent);
 	EffectComponent = CardEffectComponent;
 	EffectComponent->RegisterComponent();
 
-	// if(nullptr == KeycapMesh)
-	// {
-	// 	UE_LOG(LogTemp, Log, TEXT("Null Keycap Mesh "));
-	// 	return;
-	// }
-	// USkeletalMeshComponent* CardEffectComponent = NewObject<USkeletalMeshComponent>(this, InDataAsset->EffectComponent);
-	// EffectComponent = CardEffectComponent;
-	// EffectComponent->RegisterComponent();
-	Keycap->SetSkeletalMesh(InDataAsset->Mesh);
+	KeycapMesh->SetSkeletalMesh(InDataAsset->Mesh);
 
 	SetActorLabel(*GetCardInfo().Name);
 }
@@ -104,7 +131,7 @@ bool AJSCard::OnSelectActor()
 
 	OriginPosition = GetActorLocation();
 
-	Keycap->BodyInstance.SetEnableGravity(false);
+	CaseMesh->BodyInstance.SetEnableGravity(false);
 
 	return true;
 }
@@ -121,40 +148,50 @@ void AJSCard::OnReleaseActor()
 		SetCardStateActive(true);
 	}
 
-	Keycap->BodyInstance.SetEnableGravity(true);
-}
-
-void AJSCard::NotifyActorBeginCursorOver()
-{
-	Super::NotifyActorBeginCursorOver();
-
-	OnMouseEnterActor();
-}
-
-void AJSCard::NotifyActorEndCursorOver()
-{
-	Super::NotifyActorEndCursorOver();
-
-	OnMouseExitActor();
+	CaseMesh->BodyInstance.SetEnableGravity(true);
 }
 
 void AJSCard::OnMouseEnterActor()
 {
 	// To do : Activate Info HUD After few seconds
+	UE_LOG(LogTemp, Log, TEXT("Mouse Enter %s"), *GetActorNameOrLabel());
+	bIsDetected = true;
 }
 
 void AJSCard::OnMouseExitActor()
 {
 	// To do : Deactivate Info HUD After few Seconds
+	UE_LOG(LogTemp, Log, TEXT("Mouse Exit %s"), *GetActorNameOrLabel());
+
+	bIsDetected = false;
+	CurrentDetectingTime = 0.f;
+	bIsShowingInfo = false;
+
+	SetActiveCardInfoHUD(false);
 }
 
-void AJSCard::ActivateCardInfoHUD()
+void AJSCard::SetActiveCardInfoHUD(bool InActive)
 {
+	AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	if (JSHud != nullptr)
+	{
+		if (InActive)
+		{
+			JSHud->ShowCardInfoWidget(CardData, 0.f, 0.f, true);
+		}
+		else
+		{
+			JSHud->ShowCardInfoWidget(CardData, 0.f, 0.f, false);
+
+		}
+	}
 }
 
 void AJSCard::SetPossessCard(bool IsPossessed)
 {
 	bIsSelected = IsPossessed;
+
+	// OutLine Color to Color Green
 }
 
 void AJSCard::AddRemainTurn(int32 Value)

@@ -18,6 +18,8 @@ public:
 	// Sets default values for this actor's properties
 	AJSCard();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardDataAsset* InDataAsset);
 
@@ -35,7 +37,10 @@ protected:
 	int32 CardObjID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=CardRender)
-	TObjectPtr<USkeletalMeshComponent> Keycap;
+	TObjectPtr<UStaticMeshComponent> CaseMesh;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=CardRender)
+	TObjectPtr<USkeletalMeshComponent> KeycapMesh;
 
 	UPROPERTY(VisibleAnywhere, Category=Effect)
 	TObjectPtr<class UJSCardEffectComponent> EffectComponent;
@@ -56,14 +61,11 @@ public:
 	virtual bool OnSelectActor() override;
 	virtual void OnReleaseActor() override;
 
-	virtual void NotifyActorBeginCursorOver() override;
-	virtual void NotifyActorEndCursorOver() override;
 	virtual void OnMouseEnterActor() override;
 	virtual void OnMouseExitActor() override;
 
-	void ActivateCardInfoHUD();
-
-
+	void SetActiveCardInfoHUD(bool InActive);
+	
 	void SetPossessCard(bool IsPossessed);
 
 	ECardState CardState;
@@ -83,6 +85,8 @@ private:
 	// Card Cursor Overlap Section
 public:
 private:
-	float InfoShowDelayTime = 2.0f;
-	FTimerHandle CardInfoTimerHandler;
+	float InfoShowDelayTime;
+	float CurrentDetectingTime;
+	uint8 bIsDetected : 1;
+	uint8 bIsShowingInfo : 1;
 };

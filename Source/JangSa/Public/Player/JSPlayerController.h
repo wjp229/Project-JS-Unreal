@@ -17,6 +17,8 @@ class JANGSA_API AJSPlayerController : public APlayerController
 public:
 	AJSPlayerController(const FObjectInitializer& ObjectInitializer);
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	// Input Action Section
 protected:
 	UPROPERTY()
@@ -38,7 +40,7 @@ private:
 	void OnTapReleased();
 	void OnDrag();
 	
-	AActor* GetHitActor(const FVector2d& ScreenPosition);
+	AActor* GetHitActor(const FVector2d& ScreenPosition) const;
 	void SetMappingContext() const;
 
 	// Interaction Section
@@ -46,6 +48,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Interaction")
 	TObjectPtr<AActor> SelectedObject;
 
+	UPROPERTY(VisibleAnywhere, Category="Interaction")
+	TObjectPtr<AActor> DetectedObject;
+
+
 private:
-	FVector2d GetCurrentMousePosition();
+	FVector2d GetCurrentMousePosition() const;
 };

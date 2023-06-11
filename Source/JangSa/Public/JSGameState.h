@@ -121,6 +121,9 @@ public:
 	void OnExitTurn();
 
 private:
+	uint8 bCanReroll : 1;
+
+private:
 	void SpawnInitCard();
 
 	void OnEnterStartTurn();

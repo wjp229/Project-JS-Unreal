@@ -24,7 +24,11 @@ public:
 	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo);
 
 	// Interaction about Card Info
-	void ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float MousePositionX, const float MousePositionY);
+	void ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float MousePositionX, const float MousePositionY, const bool InActive);
+
+	void ShowDefeatWidget();
+
+	void ShowResultInfoWidget();
 	
 private:
 	UPROPERTY(EditAnywhere)
@@ -39,6 +43,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSCardInfoWidget> CardInfoWidget;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UJSResultWidget> ResultWidget;
 	
 protected:
 	virtual void BeginPlay() override;

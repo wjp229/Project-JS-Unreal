@@ -57,14 +57,22 @@ void AJSGameState::PostInitializeComponents()
 
 void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 {
-	// Deprecated Logv 
-	UE_LOG(LogTemp, Log, TEXT("CurrentStage : %d"), GetPlayerData()->CurrentStage);
-
 	if (InRemainTurn <= 0)
 	{
-		// Set To Next Phase
-		GetPlayerData()->CurrentStage += 1;
+		if(!AddCurrentCarat(-GetPlayerData()->PayCarat))
+		{
+			AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+			if (nullptr != JSHud)
+			{
+				JSHud->ShowDefeatWidget();
+			}
 
+			GamePlayState = EGamePlayState::Finished;
+			
+			return;
+		}
+		
+		// Game End If Current Stage is Last Stage
 		if (GetPlayerData()->CurrentStage == TurnInfoDatas.Num())
 		{
 			UE_LOG(LogTemp, Log, TEXT("!!!Game Clear!!!"));
@@ -73,11 +81,14 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 
 			return;
 		}
-
+		
+		// Set To Next Phase
+		GetPlayerData()->CurrentStage += 1;
+		
 		SetPayTurn(TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn);
 		SetPayCarat(TurnInfoDatas[GetPlayerData()->CurrentStage]->PayCarat);
 		GetPlayerData()->RemainTurn = TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn;
-
+		
 		return;
 	}
 
