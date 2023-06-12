@@ -18,8 +18,6 @@ public:
 	// Sets default values for this actor's properties
 	AJSCard();
 
-	virtual void Tick(float DeltaSeconds) override;
-
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardDataAsset* InDataAsset);
 
@@ -82,11 +80,4 @@ private:
 
 	FVector OriginPosition;
 
-	// Card Cursor Overlap Section
-public:
-private:
-	float InfoShowDelayTime;
-	float CurrentDetectingTime;
-	uint8 bIsDetected : 1;
-	uint8 bIsShowingInfo : 1;
 };

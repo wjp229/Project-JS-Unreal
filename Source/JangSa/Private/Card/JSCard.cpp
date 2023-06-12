@@ -14,7 +14,6 @@ AJSCard::AJSCard()
 	CaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Case Mesh"));
 	KeycapMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Keycap Mesh"));
 
-	PrimaryActorTick.bCanEverTick = true;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>
 		CaseMeshRef(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
@@ -34,26 +33,9 @@ AJSCard::AJSCard()
 	KeycapMesh->SetSimulatePhysics(false);
 
 	RemainTurn = GetCardInfo().InitRemainTurn;
-	InfoShowDelayTime = .7f;
-	bIsShowingInfo = false;
-	bIsDetected = false;
 	CardState = ECardState::Holding;
 }
 
-void AJSCard::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (!bIsDetected || bIsShowingInfo) return;
-
-	CurrentDetectingTime += DeltaSeconds;
-
-	if (CurrentDetectingTime > InfoShowDelayTime)
-	{
-		bIsShowingInfo = true;
-		SetActiveCardInfoHUD(true);
-	}
-}
 
 FCardInfoData AJSCard::GetCardInfo() const
 {
@@ -153,20 +135,11 @@ void AJSCard::OnReleaseActor()
 
 void AJSCard::OnMouseEnterActor()
 {
-	// To do : Activate Info HUD After few seconds
-	UE_LOG(LogTemp, Log, TEXT("Mouse Enter %s"), *GetActorNameOrLabel());
-	bIsDetected = true;
+	SetActiveCardInfoHUD(true);
 }
 
 void AJSCard::OnMouseExitActor()
 {
-	// To do : Deactivate Info HUD After few Seconds
-	UE_LOG(LogTemp, Log, TEXT("Mouse Exit %s"), *GetActorNameOrLabel());
-
-	bIsDetected = false;
-	CurrentDetectingTime = 0.f;
-	bIsShowingInfo = false;
-
 	SetActiveCardInfoHUD(false);
 }
 
