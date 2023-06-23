@@ -80,4 +80,9 @@ private:
 
 	FVector OriginPosition;
 
+
+	// Outline Color Section
+private:
+	void SetOutlineColor();
+
 };

@@ -147,7 +147,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 CountCardInCardRank(FString InCardRank);
 
-	bool RegisterActivateCard(class AJSCard* InCard, int32 SlotNum);
+	bool RegisterActivateCard(class AJSCard* InCard, int32 SlotNum, FVector& SlotPosition);
 	bool PurchaseCard(int32 InCardNum);
 	void ArrangeCard();
 #pragma endregion 

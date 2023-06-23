@@ -103,7 +103,15 @@ void AJSPlayerController::SetupInputComponent()
 void AJSPlayerController::OnTapPressed()
 {
 	const FVector2d CurrentMousePosition = GetCurrentMousePosition();
-	SelectedObject = GetHitActor(CurrentMousePosition);
+	AActor* HitActor = GetHitActor(CurrentMousePosition);
+	IJSInputInterface* CardInputInterface = Cast<IJSInputInterface>(HitActor);
+	if(CardInputInterface)
+	{
+		if(CardInputInterface->OnSelectActor())
+		{
+			SelectedObject = HitActor;
+		}
+	}
 }
 
 void AJSPlayerController::OnTapReleased()
@@ -128,9 +136,6 @@ AActor* AJSPlayerController::GetHitActor(const FVector2d& ScreenPosition) const
 		{
 			return nullptr;
 		}
-
-		if (!InputInterface->OnSelectActor())
-			return nullptr;
 
 		return Hit.GetActor();
 	}

@@ -33,7 +33,7 @@ AJSCard::AJSCard()
 	KeycapMesh->SetSimulatePhysics(false);
 
 	RemainTurn = GetCardInfo().InitRemainTurn;
-	CardState = ECardState::Holding;
+	CardState = ECardState::Inventory;
 }
 
 
@@ -89,10 +89,12 @@ void AJSCard::SetCardStateActive(bool Active)
 	{
 		if (Active)
 		{
+			FVector SlotPos;
 			// To do : Set Slot Num
-			if (GameState->RegisterActivateCard(this, SlotNum))
+			if (GameState->RegisterActivateCard(this, SlotNum, SlotPos))
 			{
 				CardState = ECardState::Activated;
+				SetActorLocation(FVector(SlotPos.X, SlotPos.Y, SlotPos.Z + 2.f));
 			}
 			else
 			{
@@ -113,6 +115,8 @@ bool AJSCard::OnSelectActor()
 
 	OriginPosition = GetActorLocation();
 
+	UE_LOG(LogTemp, Log, TEXT("Select Card"));
+	
 	CaseMesh->BodyInstance.SetEnableGravity(false);
 
 	return true;
@@ -130,6 +134,8 @@ void AJSCard::OnReleaseActor()
 		SetCardStateActive(true);
 	}
 
+	UE_LOG(LogTemp, Log, TEXT("Release Card"));
+	
 	CaseMesh->BodyInstance.SetEnableGravity(true);
 }
 
@@ -168,6 +174,11 @@ void AJSCard::SetPossessCard(bool IsPossessed)
 	bIsSelected = IsPossessed;
 
 	// OutLine Color to Color Green
+}
+
+void AJSCard::SetOutlineColor()
+{
+
 }
 
 void AJSCard::AddRemainTurn(int32 Value)

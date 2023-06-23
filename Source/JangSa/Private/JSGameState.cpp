@@ -140,8 +140,10 @@ void AJSGameState::SpawnInitCard()
 
 		if(StartCardInfo->FieldNum >= 0)
 		{
+			FVector SlotPos;
 			HoldingCards.Emplace(NewCardActor);
-			RegisterActivateCard(NewCardActor, StartCardInfo->FieldNum);
+			RegisterActivateCard(NewCardActor, StartCardInfo->FieldNum, SlotPos);
+			NewCardActor->SetActorLocation(SlotPos + FVector(0.f, 0.f, 1.f));
 		}
 		else
 		{
@@ -265,7 +267,7 @@ void AJSGameState::OnEnterSettleCaratPhase()
 	OnEnterStartTurn();
 }
 
-bool AJSGameState::RegisterActivateCard(AJSCard* InCard, int32 SlotNum)
+bool AJSGameState::RegisterActivateCard(AJSCard* InCard, int32 SlotNum, FVector& SlotPosition)
 {
 	if(SlotNum >= 49)
 	{
@@ -285,6 +287,8 @@ bool AJSGameState::RegisterActivateCard(AJSCard* InCard, int32 SlotNum)
 	HoldingCards.Remove(InCard);
 	ActivatedCards[SlotNum] = InCard;
 
+	SlotPosition = CardSlots[SlotNum]->GetActorLocation();
+
 	ArrangeCard();
 	
 	return true;
@@ -301,27 +305,31 @@ void AJSGameState::ArrangeCard()
 	}
 
 	// Arrange Inventory Cards
-	const FVector InventorySpawnLocation(265.0f, 400.0f, 93.1f);
-	const int32 InventoryRow = 3;
+	const FVector InventorySpawnLocation(230.0f, 390.0f, 105.f);
 	for (int ix = 0; ix < InventoryCards.Num(); ix++)
 	{
-		FVector OffsetVector = (ix / InventoryRow) * FVector(-6.f, 0.f, 0.f);
-		OffsetVector += (ix % InventoryRow) * FVector(.0f, -6.f, .0f);
-		InventoryCards[ix]->SetActorLocation(InventorySpawnLocation + OffsetVector);
+		InventoryCards[ix]->SetActorLocation(InventorySpawnLocation);
 	}
+	// const int32 InventoryRow = 3;
+	// for (int ix = 0; ix < InventoryCards.Num(); ix++)
+	// {
+	// 	FVector OffsetVector = (ix / InventoryRow) * FVector(-6.f, 0.f, 0.f);
+	// 	OffsetVector += (ix % InventoryRow) * FVector(.0f, -6.f, .0f);
+	// 	InventoryCards[ix]->SetActorLocation(InventorySpawnLocation + OffsetVector);
+	// }
 
-	// Arrange File Cards
-	const FVector OffsetLocation(.0f, .0f, 5.f);
-
-	for (int ix = 0; ix < ActivatedCards.Num(); ix++)
-	{
-		if(nullptr == ActivatedCards[ix])
-		{
-			continue;
-		}
-		
-		ActivatedCards[ix]->SetActorLocation(CardSlots[ix]->GetActorLocation() + OffsetLocation);
-	}
+	// Arrange Active Cards
+	// const FVector OffsetLocation(.0f, .0f, 5.f);
+	//
+	// for (int ix = 0; ix < ActivatedCards.Num(); ix++)
+	// {
+	// 	if(nullptr == ActivatedCards[ix])
+	// 	{
+	// 		continue;
+	// 	}
+	// 	
+	// 	ActivatedCards[ix]->SetActorLocation(CardSlots[ix]->GetActorLocation() + OffsetLocation);
+	// }
 }
 
 TArray<AJSCard*> AJSGameState::CardsInCondition(const FString InRank)
