@@ -6,6 +6,7 @@
 #include "JSGameState.h"
 #include "Data/JSCardDataAsset.h"
 #include "Kismet/GameplayStatics.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "UI/JSHUD.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -34,6 +35,11 @@ AJSCard::AJSCard()
 
 	RemainTurn = GetCardInfo().InitRemainTurn;
 	CardState = ECardState::Inventory;
+
+	DefaultOutlineColor = FLinearColor(1.0f, 1.0f, 1.0f);
+	MouseEnterOutlineColor = FLinearColor(0.1f, 1.0f, 0.1f);
+	DisabledOutlineColor = FLinearColor(1.0f, 0.1f, 0.1f);
+	SelectOulineColor = FLinearColor(1.0f, 1.0f, 0.1f);
 }
 
 
@@ -118,6 +124,7 @@ bool AJSCard::OnSelectActor()
 	UE_LOG(LogTemp, Log, TEXT("Select Card"));
 	
 	CaseMesh->BodyInstance.SetEnableGravity(false);
+	SetOutlineColor(SelectOulineColor);
 
 	return true;
 }
@@ -137,6 +144,8 @@ void AJSCard::OnReleaseActor()
 	UE_LOG(LogTemp, Log, TEXT("Release Card"));
 	
 	CaseMesh->BodyInstance.SetEnableGravity(true);
+	SetOutlineColor(DefaultOutlineColor);
+
 }
 
 void AJSCard::OnMouseEnterActor()
@@ -176,9 +185,17 @@ void AJSCard::SetPossessCard(bool IsPossessed)
 	// OutLine Color to Color Green
 }
 
-void AJSCard::SetOutlineColor()
+void AJSCard::SetOutlineColor(const FLinearColor& InColor)
 {
-
+	int32 Index = KeycapMesh->GetMaterialIndex("Mat_Outline");
+	UMaterialInstanceDynamic* OutlineMaterial = UMaterialInstanceDynamic::Create(KeycapMesh->GetMaterial(Index), NULL);
+	UE_LOG(LogTemp, Log, TEXT("Outline Mat"));
+	if(OutlineMaterial != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Change Outline Mat"));
+		KeycapMesh->SetMaterial(Index, OutlineMaterial);
+		OutlineMaterial->SetVectorParameterValue(FName(TEXT("OutlineColor")), InColor);
+	}
 }
 
 void AJSCard::AddRemainTurn(int32 Value)

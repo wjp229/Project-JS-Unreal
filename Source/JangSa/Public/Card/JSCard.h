@@ -83,6 +83,11 @@ private:
 
 	// Outline Color Section
 private:
-	void SetOutlineColor();
+	void SetOutlineColor(const FLinearColor& InColor);
+
+	FLinearColor DefaultOutlineColor;
+	FLinearColor MouseEnterOutlineColor;
+	FLinearColor SelectOulineColor;
+	FLinearColor DisabledOutlineColor;
 
 };
