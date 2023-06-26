@@ -15,7 +15,7 @@ AJSCard::AJSCard()
 	CaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Case Mesh"));
 	KeycapMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Keycap Mesh"));
 
-
+	
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>
 		CaseMeshRef(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	if (CaseMeshRef.Succeeded())
@@ -53,7 +53,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	CardData = InCardData;
 	CardObjID = InObjectID;
 	CardState = ECardState::Inventory;
-
+	
 	if (nullptr == InDataAsset)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Null Data Asset "));
@@ -67,6 +67,11 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	KeycapMesh->SetSkeletalMesh(InDataAsset->Mesh);
 
 	SetActorLabel(*GetCardInfo().Name);
+
+	
+	// CardData.Description.Replace(TEXT("[Param2]"), *FString::FromInt(CardData.Param2));
+	// CardData.Description.Replace(TEXT("[Param3]"), *FString::FromInt(CardData.Param3));
+
 }
 
 void AJSCard::ActivateCardEffect(int32 InOrder)

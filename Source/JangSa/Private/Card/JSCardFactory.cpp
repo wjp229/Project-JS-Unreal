@@ -30,6 +30,14 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 		}
 	}
 
+	for (int32 i = 0; i < CardInfoDatas.Num(); i++)
+	{
+		const TCHAR* CharArray = FString::FromInt(CardInfoDatas[i]->Param1).GetCharArray().GetData();
+		CardInfoDatas[i]->Description.ReplaceInline(TEXT("[Param1]"), *FString::FromInt(CardInfoDatas[i]->Param1));
+		UE_LOG(LogTemp, Log, TEXT("%s"), *CardInfoDatas[i]->Description);
+		UE_LOG(LogTemp, Log, TEXT("%s"), *FString::FromInt(CardInfoDatas[i]->Param1));
+	}
+	
 	// Collect Card Effects
 	for (int32 i = 0; i < CardInfoDatas.Num()-1; i++)
 	{
@@ -41,7 +49,6 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 		TargetAddress.Append(FString::FromInt(i));
 		TargetAddress.Append(ProTargetAddress);
 		TargetAddress.Append(FString::FromInt(i));
-//		TargetAddress.Append(TEXT("_C"));
 
 		const ConstructorHelpers::FObjectFinder<UJSCardDataAsset> CardDataRef(*TargetAddress);
 		if (nullptr != CardDataRef.Object)
