@@ -148,6 +148,7 @@ public:
 	int32 CountCardInCardRank(FString InCardRank);
 
 	bool RegisterActivateCard(class AJSCard* InCard, int32 SlotNum, FVector& SlotPosition);
+	bool UnregisterActivateCard(class AJSCard* InCard, int32 SlotNum);
 	bool PurchaseCard(int32 InCardNum);
 	void ArrangeCard();
 #pragma endregion 

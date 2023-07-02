@@ -2,8 +2,11 @@
 
 
 #include "Card/JSCard.h"
+
+#include "JSCardAnimInstance.h"
 #include "Card/JSCardEffectComponent.h"
 #include "JSGameState.h"
+#include "Animation/AnimInstance.h"
 #include "Data/JSCardDataAsset.h"
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -15,7 +18,7 @@ AJSCard::AJSCard()
 	CaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Case Mesh"));
 	KeycapMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Keycap Mesh"));
 
-	
+
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>
 		CaseMeshRef(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	if (CaseMeshRef.Succeeded())
@@ -25,7 +28,7 @@ AJSCard::AJSCard()
 
 	RootComponent = CaseMesh;
 	CaseMesh->SetRelativeScale3D(FVector(.05f, .05f, .01f));
-	CaseMesh->SetSimulatePhysics(true);
+	CaseMesh->SetSimulatePhysics(false);
 
 	KeycapMesh->SetupAttachment(CaseMesh);
 	KeycapMesh->SetRelativeScale3D(FVector(.7f, .7f, 3.5f));
@@ -53,7 +56,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	CardData = InCardData;
 	CardObjID = InObjectID;
 	CardState = ECardState::Inventory;
-	
+
 	if (nullptr == InDataAsset)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Null Data Asset "));
@@ -65,13 +68,22 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	EffectComponent->RegisterComponent();
 
 	KeycapMesh->SetSkeletalMesh(InDataAsset->Mesh);
+	CaseMesh->SetSimulatePhysics(true);
 
-	SetActorLabel(*GetCardInfo().Name);
+	if (nullptr != AnimInstanceClass)
+	{
+		KeycapMesh->SetAnimInstanceClass(AnimInstanceClass);
+	}
 
+	UMaterialInstanceDynamic* TextureMaterial = UMaterialInstanceDynamic::Create(KeycapMesh->GetMaterial(1), this);
+	if (TextureMaterial != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("SetTexture"));
+	//	KeycapMesh->SetMaterial(Index, OutlineMaterial);
+		TextureMaterial->SetTextureParameterValue(FName(TEXT("MainTex")), InDataAsset->Texture);
+	}
 	
-	// CardData.Description.Replace(TEXT("[Param2]"), *FString::FromInt(CardData.Param2));
-	// CardData.Description.Replace(TEXT("[Param3]"), *FString::FromInt(CardData.Param3));
-
+	SetActorLabel(*GetCardInfo().Name);
 }
 
 void AJSCard::ActivateCardEffect(int32 InOrder)
@@ -85,11 +97,7 @@ void AJSCard::ActivateCardEffect(int32 InOrder)
 
 void AJSCard::SetCardStateActive(bool Active)
 {
-	if (Active && CardState == ECardState::Activated)
-	{
-		return;
-	}
-	else if (!Active && CardState == ECardState::Holding)
+	if (!Active && CardState == ECardState::Holding)
 	{
 		return;
 	}
@@ -105,6 +113,7 @@ void AJSCard::SetCardStateActive(bool Active)
 			if (GameState->RegisterActivateCard(this, SlotNum, SlotPos))
 			{
 				CardState = ECardState::Activated;
+				bIsActivated = true;
 				SetActorLocation(FVector(SlotPos.X, SlotPos.Y, SlotPos.Z + 2.f));
 			}
 			else
@@ -114,6 +123,7 @@ void AJSCard::SetCardStateActive(bool Active)
 		}
 		else
 		{
+			GameState->UnregisterActivateCard(this, SlotNum);
 			CardState = ECardState::Holding;
 		}
 	}
@@ -124,10 +134,12 @@ bool AJSCard::OnSelectActor()
 	if (CardState == ECardState::Inventory)
 		return false;
 
+	bIsGrabbed = true;
+
 	OriginPosition = GetActorLocation();
 
 	UE_LOG(LogTemp, Log, TEXT("Select Card"));
-	
+
 	CaseMesh->BodyInstance.SetEnableGravity(false);
 	SetOutlineColor(SelectOulineColor);
 
@@ -146,11 +158,12 @@ void AJSCard::OnReleaseActor()
 		SetCardStateActive(true);
 	}
 
+	bIsGrabbed = false;
+
 	UE_LOG(LogTemp, Log, TEXT("Release Card"));
-	
+
 	CaseMesh->BodyInstance.SetEnableGravity(true);
 	SetOutlineColor(DefaultOutlineColor);
-
 }
 
 void AJSCard::OnMouseEnterActor()
@@ -171,14 +184,13 @@ void AJSCard::SetActiveCardInfoHUD(bool InActive)
 		if (InActive)
 		{
 			FVector2D NewScreenPosition = FVector2D(0.f, 0.f);
-			
+
 			GetWorld()->GetFirstPlayerController()->ProjectWorldLocationToScreen(GetActorLocation(), NewScreenPosition);
 			JSHud->ShowCardInfoWidget(CardData, NewScreenPosition.X, NewScreenPosition.Y, true);
 		}
 		else
 		{
 			JSHud->ShowCardInfoWidget(CardData, 0.f, 0.f, false);
-
 		}
 	}
 }
@@ -192,15 +204,13 @@ void AJSCard::SetPossessCard(bool IsPossessed)
 
 void AJSCard::SetOutlineColor(const FLinearColor& InColor)
 {
-	int32 Index = KeycapMesh->GetMaterialIndex("Mat_Outline");
-	UMaterialInstanceDynamic* OutlineMaterial = UMaterialInstanceDynamic::Create(KeycapMesh->GetMaterial(Index), NULL);
-	UE_LOG(LogTemp, Log, TEXT("Outline Mat"));
-	if(OutlineMaterial != nullptr)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Change Outline Mat"));
-		KeycapMesh->SetMaterial(Index, OutlineMaterial);
-		OutlineMaterial->SetVectorParameterValue(FName(TEXT("OutlineColor")), InColor);
-	}
+	// int32 Index = KeycapMesh->GetMaterialIndex("Mat_Outline");
+	// UMaterialInstanceDynamic* OutlineMaterial = UMaterialInstanceDynamic::Create(KeycapMesh->GetMaterial(Index), NULL);
+	// if(OutlineMaterial != nullptr)
+	// {
+	// 	KeycapMesh->SetMaterial(Index, OutlineMaterial);
+	// 	OutlineMaterial->SetVectorParameterValue(FName(TEXT("OutlineColor")), InColor);
+	// }
 }
 
 void AJSCard::AddRemainTurn(int32 Value)

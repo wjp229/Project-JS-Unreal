@@ -34,8 +34,6 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	{
 		const TCHAR* CharArray = FString::FromInt(CardInfoDatas[i]->Param1).GetCharArray().GetData();
 		CardInfoDatas[i]->Description.ReplaceInline(TEXT("[Param1]"), *FString::FromInt(CardInfoDatas[i]->Param1));
-		UE_LOG(LogTemp, Log, TEXT("%s"), *CardInfoDatas[i]->Description);
-		UE_LOG(LogTemp, Log, TEXT("%s"), *FString::FromInt(CardInfoDatas[i]->Param1));
 	}
 	
 	// Collect Card Effects
@@ -68,6 +66,7 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	{
 		CardBP = JsCardRef.Class;
 	}
+
 	//DEPRECATED_JsCard
 }
 
@@ -89,15 +88,23 @@ TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
 
 AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 {
+	if(Pool.Num() == 0)
+	{
+		CreateCardObjectsInPool();
+	}
+	
 	if(CardNum >= CardDataAssets.Num()) return nullptr;
 	
-	AActor* SpawnedCard = GetWorld()->SpawnActor(CardBP, InLocation);//, InLocation);
+	AActor* SpawnedCard = GetPooledObject();
+	SpawnedCard->SetActorLocation(*InLocation);
+	
+
 	AJSCard* JSSpawnedCard = Cast<AJSCard>(SpawnedCard);
 
 	if (nullptr != JSSpawnedCard)
 	{
 		JSSpawnedCard->InitCard(*CardInfoDatas[CardNum], 0, Cast<UJSCardDataAsset>(CardDataAssets[CardNum]));
-		
+
 		return SpawnedCard;
 	}
 
@@ -118,4 +125,34 @@ FCardInfoData* UJSCardFactory::SpawnCardData(int CardNum, bool IsRandom)
 const int32 UJSCardFactory::CheckCardPrice(const int InCardNum)
 {
 	return CardInfoDatas[InCardNum]->Price;
+}
+
+void UJSCardFactory::CreateCardObjectsInPool()
+{
+	for(int i = 0; i < 50; i++)
+	{
+		AActor* PoolObj = GetWorld()->SpawnActor(CardBP);
+		
+		Pool.Emplace(PoolObj);
+
+		PoolObj->SetActorHiddenInGame(true);
+	}
+}
+
+AActor* UJSCardFactory::GetPooledObject()
+{
+	if(Pool.Num() <= 0 ) return nullptr;
+	
+	AActor* ReturnObj = Pool.Pop();
+
+	ReturnObj->SetActorHiddenInGame(false);
+	
+	return ReturnObj;
+}
+
+void UJSCardFactory::ReturnObject(AActor* InReturnObj)
+{
+	Pool.Emplace(InReturnObj);
+
+	InReturnObj->SetActorHiddenInGame(true);
 }

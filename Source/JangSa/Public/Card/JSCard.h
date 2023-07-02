@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category=Effect)
 	TObjectPtr<class UJSCardEffectComponent> EffectComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=AnimationClass)
+	TSubclassOf<class UJSCardAnimInstance> AnimInstanceClass;
+
 	int32 RemainTurn;
 
 	// Card Activating Effect Section
@@ -90,4 +93,7 @@ private:
 	FLinearColor SelectOulineColor;
 	FLinearColor DisabledOutlineColor;
 
+public:
+	uint8 bIsGrabbed : 1;
+	uint8 bIsActivated : 1;
 };

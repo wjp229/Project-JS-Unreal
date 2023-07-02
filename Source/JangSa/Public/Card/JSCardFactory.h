@@ -16,8 +16,6 @@ class JANGSA_API UJSCardFactory : public UObject
 {
 	GENERATED_BODY()
 
-
-	
 public:
 	UJSCardFactory(const FObjectInitializer& ObjectInitializer);
 
@@ -37,4 +35,13 @@ private:
 	TArray<FCardInfoData*> TempCardInfoDatas;
 
 	TSubclassOf<class AJSCard> CardBP;
+
+	// Object Pooling
+private:
+	void CreateCardObjectsInPool();
+	AActor* GetPooledObject();
+
+	TArray<TObjectPtr<AActor>> Pool;
+public:
+	void ReturnObject(AActor* InReturnObj);
 };

@@ -294,6 +294,21 @@ bool AJSGameState::RegisterActivateCard(AJSCard* InCard, int32 SlotNum, FVector&
 	return true;
 }
 
+bool AJSGameState::UnregisterActivateCard(AJSCard* InCard, int32 SlotNum)
+{
+	if(SlotNum >= 49)
+	{
+		return false;
+	}
+
+	HoldingCards.Emplace(InCard);
+	ActivatedCards[SlotNum] = nullptr;
+
+	ArrangeCard();
+
+	return true;
+}
+
 void AJSGameState::ArrangeCard()
 {
 	// Arrange Holding Cards
