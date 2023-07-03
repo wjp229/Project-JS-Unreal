@@ -75,12 +75,11 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 		KeycapMesh->SetAnimInstanceClass(AnimInstanceClass);
 	}
 
-	UMaterialInstanceDynamic* TextureMaterial = UMaterialInstanceDynamic::Create(KeycapMesh->GetMaterial(1), this);
+	UMaterialInstanceDynamic* TextureMaterial = KeycapMesh->CreateAndSetMaterialInstanceDynamic(1);
 	if (TextureMaterial != nullptr)
 	{
-		UE_LOG(LogTemp, Log, TEXT("SetTexture"));
-	//	KeycapMesh->SetMaterial(Index, OutlineMaterial);
-		TextureMaterial->SetTextureParameterValue(FName(TEXT("MainTex")), InDataAsset->Texture);
+		UE_LOG(LogTemp, Log, TEXT("SetTexture %s"), *InDataAsset->Texture->GetName());
+		TextureMaterial->SetTextureParameterValue(FName("MainTex"), InDataAsset->Texture);
 	}
 	
 	SetActorLabel(*GetCardInfo().Name);
@@ -200,19 +199,18 @@ void AJSCard::SetPossessCard(bool IsPossessed)
 
 void AJSCard::SetOutlineColor(const FLinearColor InColor) const
 {
-
-	int32 Index = KeycapMesh->GetMaterialIndex(TEXT("Mat_Outline"));
-	UMaterialInstanceDynamic* OutlineMaterial = KeycapMesh->CreateDynamicMaterialInstance(Index);
-	if(OutlineMaterial != nullptr)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Change Outline Mat %s"), *InColor.ToString());
-		OutlineMaterial->SetVectorParameterValue(TEXT("OutlineColor"), InColor);
-
-		FHashedMaterialParameterInfo Info;
-		
-		UE_LOG(LogTemp, Log, TEXT("Change Outline Mat %s"), OutlineMaterial->GetVectorParameterValue());
-
-	}
+	// int32 Index = KeycapMesh->GetMaterialIndex(TEXT("Mat_Outline"));
+	// UMaterialInstanceDynamic* OutlineMaterial = KeycapMesh->CreateDynamicMaterialInstance(Index);
+	// if(OutlineMaterial != nullptr)
+	// {
+	// 	UE_LOG(LogTemp, Log, TEXT("Change Outline Mat %s"), *InColor.ToString());
+	// 	OutlineMaterial->SetVectorParameterValue(TEXT("OutlineColor"), InColor);
+	//
+	// 	FHashedMaterialParameterInfo Info;
+	// 	
+	// 	UE_LOG(LogTemp, Log, TEXT("Change Outline Mat %s"), OutlineMaterial->GetVectorParameterValue());
+	//
+	// }
 }
 
 void AJSCard::AddRemainTurn(int32 Value)
