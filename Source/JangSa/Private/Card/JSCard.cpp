@@ -67,18 +67,17 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	EffectComponent = CardEffectComponent;
 	EffectComponent->RegisterComponent();
 
-	KeycapMesh->SetSkeletalMesh(InDataAsset->Mesh);
 	CaseMesh->SetSimulatePhysics(true);
-
+	
+	// Set Key Cap Mesh and Material Settings
+	KeycapMesh->SetSkeletalMesh(InDataAsset->Mesh);
 	if (nullptr != AnimInstanceClass)
 	{
 		KeycapMesh->SetAnimInstanceClass(AnimInstanceClass);
 	}
-
 	UMaterialInstanceDynamic* TextureMaterial = KeycapMesh->CreateAndSetMaterialInstanceDynamic(1);
 	if (TextureMaterial != nullptr)
 	{
-		UE_LOG(LogTemp, Log, TEXT("SetTexture %s"), *InDataAsset->Texture->GetName());
 		TextureMaterial->SetTextureParameterValue(FName("MainTex"), InDataAsset->Texture);
 	}
 	
@@ -108,17 +107,24 @@ void AJSCard::SetCardStateActive(bool Active)
 		if (Active)
 		{
 			FVector SlotPos;
-			// To do : Set Slot Num
-			if (GameState->RegisterActivateCard(this, SlotNum, SlotPos))
+			if(CardState == ECardState::Holding)
 			{
-				CardState = ECardState::Activated;
-				bIsActivated = true;
-				SetActorLocation(FVector(SlotPos.X, SlotPos.Y, SlotPos.Z + 2.f));
+				// To do : Set Slot Num
+				if (GameState->RegisterActivateCard(this, SlotNum, SlotPos))
+				{
+					CardState = ECardState::Activated;
+					bIsActivated = true;
+					SetActorLocation(FVector(SlotPos.X, SlotPos.Y, SlotPos.Z + 2.f));
+				}
+				else
+				{
+					SetActorLocation(OriginPosition);
+				}
 			}
 			else
 			{
-				SetActorLocation(OriginPosition);
 			}
+			
 		}
 		else
 		{
