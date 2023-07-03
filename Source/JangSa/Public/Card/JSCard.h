@@ -25,7 +25,7 @@ public:
 
 protected:
 	UFUNCTION()
-	void OnDestroyCard();
+	void OnDestroyCard() const;
 
 	int CardNum;
 
@@ -57,7 +57,7 @@ public:
 	UFUNCTION()
 	void AddRemainTurn(int32 Value);
 
-	virtual void SetCardStateActive(bool Active);
+	virtual void SetCardStateActive(bool InActive);
 
 	// Mouse Interaction with actor
 	virtual bool OnSelectActor() override;

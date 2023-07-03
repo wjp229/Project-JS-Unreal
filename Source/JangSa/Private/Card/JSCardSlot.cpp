@@ -33,7 +33,6 @@ void AJSCardSlot::InitSlot(int32 InSlotNum)
 	//TriggerBox->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, true));
 
 	FVector TriggerSpawnLocation = GetActorLocation() +  FVector(0.f,0.f,7.f) ;
-	
 	FVector TriggerBoxScale = FVector(0.08f,0.08f,0.15f);
 	
 	TriggerBox->SetActorLocation(TriggerSpawnLocation);
@@ -41,7 +40,7 @@ void AJSCardSlot::InitSlot(int32 InSlotNum)
 
 	TriggerBox->OnActorBeginOverlap.AddDynamic(this, &AJSCardSlot::OnCardBeginOverlap);
 	TriggerBox->OnActorEndOverlap.AddDynamic(this, &AJSCardSlot::OnCardEndOverlap);
-
+	
 	SlotNum = InSlotNum;
 }
 

@@ -294,15 +294,16 @@ bool AJSGameState::RegisterActivateCard(AJSCard* InCard, int32 SlotNum, FVector&
 	return true;
 }
 
-bool AJSGameState::UnregisterActivateCard(AJSCard* InCard, int32 SlotNum)
+bool AJSGameState::UnregisterActivateCard(AJSCard* InCard)
 {
-	if(SlotNum >= 49)
-	{
-		return false;
-	}
+	if(!ActivatedCards.Contains(InCard)) return false;
+
+	UE_LOG(LogTemp, Log, TEXT("UnRegister Card"));
+	
+	const int32 CardIndex = ActivatedCards.Find(InCard);
 
 	HoldingCards.Emplace(InCard);
-	ActivatedCards[SlotNum] = nullptr;
+	ActivatedCards[CardIndex] = nullptr;
 
 	ArrangeCard();
 

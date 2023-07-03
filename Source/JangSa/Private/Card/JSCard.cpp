@@ -38,11 +38,11 @@ AJSCard::AJSCard()
 
 	RemainTurn = GetCardInfo().InitRemainTurn;
 	CardState = ECardState::Inventory;
-
-	DefaultOutlineColor = FLinearColor(1.0f, 1.0f, 1.0f);
-	MouseEnterOutlineColor = FLinearColor(0.1f, 1.0f, 0.1f);
-	DisabledOutlineColor = FLinearColor(1.0f, 0.1f, 0.1f);
-	SelectOulineColor = FLinearColor(1.0f, 1.0f, 0.1f);
+	
+	// DefaultOutlineColor = FLinearColor(1.0f, 1.0f, 1.0f);
+	// MouseEnterOutlineColor = FLinearColor(0.1f, 1.0f, 0.1f);
+	// DisabledOutlineColor = FLinearColor(1.0f, 0.1f, 0.1f);
+	// SelectOulineColor = FLinearColor(1.0f, 1.0f, 0.1f);
 }
 
 
@@ -93,9 +93,9 @@ void AJSCard::ActivateCardEffect(int32 InOrder)
 	}
 }
 
-void AJSCard::SetCardStateActive(bool Active)
+void AJSCard::SetCardStateActive(bool InActive)
 {
-	if (!Active && CardState == ECardState::Holding)
+	if (!InActive && CardState == ECardState::Holding)
 	{
 		return;
 	}
@@ -104,32 +104,37 @@ void AJSCard::SetCardStateActive(bool Active)
 	AJSGameState* const GameState = GetWorld()->GetGameState<AJSGameState>();
 	if (nullptr != GameState)
 	{
-		if (Active)
+		if (InActive)
 		{
 			FVector SlotPos;
 			if(CardState == ECardState::Holding)
 			{
-				// To do : Set Slot Num
+				// User is Holding Card, and Suceeded to Activate
 				if (GameState->RegisterActivateCard(this, SlotNum, SlotPos))
 				{
 					CardState = ECardState::Activated;
 					bIsActivated = true;
 					SetActorLocation(FVector(SlotPos.X, SlotPos.Y, SlotPos.Z + 2.f));
 				}
+				// User is Holding Card, but failed to Activate
 				else
 				{
 					SetActorLocation(OriginPosition);
 				}
 			}
-			else
+			else if(CardState == ECardState::Activated)
 			{
+				if(SlotNum >= 0 && SlotNum <= 49)
+				{
+					
+				}
 			}
-			
 		}
 		else
 		{
-			GameState->UnregisterActivateCard(this, SlotNum);
+			GameState->UnregisterActivateCard(this);
 			CardState = ECardState::Holding;
+			bIsActivated = false;
 		}
 	}
 }
@@ -143,8 +148,7 @@ bool AJSCard::OnSelectActor()
 
 	OriginPosition = GetActorLocation();
 	CaseMesh->BodyInstance.SetEnableGravity(false);
-	SetOutlineColor(SelectOulineColor);
-
+	
 	return true;
 }
 
@@ -155,16 +159,17 @@ void AJSCard::OnReleaseActor()
 	{
 		SetActorLocation(OriginPosition);
 	}
-	else
+	else if(SlotNum >= 0)
 	{
 		SetCardStateActive(true);
 	}
+	else if(SlotNum == -2)
+	{
+		SetCardStateActive(false);
+	}
+	
 	bIsGrabbed = false;
-
-	UE_LOG(LogTemp, Log, TEXT("Release Card"));
-
 	CaseMesh->BodyInstance.SetEnableGravity(true);
-	SetOutlineColor(DefaultOutlineColor);
 }
 
 void AJSCard::OnMouseEnterActor()
@@ -226,7 +231,7 @@ void AJSCard::AddRemainTurn(int32 Value)
 	// Set GUI For Remain Turn
 }
 
-void AJSCard::OnDestroyCard()
+void AJSCard::OnDestroyCard() const
 {
 	if (RemainTurn == 0)
 	{
