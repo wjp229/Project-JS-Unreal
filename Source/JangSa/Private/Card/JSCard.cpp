@@ -137,9 +137,6 @@ bool AJSCard::OnSelectActor()
 	bIsGrabbed = true;
 
 	OriginPosition = GetActorLocation();
-
-	UE_LOG(LogTemp, Log, TEXT("Select Card"));
-
 	CaseMesh->BodyInstance.SetEnableGravity(false);
 	SetOutlineColor(SelectOulineColor);
 
@@ -157,7 +154,6 @@ void AJSCard::OnReleaseActor()
 	{
 		SetCardStateActive(true);
 	}
-
 	bIsGrabbed = false;
 
 	UE_LOG(LogTemp, Log, TEXT("Release Card"));
@@ -176,7 +172,7 @@ void AJSCard::OnMouseExitActor()
 	SetActiveCardInfoHUD(false);
 }
 
-void AJSCard::SetActiveCardInfoHUD(bool InActive)
+void AJSCard::SetActiveCardInfoHUD(bool InActive) const
 {
 	AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	if (JSHud != nullptr)
@@ -202,15 +198,21 @@ void AJSCard::SetPossessCard(bool IsPossessed)
 	// OutLine Color to Color Green
 }
 
-void AJSCard::SetOutlineColor(const FLinearColor& InColor)
+void AJSCard::SetOutlineColor(const FLinearColor InColor) const
 {
-	// int32 Index = KeycapMesh->GetMaterialIndex("Mat_Outline");
-	// UMaterialInstanceDynamic* OutlineMaterial = UMaterialInstanceDynamic::Create(KeycapMesh->GetMaterial(Index), NULL);
-	// if(OutlineMaterial != nullptr)
-	// {
-	// 	KeycapMesh->SetMaterial(Index, OutlineMaterial);
-	// 	OutlineMaterial->SetVectorParameterValue(FName(TEXT("OutlineColor")), InColor);
-	// }
+
+	int32 Index = KeycapMesh->GetMaterialIndex(TEXT("Mat_Outline"));
+	UMaterialInstanceDynamic* OutlineMaterial = KeycapMesh->CreateDynamicMaterialInstance(Index);
+	if(OutlineMaterial != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Change Outline Mat %s"), *InColor.ToString());
+		OutlineMaterial->SetVectorParameterValue(TEXT("OutlineColor"), InColor);
+
+		FHashedMaterialParameterInfo Info;
+		
+		UE_LOG(LogTemp, Log, TEXT("Change Outline Mat %s"), OutlineMaterial->GetVectorParameterValue());
+
+	}
 }
 
 void AJSCard::AddRemainTurn(int32 Value)
@@ -226,5 +228,4 @@ void AJSCard::OnDestroyCard()
 	{
 		UE_LOG(LogTemp, Log, TEXT("Destroy"));
 	}
-	//this->Destroy();
 }

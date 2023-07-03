@@ -111,7 +111,7 @@ void AJSGameState::DprGameStart()
 
 	AddCurrentCarat(15);
 
-	FVector StartSlotSpawnPosition(255.0f,470.0f,93.5f);
+	const FVector StartSlotSpawnPosition(255.0f,470.0f,93.5f);
 	// Spawn Slot
 	for(int ix = 0; ix < (MAX_SLOT_NUM * MAX_SLOT_NUM); ix++)
 	{
@@ -163,7 +163,7 @@ void AJSGameState::OnEnterStartTurn()
 
 void AJSGameState::ShuffleHoldingCards()
 {
-	int32 MaxHoldingPack = 10;
+	const int32 MaxHoldingPack = 10;
 
 	// Send Holding Cards to Inventory
 	while (HoldingCards.Num() > 0)
@@ -198,7 +198,7 @@ void AJSGameState::OnCheckEventQueue()
 	OnResetShop();
 }
 
-void AJSGameState::OnResetShop(bool bIsInitTurn)
+void AJSGameState::OnResetShop(bool bIsInitTurn) const
 {
 	if (!bIsInitTurn)
 	{
@@ -218,13 +218,13 @@ void AJSGameState::OnResetShop(bool bIsInitTurn)
 
 bool AJSGameState::PurchaseCard(int32 InCardNum)
 {
-	int32 CardPrice = CardActorFactory->CheckCardPrice(InCardNum);
+	const int32 CardPrice = CardActorFactory->CheckCardPrice(InCardNum);
 
 	// To Do : if(GetPlayerData()->CurrentCarat >= CardPrice);
 	if (AddCurrentCarat(-CardPrice))
 	{
 		// To Do : Pay Owning Carat
-		FVector SpawnLocation(265.0f, 400.0f, 93.1f);
+		const FVector SpawnLocation(265.0f, 400.0f, 93.1f);
 
 		AJSCard* NewCardActor = Cast<AJSCard>(CardActorFactory->SpawnCardActor(InCardNum, &SpawnLocation));
 
@@ -407,7 +407,7 @@ int32 AJSGameState::CountCardInCardCharacteristics(FString InCharacteristics)
 int32 AJSGameState::CountCardInCardRank(FString InCardRank)
 {
 	int32 Count = 0;
-	for (auto Card : ActivatedCards)
+	for (const auto Card : ActivatedCards)
 	{
 		if (Card->GetCardInfo().Rank.Contains(InCardRank))
 		{

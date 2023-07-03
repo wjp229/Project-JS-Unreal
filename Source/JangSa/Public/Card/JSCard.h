@@ -21,6 +21,7 @@ public:
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardDataAsset* InDataAsset);
 
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
 	UFUNCTION()
@@ -65,7 +66,7 @@ public:
 	virtual void OnMouseEnterActor() override;
 	virtual void OnMouseExitActor() override;
 
-	void SetActiveCardInfoHUD(bool InActive);
+	void SetActiveCardInfoHUD(bool InActive) const;
 	
 	void SetPossessCard(bool IsPossessed);
 
@@ -86,7 +87,7 @@ private:
 
 	// Outline Color Section
 private:
-	void SetOutlineColor(const FLinearColor& InColor);
+	void SetOutlineColor(const FLinearColor InColor) const;
 
 	FLinearColor DefaultOutlineColor;
 	FLinearColor MouseEnterOutlineColor;

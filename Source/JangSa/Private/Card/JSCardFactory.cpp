@@ -12,6 +12,9 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	// Get All Card Data in Data Table
+
+	// Datatable to BlueprintEditable and adjust to class
+	// Object Redirector : 
 	const ConstructorHelpers::FObjectFinder<UDataTable>
 		DT_CardDataInfo(TEXT("/Game/DataTable/DT_CardInfo.DT_CardInfo"));
 	if (DT_CardDataInfo.Succeeded())
@@ -32,8 +35,10 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 
 	for (int32 i = 0; i < CardInfoDatas.Num(); i++)
 	{
-		const TCHAR* CharArray = FString::FromInt(CardInfoDatas[i]->Param1).GetCharArray().GetData();
+		// FText / Text Formatting
 		CardInfoDatas[i]->Description.ReplaceInline(TEXT("[Param1]"), *FString::FromInt(CardInfoDatas[i]->Param1));
+		CardInfoDatas[i]->Description.ReplaceInline(TEXT("[Param2]"), *FString::FromInt(CardInfoDatas[i]->Param2));
+		CardInfoDatas[i]->Description.ReplaceInline(TEXT("[Param3]"), *FString::FromInt(CardInfoDatas[i]->Param3));
 	}
 	
 	// Collect Card Effects
@@ -86,6 +91,7 @@ TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
 	return TempCardInfoDatas;
 }
 
+// To do : Actor Pooling
 AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 {
 	if(Pool.Num() == 0)

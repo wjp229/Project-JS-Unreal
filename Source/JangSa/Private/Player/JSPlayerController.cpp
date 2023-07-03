@@ -104,8 +104,7 @@ void AJSPlayerController::OnTapPressed()
 {
 	const FVector2d CurrentMousePosition = GetCurrentMousePosition();
 	AActor* HitActor = GetHitActor(CurrentMousePosition);
-	IJSInputInterface* CardInputInterface = Cast<IJSInputInterface>(HitActor);
-	if(CardInputInterface)
+	if(IJSInputInterface* CardInputInterface = Cast<IJSInputInterface>(HitActor))
 	{
 		if(CardInputInterface->OnSelectActor())
 		{
@@ -130,7 +129,7 @@ AActor* AJSPlayerController::GetHitActor(const FVector2d& ScreenPosition) const
 
 	if (GetHitResultAtScreenPosition(ScreenPosition, ECC_Visibility, true, Hit))
 	{
-		IJSInputInterface* InputInterface = Cast<IJSInputInterface>(Hit.GetActor());
+		const IJSInputInterface* InputInterface = Cast<IJSInputInterface>(Hit.GetActor());
 
 		if (nullptr == InputInterface)
 		{
@@ -182,7 +181,7 @@ FVector2d AJSPlayerController::GetCurrentMousePosition() const
 
 	GetMousePosition(MouseLocationX, MouseLocationY);
 
-	FVector2d NewPositionVector = FVector2d(MouseLocationX, MouseLocationY);
+	const FVector2d NewPositionVector = FVector2d(MouseLocationX, MouseLocationY);
 
 	return NewPositionVector;
 }

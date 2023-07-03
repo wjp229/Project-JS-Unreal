@@ -115,7 +115,7 @@ private:
 public:
 	// Deprecated
 	void DprGameStart();
-	void OnResetShop(bool bIsInitTurn = true);
+	void OnResetShop(bool bIsInitTurn = true) const;
 
 	UFUNCTION(BlueprintCallable)
 	void OnExitTurn();

@@ -44,4 +44,5 @@ private:
 	TArray<TObjectPtr<AActor>> Pool;
 public:
 	void ReturnObject(AActor* InReturnObj);
+
 };
