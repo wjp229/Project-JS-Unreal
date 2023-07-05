@@ -18,8 +18,6 @@ void AJSCardHoldZone::PostInitializeComponents()
 
 void AJSCardHoldZone::OnCardBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
-	UE_LOG(LogTemp, Log, TEXT("On Holding Overlapped"));
-
 	AJSCard* InCard = Cast<AJSCard>(OtherActor);
 	if(nullptr != InCard)
 	{
@@ -30,12 +28,10 @@ void AJSCardHoldZone::OnCardBeginOverlap(AActor* OverlappedActor, AActor* OtherA
 
 void AJSCardHoldZone::OnCardEndOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
-	UE_LOG(LogTemp, Log, TEXT("On End Holding Overlapped"));
-
 	AJSCard* InCard = Cast<AJSCard>(OtherActor);
 	if(nullptr != InCard)
 	{
 		InCard->SlotNum = -1;
-		InCard->bIsPlaceable = true;
+		InCard->bIsPlaceable = false;
 	}
 }

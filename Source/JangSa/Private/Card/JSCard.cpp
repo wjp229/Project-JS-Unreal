@@ -36,9 +36,8 @@ AJSCard::AJSCard()
 	KeycapMesh->SetRelativeLocation(FVector(.0f, .0f, 50.f));
 	KeycapMesh->SetSimulatePhysics(false);
 
-	RemainTurn = GetCardInfo().InitRemainTurn;
 	CardState = ECardState::Inventory;
-	
+
 	// DefaultOutlineColor = FLinearColor(1.0f, 1.0f, 1.0f);
 	// MouseEnterOutlineColor = FLinearColor(0.1f, 1.0f, 0.1f);
 	// DisabledOutlineColor = FLinearColor(1.0f, 0.1f, 0.1f);
@@ -54,7 +53,6 @@ FCardInfoData AJSCard::GetCardInfo() const
 void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCardDataAsset* InDataAsset)
 {
 	CardData = InCardData;
-	CardObjID = InObjectID;
 	CardState = ECardState::Inventory;
 
 	if (nullptr == InDataAsset)
@@ -68,7 +66,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	EffectComponent->RegisterComponent();
 
 	CaseMesh->SetSimulatePhysics(true);
-	
+
 	// Set Key Cap Mesh and Material Settings
 	KeycapMesh->SetSkeletalMesh(InDataAsset->Mesh);
 	if (nullptr != AnimInstanceClass)
@@ -80,7 +78,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	{
 		TextureMaterial->SetTextureParameterValue(FName("MainTex"), InDataAsset->Texture);
 	}
-	
+
 	SetActorLabel(*GetCardInfo().Name);
 }
 
@@ -89,14 +87,25 @@ void AJSCard::ActivateCardEffect(int32 InOrder)
 	if (EffectComponent != nullptr)
 	{
 		EffectComponent->OnActivateEffect();
-		RemainTurn -= 1;
 	}
 }
+
+int32 AJSCard::GetResultCarat()
+{
+	if (EffectComponent != nullptr)
+	{
+		return EffectComponent->GetEffectResult();
+	}
+
+	return 0;
+}
+
 
 void AJSCard::SetCardStateActive(bool InActive)
 {
 	if (!InActive && CardState == ECardState::Holding)
 	{
+		SetActorLocation(OriginPosition);
 		return;
 	}
 
@@ -107,7 +116,7 @@ void AJSCard::SetCardStateActive(bool InActive)
 		if (InActive)
 		{
 			FVector SlotPos;
-			if(CardState == ECardState::Holding)
+			if (CardState == ECardState::Holding)
 			{
 				// User is Holding Card, and Suceeded to Activate
 				if (GameState->RegisterActivateCard(this, SlotNum, SlotPos))
@@ -122,11 +131,13 @@ void AJSCard::SetCardStateActive(bool InActive)
 					SetActorLocation(OriginPosition);
 				}
 			}
-			else if(CardState == ECardState::Activated)
+			else if (CardState == ECardState::Activated)
 			{
-				if(SlotNum >= 0 && SlotNum <= 49)
+				if (SlotNum >= 0 && SlotNum <= 49)
 				{
-					
+					{
+						SetActorLocation(OriginPosition);
+					}
 				}
 			}
 		}
@@ -145,28 +156,39 @@ bool AJSCard::OnSelectActor()
 		return false;
 
 	bIsGrabbed = true;
-
 	OriginPosition = GetActorLocation();
 	CaseMesh->BodyInstance.SetEnableGravity(false);
-	
+
 	return true;
 }
 
 void AJSCard::OnReleaseActor()
 {
-	// Check If Card is on right place else go back to origin Place
-	if (!bIsPlaceable)
+	UE_LOG(LogTemp, Log, TEXT("%d, %d"), bIsPlaceable, SlotNum);
+
+	if(bIsPlaceable)
+	{
+		// Check If Card is on right place else go back to origin Place
+		if (SlotNum >= 0)
+		{
+			SetCardStateActive(true);
+			UE_LOG(LogTemp, Log, TEXT("Bug1"));
+
+		}
+		else if (SlotNum == -2)
+		{
+			SetCardStateActive(false);
+			UE_LOG(LogTemp, Log, TEXT("Bug2"));
+
+		}
+	}
+	else
 	{
 		SetActorLocation(OriginPosition);
+		UE_LOG(LogTemp, Log, TEXT("Bug3"));
 	}
-	else if(SlotNum >= 0)
-	{
-		SetCardStateActive(true);
-	}
-	else if(SlotNum == -2)
-	{
-		SetCardStateActive(false);
-	}
+
+	UE_LOG(LogTemp, Log, TEXT("Bug"));
 	
 	bIsGrabbed = false;
 	CaseMesh->BodyInstance.SetEnableGravity(true);
@@ -201,13 +223,6 @@ void AJSCard::SetActiveCardInfoHUD(bool InActive) const
 	}
 }
 
-void AJSCard::SetPossessCard(bool IsPossessed)
-{
-	bIsSelected = IsPossessed;
-
-	// OutLine Color to Color Green
-}
-
 void AJSCard::SetOutlineColor(const FLinearColor InColor) const
 {
 	// int32 Index = KeycapMesh->GetMaterialIndex(TEXT("Mat_Outline"));
@@ -222,19 +237,4 @@ void AJSCard::SetOutlineColor(const FLinearColor InColor) const
 	// 	UE_LOG(LogTemp, Log, TEXT("Change Outline Mat %s"), OutlineMaterial->GetVectorParameterValue());
 	//
 	// }
-}
-
-void AJSCard::AddRemainTurn(int32 Value)
-{
-	RemainTurn += Value;
-
-	// Set GUI For Remain Turn
-}
-
-void AJSCard::OnDestroyCard() const
-{
-	if (RemainTurn == 0)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Destroy"));
-	}
 }

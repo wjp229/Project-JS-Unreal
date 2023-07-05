@@ -12,13 +12,10 @@ UJSCardEffectComponent::UJSCardEffectComponent()
 
 void UJSCardEffectComponent::OnActivateEffect_Implementation()
 {
+	
 }
 
-// Called when the game starts
-void UJSCardEffectComponent::BeginPlay()
+int32 UJSCardEffectComponent::GetEffectResult_Implementation()
 {
-	Super::BeginPlay();
-
-	// ...
-	
+	return 0;
 }

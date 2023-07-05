@@ -19,7 +19,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnActivateEffect();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetEffectResult();
 };

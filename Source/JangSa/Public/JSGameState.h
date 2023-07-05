@@ -6,13 +6,13 @@
 #include "GameFramework/GameState.h"
 #include "Data/JSTypes.h"
 #include "Data/CardInfoRowBase.h"
-#include "Data/StartCardInfoRowBase.h"
 #include "JSGameState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyRemainTurn, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPayTurn, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPayCarat, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyCurrentCarat, int32, num);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyResultCarat, int32, num);
 
 /**
  * 
@@ -37,6 +37,8 @@ public:
 	FNotifyPayCarat NotifyPayCarat;
 	UPROPERTY(BlueprintAssignable)
 	FNotifyCurrentCarat NotifyCurrentCarat;
+	UPROPERTY(BlueprintAssignable)
+	FNotifyResultCarat NotifyResultCarat;
 #pragma endregion
 
 # pragma region Player / Turn Data Section
@@ -81,12 +83,15 @@ public:
 		return true;
 	}
 
+	FORCEINLINE void AddTurnResultCarat(const int32 InValue)
+	{
+		TurnResultCarat += InValue;
+		NotifyResultCarat.Broadcast(TurnResultCarat);
+	}
+
 	void RefreshPlayerInfo() const;
 
 private:
-	TArray<struct FTurnInfoData*> TurnInfoDatas;
-	TArray<struct FStartCardInfoData*> StartCardInfoDatas;
-
 	// Data includes Current Carats, Stages and State about Turn
 	FPlayerData* PlayerData;
 	EGamePlayState GamePlayState;
@@ -108,6 +113,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category="Inventory")
 	TArray<TObjectPtr<class AJSCard>> ActivatedCards;
+
+	UPROPERTY(VisibleAnywhere, Category="TurnResult")
+	int32 TurnResultCarat;
+
 #pragma endregion 
 
 #pragma region Phase Flow Section

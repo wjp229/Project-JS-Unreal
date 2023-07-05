@@ -19,6 +19,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void StartGame();
-	
+
 private:
 };

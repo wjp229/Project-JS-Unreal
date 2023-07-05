@@ -19,6 +19,8 @@ class JANGSA_API UJSCardFactory : public UObject
 public:
 	UJSCardFactory(const FObjectInitializer& ObjectInitializer);
 
+	void InitFactory();
+
 	TArray<struct FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop();
 	
 	AActor* SpawnCardActor(int CardNum, FVector const* InLocation = 0);
@@ -28,7 +30,6 @@ public:
 	const int32 CheckCardPrice(const int CardNum);
 
 private:
-	TArray<FCardInfoData*> CardInfoDatas;
 	TArray<FCardInfoData*> CardInfoDatasOnShop;
 	TArray<TObjectPtr<class UJSCardDataAsset>> CardDataAssets;
 

@@ -21,19 +21,11 @@ public:
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardDataAsset* InDataAsset);
 
-	//virtual void OnConstruction(const FTransform& Transform) override;
-
 protected:
-	UFUNCTION()
-	void OnDestroyCard() const;
-
 	int CardNum;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=CardInfo)
 	FCardInfoData CardData;
-
-	UPROPERTY()
-	int32 CardObjID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=CardRender)
 	TObjectPtr<UStaticMeshComponent> CaseMesh;
@@ -46,16 +38,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=AnimationClass)
 	TSubclassOf<class UJSCardAnimInstance> AnimInstanceClass;
-
-	int32 RemainTurn;
-
+	
 	// Card Activating Effect Section
 public:
 	UFUNCTION()
 	virtual void ActivateCardEffect(int32 InOrder) override;
 
 	UFUNCTION()
-	void AddRemainTurn(int32 Value);
+	virtual int32 GetResultCarat() override;
 
 	virtual void SetCardStateActive(bool InActive);
 
@@ -67,9 +57,8 @@ public:
 	virtual void OnMouseExitActor() override;
 
 	void SetActiveCardInfoHUD(bool InActive) const;
-	
-	void SetPossessCard(bool IsPossessed);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="CardState")
 	ECardState CardState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Placeable");
@@ -79,12 +68,8 @@ public:
 	int32 SlotNum;
 
 private:
-	UPROPERTY(VisibleAnywhere, Category="Interaction")
-	uint8 bIsSelected;
-
 	FVector OriginPosition;
-
-
+	
 	// Outline Color Section
 private:
 	void SetOutlineColor(const FLinearColor InColor) const;

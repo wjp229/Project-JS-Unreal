@@ -39,7 +39,6 @@ AJSHUD::AJSHUD()
 	{
 		ResultWidget = CreateWidget<UJSResultWidget>(GetWorld(), ResultWidgetRef.Class);
 	}
-	
 }
 
 void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo)

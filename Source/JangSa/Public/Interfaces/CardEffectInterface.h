@@ -23,4 +23,5 @@ class JANGSA_API IJSCardEffectInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void ActivateCardEffect(int32 InOrder) = 0;
+	virtual int32 GetResultCarat() = 0;
 };

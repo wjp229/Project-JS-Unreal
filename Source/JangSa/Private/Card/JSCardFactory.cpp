@@ -2,6 +2,8 @@
 
 
 #include "Card/JSCardFactory.h"
+
+#include "JSGameSingleton.h"
 #include "Card/JSCardEffectComponent.h"
 #include "Card/JSCard.h"
 #include "Data/JSCardDataAsset.h"
@@ -11,38 +13,8 @@
 UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	// Get All Card Data in Data Table
-
-	// Datatable to BlueprintEditable and adjust to class
-	// Object Redirector : 
-	const ConstructorHelpers::FObjectFinder<UDataTable>
-		DT_CardDataInfo(TEXT("/Game/DataTable/DT_CardInfo.DT_CardInfo"));
-	if (DT_CardDataInfo.Succeeded())
-	{
-		DT_CardDataInfo.Object->GetAllRows<FCardInfoData>(TEXT("GetAllRows"), CardInfoDatas);
-	}
-
-	// Data Parsing Cards on shop
-	for (int32 i = 0; i < CardInfoDatas.Num(); i++)
-	{
-		CardInfoDatas[i]->Id = i;
-
-		if (CardInfoDatas[i]->ShowOnShop == 1)
-		{
-			CardInfoDatasOnShop.Add(CardInfoDatas[i]);
-		}
-	}
-
-	for (int32 i = 0; i < CardInfoDatas.Num(); i++)
-	{
-		// FText / Text Formatting
-		CardInfoDatas[i]->Description.ReplaceInline(TEXT("[Param1]"), *FString::FromInt(CardInfoDatas[i]->Param1));
-		CardInfoDatas[i]->Description.ReplaceInline(TEXT("[Param2]"), *FString::FromInt(CardInfoDatas[i]->Param2));
-		CardInfoDatas[i]->Description.ReplaceInline(TEXT("[Param3]"), *FString::FromInt(CardInfoDatas[i]->Param3));
-	}
-	
 	// Collect Card Effects
-	for (int32 i = 0; i < CardInfoDatas.Num()-1; i++)
+	for (int32 i = 0; i < 15; i++)
 	{
 		FString PreTargetAddress = DA_CardDataPrefixPath;
 		FString ProTargetAddress = DA_CardDataSuffixPath;
@@ -64,15 +36,25 @@ UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 			}
 		}
 	}
-
+	
 	// 
 	static ConstructorHelpers::FClassFinder<AJSCard> JsCardRef(TEXT("/Game/Card/BP_JSCard.BP_JSCard_C"));
 	if(JsCardRef.Succeeded())
 	{
 		CardBP = JsCardRef.Class;
 	}
+}
 
-	//DEPRECATED_JsCard
+void UJSCardFactory::InitFactory()
+{
+	// Data Parsing Cards on shop
+	for (int32 i = 0; i < UJSGameSingleton::Get().GetMaxCardInfoCount(); i++)
+	{
+		if (UJSGameSingleton::Get().GetCardInfo(i)->ShowOnShop == 1)
+		{
+			CardInfoDatasOnShop.Add(UJSGameSingleton::Get().GetCardInfo(i));
+		}
+	}
 }
 
 TArray<FCardInfoData*>& UJSCardFactory::SpawnCardActorOnShop()
@@ -109,7 +91,7 @@ AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 
 	if (nullptr != JSSpawnedCard)
 	{
-		JSSpawnedCard->InitCard(*CardInfoDatas[CardNum], 0, Cast<UJSCardDataAsset>(CardDataAssets[CardNum]));
+		JSSpawnedCard->InitCard(*UJSGameSingleton::Get().GetCardInfo(CardNum), 0, Cast<UJSCardDataAsset>(CardDataAssets[CardNum]));
 
 		return SpawnedCard;
 	}
@@ -125,12 +107,12 @@ FCardInfoData* UJSCardFactory::SpawnCardData(int CardNum, bool IsRandom)
 		TargetNum = FMath::RandRange(0, CardInfoDatasOnShop.Num() - 1);
 	}
 
-	return CardInfoDatas[TargetNum];
+	return UJSGameSingleton::Get().GetCardInfo(TargetNum);
 }
 
 const int32 UJSCardFactory::CheckCardPrice(const int InCardNum)
 {
-	return CardInfoDatas[InCardNum]->Price;
+	return UJSGameSingleton::Get().GetCardInfo(InCardNum)->Price;
 }
 
 void UJSCardFactory::CreateCardObjectsInPool()

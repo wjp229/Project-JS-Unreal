@@ -2,6 +2,8 @@
 
 
 #include "JSGameState.h"
+
+#include "JSGameSingleton.h"
 #include "Card/JSCardFactory.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/DataTable.h"
@@ -16,43 +18,25 @@ AJSGameState::AJSGameState()
 {
 	PlayerData = new FPlayerData();
 	GetPlayerData()->CurrentStage = 0;
-
-	const ConstructorHelpers::FObjectFinder<UDataTable> DT_TurnDataTableRef(
-		TEXT("/Game/DataTable/DT_TurnInfo.DT_TurnInfo"));
-	if (DT_TurnDataTableRef.Succeeded())
-	{
-		DT_TurnDataTableRef.Object->GetAllRows<FTurnInfoData>(TEXT("GetAllRows"), TurnInfoDatas);
-	}
-
-	const ConstructorHelpers::FObjectFinder<UDataTable> DT_StartCardInfoTableRef(
-		TEXT("/Script/Engine.DataTable'/Game/DataTable/DT_StartCardInfo.DT_StartCardInfo'"));
-	if (DT_StartCardInfoTableRef.Succeeded())
-	{
-		DT_StartCardInfoTableRef.Object->GetAllRows<FStartCardInfoData>(TEXT("GetAllRows"), StartCardInfoDatas);
-	}
-
+	
 	const ConstructorHelpers::FClassFinder<AJSCardSlot> CardSlotRef(TEXT("/Script/JangSa.JSCardSlot"));
 	if(nullptr != CardSlotRef.Class)
 	{
 		CardSlot = CardSlotRef.Class;
 	}
-	
-
-	SetPayTurn(TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn);
-	SetRemainTurn(GetPlayerData()->PayTurn);
-	GetPlayerData()->PayCarat = TurnInfoDatas[GetPlayerData()->CurrentStage]->PayCarat;
 }
 
 void AJSGameState::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
+	
 	for(int ix = 0; ix < 49; ix++)
 	{
 		ActivatedCards.Emplace(nullptr);
 	}
 	
 	CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), UJSCardFactory::StaticClass());
+	CardActorFactory->InitFactory();
 }
 
 void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
@@ -73,7 +57,7 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 		}
 		
 		// Game End If Current Stage is Last Stage
-		if (GetPlayerData()->CurrentStage == TurnInfoDatas.Num())
+		if (GetPlayerData()->CurrentStage == UJSGameSingleton::Get().GetMaxTurnCount())
 		{
 			UE_LOG(LogTemp, Log, TEXT("!!!Game Clear!!!"));
 
@@ -85,9 +69,9 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 		// Set To Next Phase
 		GetPlayerData()->CurrentStage += 1;
 		
-		SetPayTurn(TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn);
-		SetPayCarat(TurnInfoDatas[GetPlayerData()->CurrentStage]->PayCarat);
-		GetPlayerData()->RemainTurn = TurnInfoDatas[GetPlayerData()->CurrentStage]->InitPhaseTurn;
+		SetPayTurn(UJSGameSingleton::Get().GetTurnInfo(GetPlayerData()->CurrentStage).InitPhaseTurn);
+		SetPayCarat(UJSGameSingleton::Get().GetTurnInfo(GetPlayerData()->CurrentStage).PayCarat);
+		GetPlayerData()->RemainTurn = UJSGameSingleton::Get().GetTurnInfo(GetPlayerData()->CurrentStage).InitPhaseTurn;
 		
 		return;
 	}
@@ -107,6 +91,12 @@ void AJSGameState::RefreshPlayerInfo() const
 void AJSGameState::DprGameStart()
 {
 	UE_LOG(LogTemp, Log, TEXT("======================================="));
+	
+	SetPayTurn(UJSGameSingleton::Get().GetTurnInfo(GetPlayerData()->CurrentStage).InitPhaseTurn);
+	SetRemainTurn(GetPlayerData()->PayTurn);
+	GetPlayerData()->PayCarat = UJSGameSingleton::Get().GetTurnInfo(GetPlayerData()->CurrentStage).PayCarat;
+	AddTurnResultCarat(0);
+	
 	RefreshPlayerInfo();
 
 	AddCurrentCarat(15);
@@ -132,7 +122,7 @@ void AJSGameState::DprGameStart()
 
 void AJSGameState::SpawnInitCard()
 {
-	for(auto StartCardInfo : StartCardInfoDatas)
+	for(auto StartCardInfo : UJSGameSingleton::Get().GetStartCardInfos())
 	{
 		FVector SpawnLocation(265.0f, 400.0f, 93.1f);
 
@@ -259,7 +249,6 @@ void AJSGameState::OnEnterSettleCaratPhase()
 		}
 
 		Card->ActivateCardEffect(0);
-		Card->AddRemainTurn(-1);
 	}
 
 	AddRemainTurn(-1);
@@ -289,6 +278,8 @@ bool AJSGameState::RegisterActivateCard(AJSCard* InCard, int32 SlotNum, FVector&
 
 	SlotPosition = CardSlots[SlotNum]->GetActorLocation();
 
+	AddTurnResultCarat(InCard->GetResultCarat());
+
 	ArrangeCard();
 	
 	return true;
@@ -305,6 +296,8 @@ bool AJSGameState::UnregisterActivateCard(AJSCard* InCard)
 	HoldingCards.Emplace(InCard);
 	ActivatedCards[CardIndex] = nullptr;
 
+	AddTurnResultCarat(-InCard->GetResultCarat());
+	
 	ArrangeCard();
 
 	return true;
