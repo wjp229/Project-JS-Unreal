@@ -2,3 +2,8 @@
 
 
 #include "UI/JSEventWidget.h"
+#include "Data/JSEventData.h"
+
+void UJSEventWidget::InitEventInfoWidget_Implementation(UJSEventData* InEventData)
+{
+}

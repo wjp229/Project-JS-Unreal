@@ -6,14 +6,25 @@
 #include "UObject/NoExportTypes.h"
 #include "JSTurnEventManager.generated.h"
 
+
 /**
  * 
  */
 UCLASS()
-class JANGSA_API UJSTurnEventManager : public UObject
+class JANGSA_API AJSTurnEventManager : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	UJSTurnEventManager();
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void SpawnEventActions(int32 InStageNum);
+	void CallNextAction();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Events)
+	TArray<TObjectPtr<class UJSEventData>> EventActions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Events)
+	TArray<TObjectPtr<class UJSEventData>> CurrentStageEvents;
 };

@@ -2,13 +2,12 @@
 
 
 #include "Card/JSCard.h"
-
-#include "JSCardAnimInstance.h"
+#include "Animation/JSCardAnimInstance.h"
 #include "Card/JSCardEffectComponent.h"
 #include "JSGameState.h"
 #include "Animation/AnimInstance.h"
 #include "Data/JSCardDataAsset.h"
-#include "Kismet/GameplayStatics.h"
+#include "Event/JSEventAction.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UI/JSHUD.h"
 #include "UObject/ConstructorHelpers.h"
@@ -55,6 +54,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	CardData = InCardData;
 	CardState = ECardState::Inventory;
 
+	
 	if (nullptr == InDataAsset)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Null Data Asset "));
@@ -172,23 +172,18 @@ void AJSCard::OnReleaseActor()
 		if (SlotNum >= 0)
 		{
 			SetCardStateActive(true);
-			UE_LOG(LogTemp, Log, TEXT("Bug1"));
 
 		}
 		else if (SlotNum == -2)
 		{
 			SetCardStateActive(false);
-			UE_LOG(LogTemp, Log, TEXT("Bug2"));
 
 		}
 	}
 	else
 	{
 		SetActorLocation(OriginPosition);
-		UE_LOG(LogTemp, Log, TEXT("Bug3"));
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("Bug"));
 	
 	bIsGrabbed = false;
 	CaseMesh->BodyInstance.SetEnableGravity(true);
@@ -225,16 +220,5 @@ void AJSCard::SetActiveCardInfoHUD(bool InActive) const
 
 void AJSCard::SetOutlineColor(const FLinearColor InColor) const
 {
-	// int32 Index = KeycapMesh->GetMaterialIndex(TEXT("Mat_Outline"));
-	// UMaterialInstanceDynamic* OutlineMaterial = KeycapMesh->CreateDynamicMaterialInstance(Index);
-	// if(OutlineMaterial != nullptr)
-	// {
-	// 	UE_LOG(LogTemp, Log, TEXT("Change Outline Mat %s"), *InColor.ToString());
-	// 	OutlineMaterial->SetVectorParameterValue(TEXT("OutlineColor"), InColor);
-	//
-	// 	FHashedMaterialParameterInfo Info;
-	// 	
-	// 	UE_LOG(LogTemp, Log, TEXT("Change Outline Mat %s"), OutlineMaterial->GetVectorParameterValue());
-	//
-	// }
+
 }

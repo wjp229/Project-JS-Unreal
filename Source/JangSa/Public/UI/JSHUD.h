@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/JSEventData.h"
 #include "GameFramework/HUD.h"
 #include "JSHUD.generated.h"
 
@@ -29,6 +30,9 @@ public:
 	void ShowDefeatWidget();
 
 	void ShowResultInfoWidget();
+
+	void ShowEventInfoWidget(UJSEventData* InEventData);
+
 	
 private:
 	UPROPERTY(EditAnywhere)
@@ -45,7 +49,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSResultWidget> ResultWidget;
-	
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UJSEventWidget> EventWidget;
 protected:
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;

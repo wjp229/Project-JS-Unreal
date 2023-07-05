@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "JSCardHoldZone.h"
+#include "Card/JSCardHoldZone.h"
 #include "Card/JSCard.h"
 
 AJSCardHoldZone::AJSCardHoldZone()

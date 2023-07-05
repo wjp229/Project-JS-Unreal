@@ -15,5 +15,8 @@ class JANGSA_API UJSEventWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void InitEventInfoWidget();
+	UFUNCTION(BlueprintNativeEvent)
+	void InitEventInfoWidget(class UJSEventData* InEventData);
+
+	
 };

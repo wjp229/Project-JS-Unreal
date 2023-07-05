@@ -4,6 +4,7 @@
 #include "UI/JSHUD.h"
 #include "Components/WidgetComponent.h"
 #include "UI/JSCardInfoWidget.h"
+#include "UI/JSEventWidget.h"
 #include "UI/JSResultWidget.h"
 #include "UI/JSShopWidget.h"
 #include "UObject/ConstructorHelpers.h"
@@ -38,6 +39,12 @@ AJSHUD::AJSHUD()
 	if (ResultWidgetRef.Class != nullptr)
 	{
 		ResultWidget = CreateWidget<UJSResultWidget>(GetWorld(), ResultWidgetRef.Class);
+	}
+
+	const ConstructorHelpers::FClassFinder<UJSEventWidget> EventWidgetRef(TEXT("/Game/UI/BW_EventInfo.BW_EventInfo_C"));
+	if (EventWidgetRef.Class != nullptr)
+	{
+		EventWidget = CreateWidget<UJSEventWidget>(GetWorld(), EventWidgetRef.Class);
 	}
 }
 
@@ -87,6 +94,15 @@ void AJSHUD::ShowDefeatWidget()
 
 void AJSHUD::ShowResultInfoWidget()
 {
+}
+
+void AJSHUD::ShowEventInfoWidget(UJSEventData* InEventData)
+{
+	EventWidget->AddToViewport();
+
+	UE_LOG(LogTemp, Log, TEXT("HIHIHI %d"), InEventData->SelectionParams.Num());
+	
+	EventWidget->InitEventInfoWidget(InEventData);
 }
 
 void AJSHUD::DrawMainHUD()

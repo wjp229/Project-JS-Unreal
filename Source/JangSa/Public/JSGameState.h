@@ -13,6 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPayTurn, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPayCarat, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyCurrentCarat, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyResultCarat, int32, num);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyCheckEvent, int32, num);
 
 /**
  * 
@@ -39,6 +40,8 @@ public:
 	FNotifyCurrentCarat NotifyCurrentCarat;
 	UPROPERTY(BlueprintAssignable)
 	FNotifyResultCarat NotifyResultCarat;
+
+	FNotifyCheckEvent NotifyCheckEvent;
 #pragma endregion
 
 # pragma region Player / Turn Data Section

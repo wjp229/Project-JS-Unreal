@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "JSCardAnimInstance.h"
-
+#include "Animation/JSCardAnimInstance.h"
 #include "Card/JSCard.h"
 
 void UJSCardAnimInstance::NativeInitializeAnimation()

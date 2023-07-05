@@ -6,7 +6,6 @@
 #include "JSGameSingleton.h"
 #include "Card/JSCardFactory.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Engine/DataTable.h"
 #include "Card/JSCard.h"
 #include "Card/JSCardSlot.h"
 #include "Data/JSTypes.h"
@@ -185,7 +184,10 @@ void AJSGameState::ShuffleHoldingCards()
 
 void AJSGameState::OnCheckEventQueue()
 {
-	OnResetShop();
+	NotifyCheckEvent.Broadcast(GetPlayerData()->CurrentStage);
+
+	UE_LOG(LogTemp, Log, TEXT("OnCheckEventQueue %d"), GetPlayerData()->CurrentStage);
+	
 }
 
 void AJSGameState::OnResetShop(bool bIsInitTurn) const
@@ -233,13 +235,14 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 
 void AJSGameState::OnExitTurn()
 {
+	GetPlayerData()->CurrentStage += 1;
+	
 	OnEnterSettleCaratPhase();
+
 }
 
 void AJSGameState::OnEnterSettleCaratPhase()
 {
-	UE_LOG(LogTemp, Log, TEXT("Acitvation On Card State"));
-
 	// Activate Each Card Effects
 	for (auto Card : ActivatedCards)
 	{
