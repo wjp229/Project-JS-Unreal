@@ -19,11 +19,16 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void SpawnEventActions(int32 InStageNum);
-	void CallNextAction();
+	void SpawnCurrentStageEvents(int32 InStageNum);
+	void CallNextEvent();
+
+	void CallEventAction(int32 InStageNum);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Events)
 	TArray<TObjectPtr<class UJSEventData>> EventActions;
+
+	// To Activate Action
+	TArray<TObjectPtr<class UJSEventAction>> ActionContainer;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Events)
 	TArray<TObjectPtr<class UJSEventData>> CurrentStageEvents;

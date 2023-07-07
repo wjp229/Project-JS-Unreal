@@ -18,5 +18,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void InitEventInfoWidget(class UJSEventData* InEventData);
 
-	
+	UFUNCTION(BlueprintCallable)
+	void ActivateEventAction(int32 InButtonNum);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=EventData)
+	TObjectPtr<UJSEventData> EventData;
 };

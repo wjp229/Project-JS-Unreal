@@ -5,6 +5,7 @@
 
 #include "JSGameState.h"
 #include "Data/JSEventData.h"
+#include "Event/JSEventAction.h"
 #include "Event/JSEventDataObject.h"
 #include "GameFramework/PlayerController.h"
 #include "UI/JSHUD.h"
@@ -16,15 +17,12 @@ void AJSTurnEventManager::BeginPlay()
 	AJSGameState* GameState = Cast<AJSGameState>(GetWorld()->GetGameState());
 	if(GameState != nullptr)
 	{
-		GameState->NotifyCheckEvent.AddDynamic(this, &AJSTurnEventManager::SpawnEventActions);
-		UE_LOG(LogTemp, Log, TEXT("Bind Succeeded!"));
+		GameState->NotifyCheckEvent.AddDynamic(this, &AJSTurnEventManager::SpawnCurrentStageEvents);
 	}
 }
 
-void AJSTurnEventManager::SpawnEventActions(int32 InStageNum)
+void AJSTurnEventManager::SpawnCurrentStageEvents(int32 InStageNum)
 {
-	UE_LOG(LogTemp, Log, TEXT("Spawn Event Actions Pre"));
-
 	// Stack Current Event Actions
 	if (CurrentStageEvents.Num() > 0)
 	{
@@ -46,14 +44,12 @@ void AJSTurnEventManager::SpawnEventActions(int32 InStageNum)
 			CurrentStageEvents.Add(CurrentStageData[i]);
 		}
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("SpawnEventActions"));
-
+	
 	// Call
-	CallNextAction();
+	CallNextEvent();
 }
 
-void AJSTurnEventManager::CallNextAction()
+void AJSTurnEventManager::CallNextEvent()
 {
 	if (CurrentStageEvents.Num() <= 0)
 	{
@@ -65,6 +61,8 @@ void AJSTurnEventManager::CallNextAction()
 		
 		return;
 	}
+
+	ActionContainer.Empty();
 	
 	// Init JS Event 
 	UJSEventData* EventData = CurrentStageEvents.Pop();
@@ -74,4 +72,9 @@ void AJSTurnEventManager::CallNextAction()
 	{
 		JSHud->ShowEventInfoWidget(EventData);
 	}
+}
+
+void AJSTurnEventManager::CallEventAction(int32 InStageNum)
+{
+	ActionContainer[InStageNum]->ActivateEvent();
 }

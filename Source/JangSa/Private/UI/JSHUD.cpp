@@ -99,8 +99,6 @@ void AJSHUD::ShowResultInfoWidget()
 void AJSHUD::ShowEventInfoWidget(UJSEventData* InEventData)
 {
 	EventWidget->AddToViewport();
-
-	UE_LOG(LogTemp, Log, TEXT("HIHIHI %d"), InEventData->SelectionParams.Num());
 	
 	EventWidget->InitEventInfoWidget(InEventData);
 }

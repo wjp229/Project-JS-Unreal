@@ -61,6 +61,8 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 		return;
 	}
 
+	OnBeginCursorOver
+
 	UJSCardEffectComponent* CardEffectComponent = NewObject<UJSCardEffectComponent>(this, InDataAsset->EffectComponent);
 	EffectComponent = CardEffectComponent;
 	EffectComponent->RegisterComponent();

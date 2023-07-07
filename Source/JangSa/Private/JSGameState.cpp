@@ -185,9 +185,6 @@ void AJSGameState::ShuffleHoldingCards()
 void AJSGameState::OnCheckEventQueue()
 {
 	NotifyCheckEvent.Broadcast(GetPlayerData()->CurrentStage);
-
-	UE_LOG(LogTemp, Log, TEXT("OnCheckEventQueue %d"), GetPlayerData()->CurrentStage);
-	
 }
 
 void AJSGameState::OnResetShop(bool bIsInitTurn) const
@@ -205,6 +202,7 @@ void AJSGameState::OnResetShop(bool bIsInitTurn) const
 	if (nullptr != JSHud)
 	{
 		JSHud->InitializeShop(CardInfoDatas);
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
 	}
 }
 

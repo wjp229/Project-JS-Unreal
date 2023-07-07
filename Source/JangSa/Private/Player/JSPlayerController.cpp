@@ -46,6 +46,8 @@ AJSPlayerController::AJSPlayerController(const FObjectInitializer& ObjectInitial
 	}
 }
 
+
+// Tick to .5 Interval Method
 void AJSPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
