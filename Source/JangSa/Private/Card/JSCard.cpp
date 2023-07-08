@@ -6,6 +6,7 @@
 #include "Card/JSCardEffectComponent.h"
 #include "JSGameState.h"
 #include "Animation/AnimInstance.h"
+#include "Components/CapsuleComponent.h"
 #include "Data/JSCardDataAsset.h"
 #include "Event/JSEventAction.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -16,7 +17,7 @@ AJSCard::AJSCard()
 {
 	CaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Case Mesh"));
 	KeycapMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Keycap Mesh"));
-
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>
 		CaseMeshRef(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
@@ -31,6 +32,9 @@ AJSCard::AJSCard()
 
 	KeycapMesh->SetupAttachment(CaseMesh);
 	KeycapMesh->SetSimulatePhysics(false);
+
+		CapsuleComponent->SetupAttachment(CaseMesh);
+
 
 	CardState = ECardState::Inventory;
 
@@ -50,7 +54,6 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 {
 	CardData = InCardData;
 	CardState = ECardState::Inventory;
-
 	
 	if (nullptr == InDataAsset)
 	{
@@ -65,7 +68,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	CaseMesh->SetSimulatePhysics(true);
 
 	// Set Key Cap Mesh and Material Settings
-	KeycapMesh->SetSkeletalMesh(InDataAsset->Mesh);
+	//KeycapMesh->SetSkeletalMesh(InDataAsset->Mesh);
 	if (nullptr != AnimInstanceClass)
 	{
 		KeycapMesh->SetAnimInstanceClass(AnimInstanceClass);

@@ -208,7 +208,6 @@ void AJSGameState::OnResetShop(bool bIsInitTurn) const
 	if (nullptr != JSHud)
 	{
 		JSHud->InitializeShop(CardInfoDatas);
-		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
 	}
 }
 
@@ -318,6 +317,7 @@ void AJSGameState::ArrangeCard()
 	for (int ix = 0; ix < HoldingCards.Num(); ix++)
 	{
 		HoldingCards[ix]->SetActorLocation(HoldingSpawnLocation + (FVector(.0, -6.0f, .0f) * ix));
+		HoldingCards[ix]->SetActorRotation(FRotator(0.f, 0.f, 0.f));
 	}
 
 	// Arrange Inventory Cards

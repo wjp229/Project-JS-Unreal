@@ -33,6 +33,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=CardRender)
 	TObjectPtr<USkeletalMeshComponent> KeycapMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=CardCollider, meta=(AllowPrivateAccess))
+	TObjectPtr<class UCapsuleComponent> CapsuleComponent;
+	
 	UPROPERTY(VisibleAnywhere, Category=Effect)
 	TObjectPtr<class UJSCardEffectComponent> EffectComponent;
 
@@ -61,12 +64,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="CardState")
 	ECardState CardState;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Placeable");
 	uint8 bIsPlaceable : 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Slot");
 	int32 SlotNum;
-
 private:
 	FVector OriginPosition;
 	
