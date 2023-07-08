@@ -10,6 +10,7 @@
 #include "Card/JSCardSlot.h"
 #include "Data/JSTypes.h"
 #include "Kismet/GameplayStatics.h"
+#include "Manager/JSTurnEventManager.h"
 #include "UI/JSHUD.h"
 #include "Math/UnrealMathUtility.h"
 
@@ -23,6 +24,12 @@ AJSGameState::AJSGameState()
 	{
 		CardSlot = CardSlotRef.Class;
 	}
+
+	const ConstructorHelpers::FClassFinder<AJSTurnEventManager> TurnManagerRef(TEXT("/Game/BP/BP_TurnEventManager.BP_TurnEventManager_C"));
+	if(nullptr != TurnManagerRef.Class)
+	{
+		TurnManagerClass = TurnManagerRef.Class;
+	}
 }
 
 void AJSGameState::PostInitializeComponents()
@@ -35,6 +42,7 @@ void AJSGameState::PostInitializeComponents()
 	}
 	
 	CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), UJSCardFactory::StaticClass());
+	TurnManager = GetWorld()->SpawnActor<AJSTurnEventManager>(TurnManagerClass);
 	CardActorFactory->InitFactory();
 }
 
@@ -97,9 +105,7 @@ void AJSGameState::DprGameStart()
 	AddTurnResultCarat(0);
 	
 	RefreshPlayerInfo();
-
-	AddCurrentCarat(15);
-
+	
 	const FVector StartSlotSpawnPosition(255.0f,470.0f,93.5f);
 	// Spawn Slot
 	for(int ix = 0; ix < (MAX_SLOT_NUM * MAX_SLOT_NUM); ix++)
@@ -340,6 +346,20 @@ void AJSGameState::ArrangeCard()
 	// 	
 	// 	ActivatedCards[ix]->SetActorLocation(CardSlots[ix]->GetActorLocation() + OffsetLocation);
 	// }
+}
+
+AJSTurnEventManager* AJSGameState::GetTurnManager()
+{
+	if(nullptr != TurnManager)
+	{
+		return Cast<AJSTurnEventManager>(TurnManager);
+	}
+
+	return nullptr;
+
+	// TurnManager = Cast<AJSTurnEventManager>(GetWorld()->SpawnActor(AJSTurnEventManager::StaticClass()));
+	//
+	// return Cast<AJSTurnEventManager>(TurnManager);
 }
 
 TArray<AJSCard*> AJSGameState::CardsInCondition(const FString InRank)

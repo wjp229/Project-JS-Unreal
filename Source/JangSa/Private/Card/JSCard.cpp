@@ -30,9 +30,6 @@ AJSCard::AJSCard()
 	CaseMesh->SetSimulatePhysics(false);
 
 	KeycapMesh->SetupAttachment(CaseMesh);
-	KeycapMesh->SetRelativeScale3D(FVector(.7f, .7f, 3.5f));
-	KeycapMesh->SetRelativeRotation(FRotator(.0f, 270.0f, 0.f));
-	KeycapMesh->SetRelativeLocation(FVector(.0f, .0f, 50.f));
 	KeycapMesh->SetSimulatePhysics(false);
 
 	CardState = ECardState::Inventory;
@@ -60,9 +57,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 		UE_LOG(LogTemp, Log, TEXT("Null Data Asset "));
 		return;
 	}
-
-	OnBeginCursorOver
-
+	
 	UJSCardEffectComponent* CardEffectComponent = NewObject<UJSCardEffectComponent>(this, InDataAsset->EffectComponent);
 	EffectComponent = CardEffectComponent;
 	EffectComponent->RegisterComponent();
@@ -82,6 +77,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	}
 
 	SetActorLabel(*GetCardInfo().Name);
+
 }
 
 void AJSCard::ActivateCardEffect(int32 InOrder)

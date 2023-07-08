@@ -6,7 +6,6 @@
 #include "JSGameState.h"
 #include "Data/JSEventData.h"
 #include "Event/JSEventAction.h"
-#include "Event/JSEventDataObject.h"
 #include "GameFramework/PlayerController.h"
 #include "UI/JSHUD.h"
 
@@ -56,14 +55,18 @@ void AJSTurnEventManager::CallNextEvent()
 		AJSGameState* GameState = Cast<AJSGameState>(GetWorld()->GetGameState());
 		if(GameState != nullptr)
 		{
+			AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+			if(JSHud != nullptr)
+			{
+				JSHud->CloseEventInfoWidget();
+			}
+			
 			GameState->OnResetShop();
 		}
 		
 		return;
 	}
 
-	ActionContainer.Empty();
-	
 	// Init JS Event 
 	UJSEventData* EventData = CurrentStageEvents.Pop();
 
@@ -72,9 +75,4 @@ void AJSTurnEventManager::CallNextEvent()
 	{
 		JSHud->ShowEventInfoWidget(EventData);
 	}
-}
-
-void AJSTurnEventManager::CallEventAction(int32 InStageNum)
-{
-	ActionContainer[InStageNum]->ActivateEvent();
 }

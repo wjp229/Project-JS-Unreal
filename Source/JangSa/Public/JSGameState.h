@@ -163,5 +163,13 @@ public:
 	bool UnregisterActivateCard(class AJSCard* InCard);
 	bool PurchaseCard(int32 InCardNum);
 	void ArrangeCard();
-#pragma endregion 
+#pragma endregion
+public:
+	class AJSTurnEventManager* GetTurnManager();
+	
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=EventManager, meta=(AllowPrivateAccess))
+	TObjectPtr<class AJSTurnEventManager> TurnManager;
+
+	TSubclassOf<class AJSTurnEventManager> TurnManagerClass;
 };

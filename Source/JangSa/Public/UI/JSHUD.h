@@ -26,12 +26,13 @@ public:
 
 	// Interaction about Card Info
 	void ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float MousePositionX, const float MousePositionY, const bool InActive);
-
+	
 	void ShowDefeatWidget();
 
 	void ShowResultInfoWidget();
 
 	void ShowEventInfoWidget(UJSEventData* InEventData);
+	void CloseEventInfoWidget();
 
 	
 private:
@@ -52,6 +53,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSEventWidget> EventWidget;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;

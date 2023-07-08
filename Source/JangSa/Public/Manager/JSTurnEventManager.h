@@ -18,17 +18,15 @@ class JANGSA_API AJSTurnEventManager : public AActor
 public:
 	virtual void BeginPlay() override;
 
+	static AJSTurnEventManager& Get();
+
+
 	UFUNCTION()
 	void SpawnCurrentStageEvents(int32 InStageNum);
 	void CallNextEvent();
-
-	void CallEventAction(int32 InStageNum);
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Events)
 	TArray<TObjectPtr<class UJSEventData>> EventActions;
-
-	// To Activate Action
-	TArray<TObjectPtr<class UJSEventAction>> ActionContainer;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Events)
 	TArray<TObjectPtr<class UJSEventData>> CurrentStageEvents;

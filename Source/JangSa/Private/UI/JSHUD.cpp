@@ -87,8 +87,11 @@ void AJSHUD::ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float Mou
 
 void AJSHUD::ShowDefeatWidget()
 {
-	ResultWidget->AddToViewport();
-	
+	if (!ResultWidget->IsInViewport())
+	{
+		ResultWidget->AddToViewport();
+	}
+		
 	ResultWidget->ShowDefeatWidget();
 }
 
@@ -98,9 +101,18 @@ void AJSHUD::ShowResultInfoWidget()
 
 void AJSHUD::ShowEventInfoWidget(UJSEventData* InEventData)
 {
-	EventWidget->AddToViewport();
-	
+	if (!EventWidget->IsInViewport())
+	{
+		EventWidget->AddToViewport();
+	}
+
+	EventWidget->SetVisibility(ESlateVisibility::Visible);
 	EventWidget->InitEventInfoWidget(InEventData);
+}
+
+void AJSHUD::CloseEventInfoWidget()
+{
+	EventWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AJSHUD::DrawMainHUD()
