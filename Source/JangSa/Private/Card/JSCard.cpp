@@ -2,15 +2,16 @@
 
 
 #include "Card/JSCard.h"
-#include "Animation/JSCardAnimInstance.h"
 #include "Card/JSCardEffectComponent.h"
-#include "JSGameState.h"
+#include "Animation/JSCardAnimInstance.h"
 #include "Animation/AnimInstance.h"
+#include "Cascade/Classes/CascadeParticleSystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Data/JSCardDataAsset.h"
 #include "Event/JSEventAction.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UI/JSHUD.h"
+#include "JSGameState.h"
 #include "UObject/ConstructorHelpers.h"
 
 AJSCard::AJSCard()
@@ -18,6 +19,7 @@ AJSCard::AJSCard()
 	CaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Case Mesh"));
 	KeycapMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Keycap Mesh"));
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
+	ParticleEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle"));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>
 		CaseMeshRef(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
@@ -33,15 +35,11 @@ AJSCard::AJSCard()
 	KeycapMesh->SetupAttachment(CaseMesh);
 	KeycapMesh->SetSimulatePhysics(false);
 
-		CapsuleComponent->SetupAttachment(CaseMesh);
+	CapsuleComponent->SetupAttachment(CaseMesh);
 
+	//ParticleComponent->SetupAttachment(CaseMesh);
 
 	CardState = ECardState::Inventory;
-
-	// DefaultOutlineColor = FLinearColor(1.0f, 1.0f, 1.0f);
-	// MouseEnterOutlineColor = FLinearColor(0.1f, 1.0f, 0.1f);
-	// DisabledOutlineColor = FLinearColor(1.0f, 0.1f, 0.1f);
-	// SelectOulineColor = FLinearColor(1.0f, 1.0f, 0.1f);
 }
 
 
@@ -54,13 +52,13 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 {
 	CardData = InCardData;
 	CardState = ECardState::Inventory;
-	
+
 	if (nullptr == InDataAsset)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Null Data Asset "));
 		return;
 	}
-	
+
 	UJSCardEffectComponent* CardEffectComponent = NewObject<UJSCardEffectComponent>(this, InDataAsset->EffectComponent);
 	EffectComponent = CardEffectComponent;
 	EffectComponent->RegisterComponent();
@@ -80,7 +78,33 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	}
 
 	SetActorLabel(*GetCardInfo().Name);
+}
 
+void AJSCard::SetCardState(ECardState InState)
+{
+	CardState = InState;
+	
+	switch (InState)
+	{
+	case ECardState::Inventory:
+		CaseMesh->BodyInstance.bLockXRotation = false;
+		CaseMesh->BodyInstance.bLockYRotation = false;
+		CaseMesh->BodyInstance.bLockZRotation = false;
+		break;
+	case ECardState::Holding:
+		CaseMesh->BodyInstance.bLockXRotation = true;
+		CaseMesh->BodyInstance.bLockYRotation = true;
+		CaseMesh->BodyInstance.bLockZRotation = true;
+		break;
+	case ECardState::Activated:
+		CaseMesh->BodyInstance.bLockXRotation = true;
+		CaseMesh->BodyInstance.bLockYRotation = true;
+		CaseMesh->BodyInstance.bLockZRotation = true;
+		break;
+	case ECardState::Disabled:
+		break;
+	default: ;
+	}
 }
 
 void AJSCard::ActivateCardEffect(int32 InOrder)
@@ -165,29 +189,42 @@ bool AJSCard::OnSelectActor()
 
 void AJSCard::OnReleaseActor()
 {
-	UE_LOG(LogTemp, Log, TEXT("%d, %d"), bIsPlaceable, SlotNum);
-
-	if(bIsPlaceable)
+	if (bIsPlaceable)
 	{
 		// Check If Card is on right place else go back to origin Place
 		if (SlotNum >= 0)
 		{
+			GravityTimerHandler.Invalidate();
+
 			SetCardStateActive(true);
 
+			GetWorldTimerManager().SetTimer(GravityTimerHandler, FTimerDelegate::CreateLambda([this]()
+			{
+				CaseMesh->BodyInstance.SetEnableGravity(true);
+
+				if (ParticleEffectComponent != nullptr)
+				{
+					ParticleEffectComponent->Deactivate();
+					ParticleEffectComponent->SetWorldLocation(GetActorLocation() - FVector(.0f, .0f, 2.f));
+					ParticleEffectComponent->Activate();
+				}
+			}), .5f, false);
+
+			bIsGrabbed = false;
+			return;
 		}
 		else if (SlotNum == -2)
 		{
 			SetCardStateActive(false);
-
 		}
 	}
 	else
 	{
 		SetActorLocation(OriginPosition);
 	}
-	
-	bIsGrabbed = false;
+
 	CaseMesh->BodyInstance.SetEnableGravity(true);
+	bIsGrabbed = false;
 }
 
 void AJSCard::OnMouseEnterActor()
@@ -217,9 +254,4 @@ void AJSCard::SetActiveCardInfoHUD(bool InActive) const
 			JSHud->ShowCardInfoWidget(CardData, 0.f, 0.f, false);
 		}
 	}
-}
-
-void AJSCard::SetOutlineColor(const FLinearColor InColor) const
-{
-
 }

@@ -10,7 +10,7 @@ public class JangSa : ModuleRules
 	
 		PublicIncludePaths.AddRange(new string[] { "JangSa" });
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "EnhancedInput", "Cascade" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

@@ -8,8 +8,6 @@
 void UJSEventWidget::InitEventInfoWidget_Implementation(UJSEventData* InEventData)
 {
 	EventData = InEventData;
-
-	UE_LOG(LogTemp, Log, TEXT("HI"));
 }
 
 void UJSEventWidget::ActivateEventAction(int32 InButtonNum)

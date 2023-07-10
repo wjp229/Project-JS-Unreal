@@ -18,18 +18,6 @@ AJSGameState::AJSGameState()
 {
 	PlayerData = new FPlayerData();
 	GetPlayerData()->CurrentStage = 0;
-	
-	const ConstructorHelpers::FClassFinder<AJSCardSlot> CardSlotRef(TEXT("/Script/JangSa.JSCardSlot"));
-	if(nullptr != CardSlotRef.Class)
-	{
-		CardSlot = CardSlotRef.Class;
-	}
-
-	const ConstructorHelpers::FClassFinder<AJSTurnEventManager> TurnManagerRef(TEXT("/Game/BP/BP_TurnEventManager.BP_TurnEventManager_C"));
-	if(nullptr != TurnManagerRef.Class)
-	{
-		TurnManagerClass = TurnManagerRef.Class;
-	}
 }
 
 void AJSGameState::PostInitializeComponents()
@@ -166,7 +154,7 @@ void AJSGameState::ShuffleHoldingCards()
 		AJSCard* CardActor = HoldingCards[0];
 		HoldingCards.RemoveAt(0);
 		InventoryCards.Emplace(CardActor);
-		CardActor->CardState = ECardState::Inventory;
+		CardActor->SetCardState(ECardState::Inventory);
 	}
 
 	// Send Inventory Cards to hold
@@ -181,7 +169,7 @@ void AJSGameState::ShuffleHoldingCards()
 		AJSCard* CardActor = InventoryCards[InCardIndex];
 		InventoryCards.RemoveAt(InCardIndex);
 		HoldingCards.Emplace(CardActor);
-		CardActor->CardState = ECardState::Holding;
+		CardActor->SetCardState(ECardState::Holding);
 	}
 
 	ArrangeCard();

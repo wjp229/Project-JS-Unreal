@@ -21,6 +21,8 @@ public:
 	FCardInfoData GetCardInfo() const;
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardDataAsset* InDataAsset);
 
+	void SetCardState(ECardState InState);
+
 protected:
 	int CardNum;
 
@@ -41,6 +43,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=AnimationClass)
 	TSubclassOf<class UJSCardAnimInstance> AnimInstanceClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=ParticleEffect)
+	TObjectPtr<class UParticleSystemComponent> ParticleEffectComponent;
 	
 	// Card Activating Effect Section
 public:
@@ -60,23 +65,18 @@ public:
 	virtual void OnMouseExitActor() override;
 
 	void SetActiveCardInfoHUD(bool InActive) const;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="CardState")
-	ECardState CardState;
-
+	
 	uint8 bIsPlaceable : 1;
 	int32 SlotNum;
+	
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="CardState", meta=(AllowPrivateAccess))
+	ECardState CardState;
+
+	FTimerHandle GravityTimerHandler;
+
 private:
 	FVector OriginPosition;
-	
-	// Outline Color Section
-private:
-	void SetOutlineColor(const FLinearColor InColor) const;
-
-	FLinearColor DefaultOutlineColor;
-	FLinearColor MouseEnterOutlineColor;
-	FLinearColor SelectOulineColor;
-	FLinearColor DisabledOutlineColor;
 
 public:
 	uint8 bIsGrabbed : 1;

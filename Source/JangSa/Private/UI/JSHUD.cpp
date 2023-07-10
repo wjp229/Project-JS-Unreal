@@ -11,19 +11,19 @@
 
 AJSHUD::AJSHUD()
 {
-	const ConstructorHelpers::FClassFinder<UUserWidget> StartWidgetRef(TEXT("/Game/UI/StartMenu.StartMenu_C"));
+	const ConstructorHelpers::FClassFinder<UUserWidget> StartWidgetRef(TEXT("/Game/UI/BW_StartMenu.BW_StartMenu_C"));
 	if (StartWidgetRef.Class != nullptr)
 	{
 		StartMenuWidget = CreateWidget<UUserWidget>(GetWorld(), StartWidgetRef.Class);
 	}
 
-	const ConstructorHelpers::FClassFinder<UUserWidget> HUDWidgetRef(TEXT("/Game/UI/HUD.HUD_C"));
+	const ConstructorHelpers::FClassFinder<UUserWidget> HUDWidgetRef(TEXT("/Game/UI/BW_HUD.BW_HUD_C"));
 	if (HUDWidgetRef.Class != nullptr)
 	{
 		MainHUDWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetRef.Class);
 	}
 
-	const ConstructorHelpers::FClassFinder<UJSShopWidget> ShopWidgetRef(TEXT("/Game/UI/BP_JSShop.BP_JSShop_C"));
+	const ConstructorHelpers::FClassFinder<UJSShopWidget> ShopWidgetRef(TEXT("/Game/UI/BW_ShopWindow.BW_ShopWindow_C"));
 	if (ShopWidgetRef.Class != nullptr)
 	{
 		JSShopWidget = CreateWidget<UJSShopWidget>(GetWorld(), ShopWidgetRef.Class);
@@ -35,10 +35,10 @@ AJSHUD::AJSHUD()
 		CardInfoWidget = CreateWidget<UJSCardInfoWidget>(GetWorld(), CardInfoWidgetRef.Class);
 	}
 
-	const ConstructorHelpers::FClassFinder<UJSResultWidget> ResultWidgetRef(TEXT("/Game/UI/BP_ResultWidget.BP_ResultWidget_C"));
-	if (ResultWidgetRef.Class != nullptr)
+	const ConstructorHelpers::FClassFinder<UJSResultWidget> DefeatWidgetRef(TEXT("/Game/UI/BW_DefeatWidget.BW_DefeatWidget_C"));
+	if (DefeatWidgetRef.Class != nullptr)
 	{
-		ResultWidget = CreateWidget<UJSResultWidget>(GetWorld(), ResultWidgetRef.Class);
+		ResultWidget = CreateWidget<UJSResultWidget>(GetWorld(), DefeatWidgetRef.Class);
 	}
 
 	const ConstructorHelpers::FClassFinder<UJSEventWidget> EventWidgetRef(TEXT("/Game/UI/BW_EventInfo.BW_EventInfo_C"));

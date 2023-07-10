@@ -17,6 +17,5 @@ void UJSEventAction::ActivateEvent_Implementation()
 	if(nullptr != GameState)
 	{
 		GameState->GetTurnManager()->CallNextEvent();
-		UE_LOG(LogTemp, Log, TEXT("Action Button Clicked"));
 	}
 }

@@ -36,23 +36,29 @@ public:
 
 	
 private:
-	UPROPERTY(EditAnywhere)
 	TObjectPtr<UUserWidget> StartMenuWidget;
-	
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> StartMenuWidgetClass;
+	
 	TObjectPtr<UUserWidget> MainHUDWidget;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> MainHUDWidgetClass;
 	
-	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSShopWidget> JSShopWidget;
-
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UJSShopWidget> JSShopWidgetClass;
+
 	TObjectPtr<class UJSCardInfoWidget> CardInfoWidget;
-
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UJSCardInfoWidget> CardInfoWidgetClass;
+
 	TObjectPtr<class UJSResultWidget> ResultWidget;
-
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UJSResultWidget> ResultWidgetClass;
+
 	TObjectPtr<class UJSEventWidget> EventWidget;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UJSEventWidget> EventWidgetClass;
 
 protected:
 	virtual void BeginPlay() override;

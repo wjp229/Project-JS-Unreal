@@ -102,7 +102,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UJSCardFactory> CardActorFactory;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Slot, meta=(AllowPrivateAccess))
 	TSubclassOf<class AJSCardSlot> CardSlot;
 
 	UPROPERTY(VisibleAnywhere, Category="Slot")
@@ -171,5 +171,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=EventManager, meta=(AllowPrivateAccess))
 	TObjectPtr<class AJSTurnEventManager> TurnManager;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=EventManager, meta=(AllowPrivateAccess))
 	TSubclassOf<class AJSTurnEventManager> TurnManagerClass;
 };

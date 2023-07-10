@@ -25,6 +25,7 @@ private:
 	void OnCardEndOverlap(AActor* OverlappedActor, AActor* OtherActor);
 	
 	int32 SlotNum;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Mesh, meta=(AllowPrivateAccess))
 	TObjectPtr<UStaticMeshComponent> SlotMesh;
 	TObjectPtr<class ATriggerBox> TriggerBox;
 };
