@@ -39,20 +39,29 @@ enum class ECardRank
 	Special
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FPlayerData
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=PlayerData)
 	int32 CurrentStage;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=PlayerData)
 	int32 RemainTurn;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=PlayerData)
 	int32 PayTurn;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=PlayerData)
 	int32 CurrentCarat;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=PlayerData)
 	int32 PayCarat;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=PlayerData)
+	int32 PurchasedCard;
 };
 
 const FString BP_CardEffectPrefixPath = TEXT("/Game/Card/CardEffect/CE_JSCard_");

@@ -5,7 +5,6 @@
 
 #include "JSGameSingleton.h"
 #include "Card/JSCardFactory.h"
-#include "UObject/ConstructorHelpers.h"
 #include "Card/JSCard.h"
 #include "Card/JSCardSlot.h"
 #include "Data/JSTypes.h"
@@ -28,10 +27,14 @@ void AJSGameState::PostInitializeComponents()
 	{
 		ActivatedCards.Emplace(nullptr);
 	}
-	
-	CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), UJSCardFactory::StaticClass());
+
+	if(nullptr != CardFactoryRef)
+	{
+		CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), CardFactoryRef);
+		CardActorFactory->InitFactory();
+	}
+
 	TurnManager = GetWorld()->SpawnActor<AJSTurnEventManager>(TurnManagerClass);
-	CardActorFactory->InitFactory();
 }
 
 void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
@@ -45,7 +48,6 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 			{
 				JSHud->ShowDefeatWidget();
 			}
-
 			GamePlayState = EGamePlayState::Finished;
 			
 			return;
@@ -54,8 +56,11 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 		// Game End If Current Stage is Last Stage
 		if (GetPlayerData()->CurrentStage == UJSGameSingleton::Get().GetMaxTurnCount())
 		{
-			UE_LOG(LogTemp, Log, TEXT("!!!Game Clear!!!"));
-
+			AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+			if (nullptr != JSHud)
+			{
+				JSHud->ShowResultInfoWidget(*GetPlayerData());
+			}
 			GamePlayState = EGamePlayState::Finished;
 
 			return;
@@ -86,6 +91,8 @@ void AJSGameState::RefreshPlayerInfo() const
 void AJSGameState::DprGameStart()
 {
 	UE_LOG(LogTemp, Log, TEXT("======================================="));
+
+	GamePlayState = EGamePlayState::Playing;
 	
 	SetPayTurn(UJSGameSingleton::Get().GetTurnInfo(GetPlayerData()->CurrentStage).InitPhaseTurn);
 	SetRemainTurn(GetPlayerData()->PayTurn);
@@ -139,6 +146,9 @@ void AJSGameState::SpawnInitCard()
 
 void AJSGameState::OnEnterStartTurn()
 {
+	if(GamePlayState != EGamePlayState::Playing)
+		return;
+	
 	ShuffleHoldingCards();
 
 	OnCheckEventQueue();
@@ -214,6 +224,8 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 		if (NewCardActor != nullptr)
 		{
 			InventoryCards.Emplace(NewCardActor);
+
+			GetPlayerData()->PurchasedCard++;
 
 			ArrangeCard();
 

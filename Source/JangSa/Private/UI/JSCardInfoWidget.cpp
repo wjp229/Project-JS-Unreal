@@ -3,14 +3,13 @@
 
 #include "UI/JSCardInfoWidget.h"
 
-void UJSCardInfoWidget::ShowCardInfoWidget_Implementation(const FVector2D CurrentMousePosition)
+void UJSCardInfoWidget::ShowCardInfoWidget_Implementation()
 {
 
 }
 
-void UJSCardInfoWidget::InitCardInfoWidget(const FCardInfoData& InCardInfoData, const float MousePositionX,
-	const float MousePositionY)
+void UJSCardInfoWidget::InitCardInfoWidget(const FCardInfoData& InCardInfoData)
 {
 	CardInfoData = InCardInfoData;
-	ShowCardInfoWidget(FVector2D(MousePositionX, MousePositionY));
+	ShowCardInfoWidget();
 }

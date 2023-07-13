@@ -12,7 +12,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class JANGSA_API UJSGameSingleton : public UObject
 {
 	GENERATED_BODY()
@@ -47,7 +47,6 @@ public:
 
 	FORCEINLINE TArray<FJSEventInfoData*> GetEventInfos()
 	{
-		
 		return EventInfoDatas;
 	}
 

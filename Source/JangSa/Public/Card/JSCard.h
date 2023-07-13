@@ -77,8 +77,16 @@ private:
 
 private:
 	FVector OriginPosition;
+	FVector OriginScale;
 
 public:
+	uint8 bIsShaking : 1;
 	uint8 bIsGrabbed : 1;
 	uint8 bIsActivated : 1;
+
+private:
+	void ShakeMesh();
+	void SetOutline();
+
+	FTimerHandle ShakeTimerHandler;
 };

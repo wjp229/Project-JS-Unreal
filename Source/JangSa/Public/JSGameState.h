@@ -102,6 +102,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UJSCardFactory> CardActorFactory;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=CardFactory, meta=(AllowPrivateAccess))
+	TSubclassOf<class UJSCardFactory> CardFactoryRef;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Slot, meta=(AllowPrivateAccess))
 	TSubclassOf<class AJSCardSlot> CardSlot;
 

@@ -21,16 +21,16 @@ public:
 
 	// Input Action Section
 protected:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess))
 	TObjectPtr<class UJSControlData> ControlData;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess))
 	TObjectPtr<class UInputAction> PressAction;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess))
 	TObjectPtr<class UInputAction> ReleaseAction;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess))
 	TObjectPtr<class UInputAction> DragAction;
 
 private:

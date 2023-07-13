@@ -2,9 +2,11 @@
 
 
 #include "UI/JSHUD.h"
-#include "Components/WidgetComponent.h"
+
+#include "ImaginaryBlueprintData.h"
 #include "UI/JSCardInfoWidget.h"
 #include "UI/JSEventWidget.h"
+#include "UI/JSDefeatWidget.h"
 #include "UI/JSResultWidget.h"
 #include "UI/JSShopWidget.h"
 #include "UObject/ConstructorHelpers.h"
@@ -29,16 +31,25 @@ AJSHUD::AJSHUD()
 		JSShopWidget = CreateWidget<UJSShopWidget>(GetWorld(), ShopWidgetRef.Class);
 	}
 
-	const ConstructorHelpers::FClassFinder<UJSCardInfoWidget> CardInfoWidgetRef(TEXT("/Game/UI/BW_JSCardInfo.BW_JSCardInfo_C"));
+	const ConstructorHelpers::FClassFinder<UJSCardInfoWidget> CardInfoWidgetRef(
+		TEXT("/Game/UI/BW_JSCardInfo.BW_JSCardInfo_C"));
 	if (ShopWidgetRef.Class != nullptr)
 	{
 		CardInfoWidget = CreateWidget<UJSCardInfoWidget>(GetWorld(), CardInfoWidgetRef.Class);
 	}
 
-	const ConstructorHelpers::FClassFinder<UJSResultWidget> DefeatWidgetRef(TEXT("/Game/UI/BW_DefeatWidget.BW_DefeatWidget_C"));
+	const ConstructorHelpers::FClassFinder<UJSDefeatWidget> DefeatWidgetRef(
+		TEXT("/Game/UI/BW_DefeatWidget.BW_DefeatWidget_C"));
 	if (DefeatWidgetRef.Class != nullptr)
 	{
-		ResultWidget = CreateWidget<UJSResultWidget>(GetWorld(), DefeatWidgetRef.Class);
+		DefeatWidget = CreateWidget<UJSDefeatWidget>(GetWorld(), DefeatWidgetRef.Class);
+	}
+
+	const ConstructorHelpers::FClassFinder<UJSResultWidget> ResultWidgetRef(
+		TEXT("/Game/UI/BW_ResultWidget.BW_ResultWidget_C"));
+	if (ResultWidgetRef.Class != nullptr)
+	{
+		ResultWidget = CreateWidget<UJSResultWidget>(GetWorld(), ResultWidgetRef.Class);
 	}
 
 	const ConstructorHelpers::FClassFinder<UJSEventWidget> EventWidgetRef(TEXT("/Game/UI/BW_EventInfo.BW_EventInfo_C"));
@@ -61,11 +72,11 @@ void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo)
 	JSShopWidget->InitShop(InCardInfo);
 }
 
-void AJSHUD::ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float MousePositionX, const float MousePositionY, const bool InActive)
+void AJSHUD::ShowCardInfoWidget(const FCardInfoData& InCardInfo, const bool InActive)
 {
-	if(nullptr != CardInfoWidget)
+	if (nullptr != CardInfoWidget)
 	{
-		if(InActive)
+		if (InActive)
 		{
 			if (!CardInfoWidget->IsInViewport())
 			{
@@ -74,9 +85,8 @@ void AJSHUD::ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float Mou
 			else
 			{
 				CardInfoWidget->SetVisibility(ESlateVisibility::Visible);
-
 			}
-			CardInfoWidget->InitCardInfoWidget(InCardInfo, MousePositionX, MousePositionY);
+			CardInfoWidget->InitCardInfoWidget(InCardInfo);
 		}
 		else
 		{
@@ -87,16 +97,25 @@ void AJSHUD::ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float Mou
 
 void AJSHUD::ShowDefeatWidget()
 {
+	CloseAllUserWidget();
+
+	if (!DefeatWidget->IsInViewport())
+	{
+		DefeatWidget->AddToViewport();
+	}
+
+	DefeatWidget->ShowDefeatWidget();
+}
+
+void AJSHUD::ShowResultInfoWidget(FPlayerData& InData)
+{
+	CloseAllUserWidget();
+
 	if (!ResultWidget->IsInViewport())
 	{
 		ResultWidget->AddToViewport();
+		ResultWidget->InitResultWidget(InData);
 	}
-		
-	ResultWidget->ShowDefeatWidget();
-}
-
-void AJSHUD::ShowResultInfoWidget()
-{
 }
 
 void AJSHUD::ShowEventInfoWidget(UJSEventData* InEventData)
@@ -108,6 +127,8 @@ void AJSHUD::ShowEventInfoWidget(UJSEventData* InEventData)
 
 	EventWidget->SetVisibility(ESlateVisibility::Visible);
 	EventWidget->InitEventInfoWidget(InEventData);
+
+	SetWidgetScale(EventWidget, .03f);
 }
 
 void AJSHUD::CloseEventInfoWidget()
@@ -130,4 +151,33 @@ void AJSHUD::BeginPlay()
 void AJSHUD::DrawHUD()
 {
 	Super::DrawHUD();
+}
+
+void AJSHUD::SetWidgetScale(UUserWidget* InWidget, float InScaleSpeed)
+{
+	InWidget->SetRenderScale(FVector2D(1.f, 0.f));
+	
+	ScaleHandler.Invalidate();
+
+	GetWorld()->GetTimerManager().SetTimer(ScaleHandler, FTimerDelegate::CreateLambda([this, InWidget, InScaleSpeed]()
+	{
+		float YValue = InWidget->GetRenderTransform().Scale.Y;
+		if(YValue >= 1.f) return;
+
+		YValue += InScaleSpeed;
+		EventWidget->SetRenderScale(FVector2D(1.f, YValue));
+
+	}), .002f, true);
+}
+
+void AJSHUD::SetWidgetPosition(UUserWidget* InWidget, FVector2D InitPos, float InMoveSpeed)
+{
+}
+
+void AJSHUD::CloseAllUserWidget()
+{
+	MainHUDWidget->SetVisibility(ESlateVisibility::Hidden);
+	JSShopWidget->SetVisibility(ESlateVisibility::Hidden);
+	CardInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+	EventWidget->SetVisibility(ESlateVisibility::Hidden);
 }

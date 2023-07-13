@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Data/JSEventData.h"
+#include "Data/JSTypes.h"
 #include "GameFramework/HUD.h"
 #include "JSHUD.generated.h"
 
@@ -25,11 +26,11 @@ public:
 	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo);
 
 	// Interaction about Card Info
-	void ShowCardInfoWidget(const FCardInfoData& InCardInfo, const float MousePositionX, const float MousePositionY, const bool InActive);
+	void ShowCardInfoWidget(const FCardInfoData& InCardInfo, const bool InActive);
 	
 	void ShowDefeatWidget();
 
-	void ShowResultInfoWidget();
+	void ShowResultInfoWidget(FPlayerData& InData);
 
 	void ShowEventInfoWidget(UJSEventData* InEventData);
 	void CloseEventInfoWidget();
@@ -52,16 +53,26 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJSCardInfoWidget> CardInfoWidgetClass;
 
+	TObjectPtr<class UJSDefeatWidget> DefeatWidget;
+
 	TObjectPtr<class UJSResultWidget> ResultWidget;
+	
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UJSResultWidget> ResultWidgetClass;
+	TSubclassOf<class UJSDefeatWidget> ResultWidgetClass;
 
 	TObjectPtr<class UJSEventWidget> EventWidget;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJSEventWidget> EventWidgetClass;
 
+	FTimerHandle ScaleHandler;
+	FTimerHandle MoveHandler;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;
-	
+
+	void SetWidgetScale(UUserWidget* InWidget, float InScaleSpeed);
+	void SetWidgetPosition(UUserWidget* InWidget, FVector2D InitPos, float InMoveSpeed);
+
+	void CloseAllUserWidget();
 };

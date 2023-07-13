@@ -3,6 +3,6 @@
 
 #include "UI/JSResultWidget.h"
 
-void UJSResultWidget::ShowDefeatWidget_Implementation()
+void UJSResultWidget::InitResultWidget_Implementation(const FPlayerData& InData)
 {
 }

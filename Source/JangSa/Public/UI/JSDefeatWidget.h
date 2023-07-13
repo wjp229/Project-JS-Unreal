@@ -4,20 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Data/JSTypes.h"
-#include "JSResultWidget.generated.h"
+#include "JSDefeatWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class JANGSA_API UJSResultWidget : public UUserWidget
+class JANGSA_API UJSDefeatWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
 	UFUNCTION(BlueprintNativeEvent)
-	void InitResultWidget(const FPlayerData& InData);
-
-
+	void ShowDefeatWidget();
 };

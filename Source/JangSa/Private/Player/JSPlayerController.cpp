@@ -16,34 +16,6 @@ AJSPlayerController::AJSPlayerController(const FObjectInitializer& ObjectInitial
 	bEnableClickEvents = true;
 	bEnableTouchEvents = true;
 	PrimaryActorTick.bCanEverTick = true;
-	
-	static ConstructorHelpers::FObjectFinder<UJSControlData> ControlDataRef(
-		TEXT("/Script/JangSa.JSControlData'/Game/CameraData/DA_JSController.DA_JSController'"));
-	if (ControlDataRef.Succeeded())
-	{
-		ControlData = ControlDataRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionClickRef(
-		TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IJS_Click.IJS_Click'"));
-	if (InputActionClickRef.Succeeded())
-	{
-		PressAction = InputActionClickRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionReleaseRef(
-		TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IJS_Release.IJS_Release'"));
-	if (InputActionReleaseRef.Succeeded())
-	{
-		ReleaseAction = InputActionReleaseRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionDragRef(
-		TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IJS_Drag.IJS_Drag'"));
-	if (InputActionDragRef.Succeeded())
-	{
-		DragAction = InputActionDragRef.Object;
-	}
 }
 
 
@@ -128,7 +100,7 @@ AActor* AJSPlayerController::GetHitActor(const FVector2d& ScreenPosition) const
 {
 	FHitResult Hit;
 
-	if (GetHitResultAtScreenPosition(ScreenPosition, ECC_Visibility, true, Hit))
+	if (GetHitResultAtScreenPosition(ScreenPosition, ECC_GameTraceChannel1, true, Hit))
 	{
 		const IJSInputInterface* InputInterface = Cast<IJSInputInterface>(Hit.GetActor());
 

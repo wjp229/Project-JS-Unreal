@@ -13,36 +13,6 @@
 UJSCardFactory::UJSCardFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	// Collect Card Effects
-	for (int32 i = 0; i < 15; i++)
-	{
-		FString PreTargetAddress = DA_CardDataPrefixPath;
-		FString ProTargetAddress = DA_CardDataSuffixPath;
-
-		FString TargetAddress;
-		TargetAddress.Append(PreTargetAddress);
-		TargetAddress.Append(FString::FromInt(i));
-		TargetAddress.Append(ProTargetAddress);
-		TargetAddress.Append(FString::FromInt(i));
-
-		const ConstructorHelpers::FObjectFinder<UJSCardDataAsset> CardDataRef(*TargetAddress);
-		if (nullptr != CardDataRef.Object)
-		{
-			UJSCardDataAsset* Data = CardDataRef.Object;
-
-			if (nullptr != Data)
-			{
-				CardDataAssets.Emplace(Data);
-			}
-		}
-	}
-	
-	// 
-	static ConstructorHelpers::FClassFinder<AJSCard> JsCardRef(TEXT("/Game/Card/BP_JSCard.BP_JSCard_C"));
-	if(JsCardRef.Succeeded())
-	{
-		CardBP = JsCardRef.Class;
-	}
 }
 
 void UJSCardFactory::InitFactory()

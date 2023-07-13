@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class JANGSA_API UJSCardFactory : public UObject
 {
 	GENERATED_BODY()
@@ -31,10 +31,13 @@ public:
 
 private:
 	TArray<FCardInfoData*> CardInfoDatasOnShop;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=CardData, meta=(AllowPrivateAccess))
 	TArray<TObjectPtr<class UJSCardDataAsset>> CardDataAssets;
 
 	TArray<FCardInfoData*> TempCardInfoDatas;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=CardData, meta=(AllowPrivateAccess))
 	TSubclassOf<class AJSCard> CardBP;
 
 	// Object Pooling

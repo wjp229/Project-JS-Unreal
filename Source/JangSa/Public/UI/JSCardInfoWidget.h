@@ -16,10 +16,10 @@ class JANGSA_API UJSCardInfoWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void InitCardInfoWidget(const FCardInfoData& InCardInfoData, const float MousePositionX, const float MousePositionY);
+	void InitCardInfoWidget(const FCardInfoData& InCardInfoData);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void ShowCardInfoWidget(const FVector2D CurrentMousePosition);
+	void ShowCardInfoWidget();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="CardInfo")
 	FCardInfoData CardInfoData;
