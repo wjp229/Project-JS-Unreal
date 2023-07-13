@@ -51,6 +51,8 @@ void AJSCardSlot::OnCardBeginOverlap(AActor* OverlappedActor, AActor* OtherActor
 	{
 		InCard->SlotNum = SlotNum;
 		InCard->bIsPlaceable = true;
+
+		SlotMesh->SetCustomDepthStencilValue(253);
 	}
 }
 
@@ -61,6 +63,8 @@ void AJSCardSlot::OnCardEndOverlap(AActor* OverlappedActor, AActor* OtherActor)
 	{
 		InCard->SlotNum = -1;
 		InCard->bIsPlaceable = false;
+
+		SlotMesh->SetCustomDepthStencilValue(0);
 	}
 }
 

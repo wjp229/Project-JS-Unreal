@@ -189,9 +189,11 @@ bool AJSCard::OnSelectActor()
 	if (CardState == ECardState::Inventory)
 		return false;
 
+	
 	bIsGrabbed = true;
 	OriginPosition = GetActorLocation();
 	CaseMesh->BodyInstance.SetEnableGravity(false);
+	SetOutline(253);
 
 	return true;
 }
@@ -215,6 +217,7 @@ void AJSCard::OnReleaseActor()
 		SetActorLocation(OriginPosition);
 	}
 
+	SetOutline(251);
 	bIsGrabbed = false;
 	CaseMesh->BodyInstance.SetEnableGravity(true);
 }
@@ -225,6 +228,7 @@ void AJSCard::OnMouseEnterActor()
 
 	SetActorRelativeScale3D(OriginScale * 1.1f);
 
+	SetOutline(252);
 }
 
 void AJSCard::OnMouseExitActor()
@@ -234,6 +238,8 @@ void AJSCard::OnMouseExitActor()
 	SetActorRotation(FRotator(.0f));
 	
 	SetActorRelativeScale3D(OriginScale);
+
+	SetOutline(251);
 }
 
 void AJSCard::SetActiveCardInfoHUD(bool InActive) const
@@ -261,6 +267,8 @@ void AJSCard::ShakeMesh()
 	// }), .1f, true);
 }
 
-void AJSCard::SetOutline()
+void AJSCard::SetOutline(int32 InValue)
 {
+	CaseMesh->SetCustomDepthStencilValue(InValue);
+	KeycapMesh->SetCustomDepthStencilValue(InValue);
 }

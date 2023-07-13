@@ -86,7 +86,7 @@ public:
 
 private:
 	void ShakeMesh();
-	void SetOutline();
+	void SetOutline(int32 InValue);
 
 	FTimerHandle ShakeTimerHandler;
 };
