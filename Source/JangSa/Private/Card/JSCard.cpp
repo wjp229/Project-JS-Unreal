@@ -3,16 +3,14 @@
 
 #include "Card/JSCard.h"
 #include "Card/JSCardEffectComponent.h"
-#include "Animation/JSCardAnimInstance.h"
 #include "Animation/AnimInstance.h"
-#include "Cascade/Classes/CascadeParticleSystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Data/JSCardDataAsset.h"
 #include "Event/JSEventAction.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UI/JSHUD.h"
 #include "JSGameState.h"
-#include "BehaviorTree/Tasks/BTTask_MoveTo.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
 AJSCard::AJSCard()
@@ -70,8 +68,8 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	{
 		TextureMaterial->SetTextureParameterValue(FName("MainTex"), InDataAsset->Texture);
 	}
-
-	SetActorLabel(*GetCardInfo().Name);
+	
+	//SetActorLabel(*GetCardInfo().Name);
 }
 
 void AJSCard::SetCardState(ECardState InState)
@@ -188,7 +186,6 @@ bool AJSCard::OnSelectActor()
 {
 	if (CardState == ECardState::Inventory)
 		return false;
-
 	
 	bIsGrabbed = true;
 	OriginPosition = GetActorLocation();

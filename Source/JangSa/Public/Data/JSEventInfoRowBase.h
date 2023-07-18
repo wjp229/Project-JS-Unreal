@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TurnInfoRowBase.h"
 #include "UObject/NoExportTypes.h"
 #include "JSEventInfoRowBase.generated.h"
 

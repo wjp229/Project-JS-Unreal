@@ -2,7 +2,6 @@
 
 
 #include "Card/JSCardSlot.h"
-
 #include "Card/JSCard.h"
 #include "Engine/TriggerBox.h"
 #include "UObject/ConstructorHelpers.h"

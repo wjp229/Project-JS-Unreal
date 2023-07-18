@@ -2,8 +2,6 @@
 
 
 #include "UI/JSHUD.h"
-
-#include "ImaginaryBlueprintData.h"
 #include "UI/JSCardInfoWidget.h"
 #include "UI/JSEventWidget.h"
 #include "UI/JSDefeatWidget.h"
