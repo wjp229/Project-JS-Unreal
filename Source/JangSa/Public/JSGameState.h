@@ -14,6 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPayCarat, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyCurrentCarat, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyResultCarat, int32, num);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyCheckEvent, int32, num);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotifyPlayerControllerState, EPlayerControllerState, state);
 
 /**
  * 
@@ -42,6 +43,7 @@ public:
 	FNotifyResultCarat NotifyResultCarat;
 
 	FNotifyCheckEvent NotifyCheckEvent;
+	FNotifyPlayerControllerState NotifyPlayerControllerState;
 #pragma endregion
 
 # pragma region Player / Turn Data Section
@@ -131,6 +133,8 @@ public:
 	// Deprecated
 	void DprGameStart();
 	void OnResetShop(bool bIsInitTurn = true) const;
+	void FoldShop(bool bIsFolded);
+	void ExitShop();
 
 	UFUNCTION(BlueprintCallable)
 	void OnExitTurn();
@@ -168,7 +172,7 @@ public:
 	void ArrangeCard();
 #pragma endregion
 public:
-	class AJSTurnEventManager* GetTurnManager();
+	class AJSTurnEventManager* GetTurnManager() const;
 	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=EventManager, meta=(AllowPrivateAccess))

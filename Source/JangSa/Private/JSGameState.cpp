@@ -133,7 +133,7 @@ void AJSGameState::SpawnInitCard()
 			FVector SlotPos;
 			HoldingCards.Emplace(NewCardActor);
 			RegisterActivateCard(NewCardActor, StartCardInfo->FieldNum, SlotPos);
-			NewCardActor->SetActorLocation(SlotPos + FVector(0.f, 0.f, 1.f));
+		//	NewCardActor->SetActorLocation(SlotPos + FVector(0.f, 0.f, 1.f));
 		}
 		else
 		{
@@ -188,6 +188,8 @@ void AJSGameState::ShuffleHoldingCards()
 
 void AJSGameState::OnCheckEventQueue()
 {
+	NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Disabled);
+
 	NotifyCheckEvent.Broadcast(GetPlayerData()->CurrentStage);
 }
 
@@ -200,13 +202,32 @@ void AJSGameState::OnResetShop(bool bIsInitTurn) const
 		//return;
 	}
 
+	NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Disabled);
+
 	TArray<FCardInfoData*> CardInfoDatas = CardActorFactory->SpawnCardActorOnShop();
 
 	AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	if (nullptr != JSHud)
 	{
-		JSHud->InitializeShop(CardInfoDatas);
+		JSHud->InitializeShop(CardInfoDatas, bIsInitTurn);
 	}
+}
+
+void AJSGameState::FoldShop(bool bIsFolded)
+{
+	if(bIsFolded)
+	{
+		NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Disabled);
+	}
+	else
+	{
+		NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Interactable);
+	}
+}
+
+void AJSGameState::ExitShop()
+{
+	NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Selectable);
 }
 
 bool AJSGameState::PurchaseCard(int32 InCardNum)
@@ -241,7 +262,6 @@ void AJSGameState::OnExitTurn()
 	GetPlayerData()->CurrentStage += 1;
 	
 	OnEnterSettleCaratPhase();
-
 }
 
 void AJSGameState::OnEnterSettleCaratPhase()
@@ -282,8 +302,10 @@ bool AJSGameState::RegisterActivateCard(AJSCard* InCard, int32 SlotNum, FVector&
 	HoldingCards.Remove(InCard);
 	ActivatedCards[SlotNum] = InCard;
 
-	SlotPosition = CardSlots[SlotNum]->GetActorLocation();
-
+	SlotPosition = CardSlots[SlotNum]->GetActorLocation() + FVector(0.f, 0.f ,5.f);
+	InCard->SetActorLocation(SlotPosition);
+	
+	CardSlots[SlotNum]->RegisterCard();
 	AddTurnResultCarat(InCard->GetResultCarat());
 
 	ArrangeCard();
@@ -326,29 +348,9 @@ void AJSGameState::ArrangeCard()
 	{
 		InventoryCards[ix]->SetActorLocation(InventorySpawnLocation);
 	}
-	// const int32 InventoryRow = 3;
-	// for (int ix = 0; ix < InventoryCards.Num(); ix++)
-	// {
-	// 	FVector OffsetVector = (ix / InventoryRow) * FVector(-6.f, 0.f, 0.f);
-	// 	OffsetVector += (ix % InventoryRow) * FVector(.0f, -6.f, .0f);
-	// 	InventoryCards[ix]->SetActorLocation(InventorySpawnLocation + OffsetVector);
-	// }
-
-	// Arrange Active Cards
-	// const FVector OffsetLocation(.0f, .0f, 5.f);
-	//
-	// for (int ix = 0; ix < ActivatedCards.Num(); ix++)
-	// {
-	// 	if(nullptr == ActivatedCards[ix])
-	// 	{
-	// 		continue;
-	// 	}
-	// 	
-	// 	ActivatedCards[ix]->SetActorLocation(CardSlots[ix]->GetActorLocation() + OffsetLocation);
-	// }
 }
 
-AJSTurnEventManager* AJSGameState::GetTurnManager()
+AJSTurnEventManager* AJSGameState::GetTurnManager() const
 {
 	if(nullptr != TurnManager)
 	{
@@ -356,10 +358,6 @@ AJSTurnEventManager* AJSGameState::GetTurnManager()
 	}
 
 	return nullptr;
-
-	// TurnManager = Cast<AJSTurnEventManager>(GetWorld()->SpawnActor(AJSTurnEventManager::StaticClass()));
-	//
-	// return Cast<AJSTurnEventManager>(TurnManager);
 }
 
 TArray<AJSCard*> AJSGameState::CardsInCondition(const FString InRank)

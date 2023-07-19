@@ -39,6 +39,15 @@ enum class ECardRank
 	Special
 };
 
+UENUM()
+enum EPlayerControllerState
+{
+	Selectable,
+	Interactable,
+	Disabled
+};
+
+
 USTRUCT(BlueprintType)
 struct FPlayerData
 {

@@ -2,10 +2,10 @@
 
 
 #include "Player/JSPlayerController.h"
-#include "UObject/ConstructorHelpers.h"
 #include "Data/JSControlData.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "JSGameState.h"
 #include "Card/JSCard.h"
 #include "Engine/LocalPlayer.h"
 
@@ -16,46 +16,69 @@ AJSPlayerController::AJSPlayerController(const FObjectInitializer& ObjectInitial
 	bEnableClickEvents = true;
 	bEnableTouchEvents = true;
 	PrimaryActorTick.bCanEverTick = true;
+
+	ControllerState = Disabled;
 }
 
-
-// Tick to .5 Interval Method
-void AJSPlayerController::Tick(float DeltaSeconds)
+void AJSPlayerController::BeginPlay()
 {
-	Super::Tick(DeltaSeconds);
-
-	if (SelectedObject != nullptr)
-	{
-		return;
-	}
-
-	const FVector2d CurrentMousePosition = GetCurrentMousePosition();
-	AActor* CurrentDetectedObject = GetHitActor(CurrentMousePosition);
-
-	if(DetectedObject == CurrentDetectedObject)
-	{
-		return;
-	}
-
-	if(DetectedObject != nullptr)
-	{
-		IJSInputInterface* InputInterface = Cast<IJSInputInterface>(DetectedObject);
-		if (InputInterface != nullptr)
-		{
-			InputInterface->OnMouseExitActor();
-		}
-	}
-
-	DetectedObject = CurrentDetectedObject;
+	Super::BeginPlay();
 	
-	if (DetectedObject != nullptr)
+	AJSGameState* GameState = Cast<AJSGameState>(GetWorld()->GetGameState());
+	if(nullptr != GameState)
 	{
-		IJSInputInterface* InputInterface = Cast<IJSInputInterface>(DetectedObject);
-		if (InputInterface != nullptr)
-		{
-			InputInterface->OnMouseEnterActor();
-		}
+		GameState->NotifyPlayerControllerState.AddDynamic(this, &AJSPlayerController::SetPlayerControllerState);
 	}
+}
+
+void AJSPlayerController::SetPlayerControllerState(EPlayerControllerState InState)
+{
+	ControllerState = InState;
+	
+	RayHandler.Invalidate();
+
+	GetWorld()->GetTimerManager().SetTimer(RayHandler, FTimerDelegate::CreateLambda([this]()
+	{
+		if(ControllerState == Disabled)
+		{
+			RayHandler.Invalidate();
+			return;
+		}
+		
+		if (SelectedObject != nullptr)
+		{
+			return;
+		}
+
+
+		const FVector2d CurrentMousePosition = GetCurrentMousePosition();
+		AActor* CurrentDetectedObject = GetHitActor(CurrentMousePosition);
+
+		if (DetectedObject == CurrentDetectedObject)
+		{
+			return;
+		}
+
+		if (DetectedObject != nullptr)
+		{
+			IJSInputInterface* InputInterface = Cast<IJSInputInterface>(DetectedObject);
+			if (InputInterface != nullptr)
+			{
+				InputInterface->OnMouseExitActor();
+			}
+		}
+
+		DetectedObject = CurrentDetectedObject;
+
+		if (DetectedObject != nullptr)
+		{
+			IJSInputInterface* InputInterface = Cast<IJSInputInterface>(DetectedObject);
+			if (InputInterface != nullptr)
+			{
+				InputInterface->OnMouseEnterActor();
+			}
+		}
+	}), 0.1f, true);
 }
 
 
@@ -75,11 +98,16 @@ void AJSPlayerController::SetupInputComponent()
 
 void AJSPlayerController::OnTapPressed()
 {
+	if(ControllerState != Selectable)
+	{
+		return;
+	}
+	
 	const FVector2d CurrentMousePosition = GetCurrentMousePosition();
 	AActor* HitActor = GetHitActor(CurrentMousePosition);
-	if(IJSInputInterface* CardInputInterface = Cast<IJSInputInterface>(HitActor))
+	if (IJSInputInterface* CardInputInterface = Cast<IJSInputInterface>(HitActor))
 	{
-		if(CardInputInterface->OnSelectActor())
+		if (CardInputInterface->OnSelectActor())
 		{
 			SelectedObject = HitActor;
 		}
@@ -87,7 +115,7 @@ void AJSPlayerController::OnTapPressed()
 }
 
 void AJSPlayerController::OnTapReleased()
-{
+{	
 	IJSInputInterface* InputInterface = Cast<IJSInputInterface>(SelectedObject);
 	if (nullptr != InputInterface)
 	{

@@ -16,6 +16,8 @@ public:
 	AJSCardSlot();
 
 	void InitSlot(int32 InSlotNum);
+	
+	void RegisterCard();
 
 private:
 	UFUNCTION()
@@ -23,6 +25,7 @@ private:
 
 	UFUNCTION()
 	void OnCardEndOverlap(AActor* OverlappedActor, AActor* OtherActor);
+
 	
 	int32 SlotNum;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Mesh, meta=(AllowPrivateAccess))

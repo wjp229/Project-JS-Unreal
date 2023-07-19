@@ -30,4 +30,10 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	bool ClickPurchaseCardButton(int32 InButtonNum);
+
+	UFUNCTION(BlueprintCallable)
+	void ExitShop();
+
+	UFUNCTION(BlueprintCallable)
+	void FoldShop(bool bIsFolded);
 };

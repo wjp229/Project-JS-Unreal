@@ -33,13 +33,13 @@ public:
 	FString Rank;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
-	uint8 CanControlByUser;
+	uint8 CanControlByUser : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
 	int32 InitRemainTurn;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
-	uint8 ShowOnShop;
+	uint8 ShowOnShop : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CardInfo")
 	int32 Price;

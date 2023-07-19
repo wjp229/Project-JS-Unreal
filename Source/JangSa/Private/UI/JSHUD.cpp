@@ -7,6 +7,7 @@
 #include "UI/JSDefeatWidget.h"
 #include "UI/JSResultWidget.h"
 #include "UI/JSShopWidget.h"
+#include "UI/PhaseAlarmWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
 AJSHUD::AJSHUD()
@@ -55,19 +56,43 @@ AJSHUD::AJSHUD()
 	{
 		EventWidget = CreateWidget<UJSEventWidget>(GetWorld(), EventWidgetRef.Class);
 	}
+
+	const ConstructorHelpers::FClassFinder<UPhaseAlarmWidget> PhaseAlarmRef(
+		TEXT("/Game/UI/BW_PhaseAlarm.BW_PhaseAlarm_C"));
+	if (PhaseAlarmRef.Class != nullptr)
+	{
+		PhaseAlarmWidget = CreateWidget<UPhaseAlarmWidget>(GetWorld(), PhaseAlarmRef.Class);
+	}
 }
 
-void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo)
+void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo, bool bIsInitPhase)
 {
+	if (bIsInitPhase)
+	{
+		PhaseAlarmWidget->SetPhaseText(TEXT("상점 페이즈"));
+		PhaseAlarmWidget->SetVisibility(ESlateVisibility::Visible);
+		SetWidgetScale(PhaseAlarmWidget, .005f, false);
+	}
+
 	if (!JSShopWidget->IsInViewport())
 	{
 		JSShopWidget->AddToViewport();
+		JSShopWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else
-	{
-		JSShopWidget->SetVisibility(ESlateVisibility::Visible);
-	}
+	
 	JSShopWidget->InitShop(InCardInfo);
+
+	if(bIsInitPhase)
+	{
+		PhaseHandler.Invalidate();
+
+		GetWorld()->GetTimerManager().SetTimer(PhaseHandler, FTimerDelegate::CreateLambda([this]()
+		{
+			PhaseAlarmWidget->SetVisibility(ESlateVisibility::Hidden);
+			JSShopWidget->SetVisibility(ESlateVisibility::Visible);
+			SetWidgetScale(JSShopWidget, .03f, true);
+		}), .002f, false, 1.5f);
+	}
 }
 
 void AJSHUD::ShowCardInfoWidget(const FCardInfoData& InCardInfo, const bool InActive)
@@ -118,15 +143,28 @@ void AJSHUD::ShowResultInfoWidget(FPlayerData& InData)
 
 void AJSHUD::ShowEventInfoWidget(UJSEventData* InEventData)
 {
+	PhaseAlarmWidget->SetPhaseText(TEXT("이벤트 페이즈"));
+	PhaseAlarmWidget->SetVisibility(ESlateVisibility::Visible);
+	SetWidgetScale(PhaseAlarmWidget, .005f, false);
+
 	if (!EventWidget->IsInViewport())
 	{
 		EventWidget->AddToViewport();
+		EventWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 
-	EventWidget->SetVisibility(ESlateVisibility::Visible);
 	EventWidget->InitEventInfoWidget(InEventData);
 
-	SetWidgetScale(EventWidget, .03f);
+	PhaseHandler.Invalidate();
+
+	GetWorld()->GetTimerManager().SetTimer(PhaseHandler, FTimerDelegate::CreateLambda([this]()
+	{
+		PhaseAlarmWidget->SetVisibility(ESlateVisibility::Hidden);
+		EventWidget->SetVisibility(ESlateVisibility::Visible);
+		SetWidgetScale(EventWidget, .03f, true);
+
+		UE_LOG(LogTemp, Log, TEXT("HIO"));
+	}), .002f, false, 1.5f);
 }
 
 void AJSHUD::CloseEventInfoWidget()
@@ -137,6 +175,9 @@ void AJSHUD::CloseEventInfoWidget()
 void AJSHUD::DrawMainHUD()
 {
 	MainHUDWidget->AddToViewport();
+
+	PhaseAlarmWidget->AddToViewport();
+	PhaseAlarmWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AJSHUD::BeginPlay()
@@ -151,20 +192,19 @@ void AJSHUD::DrawHUD()
 	Super::DrawHUD();
 }
 
-void AJSHUD::SetWidgetScale(UUserWidget* InWidget, float InScaleSpeed)
+void AJSHUD::SetWidgetScale(UUserWidget* InWidget, float InScaleSpeed, bool IsDirectionX)
 {
 	InWidget->SetRenderScale(FVector2D(1.f, 0.f));
-	
+
 	ScaleHandler.Invalidate();
 
 	GetWorld()->GetTimerManager().SetTimer(ScaleHandler, FTimerDelegate::CreateLambda([this, InWidget, InScaleSpeed]()
 	{
 		float YValue = InWidget->GetRenderTransform().Scale.Y;
-		if(YValue >= 1.f) return;
+		if (YValue >= 1.f) return;
 
 		YValue += InScaleSpeed;
-		EventWidget->SetRenderScale(FVector2D(1.f, YValue));
-
+		InWidget->SetRenderScale(FVector2D(1.f, YValue));
 	}), .002f, true);
 }
 

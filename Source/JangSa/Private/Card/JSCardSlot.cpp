@@ -29,8 +29,6 @@ void AJSCardSlot::InitSlot(int32 InSlotNum)
 {
 	TriggerBox = Cast<ATriggerBox>(GetWorld()->SpawnActor(ATriggerBox::StaticClass()));
 
-	//TriggerBox->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, true));
-
 	FVector TriggerSpawnLocation = GetActorLocation() +  FVector(0.f,0.f,7.f) ;
 	FVector TriggerBoxScale = FVector(0.08f,0.08f,0.15f);
 	
@@ -41,6 +39,12 @@ void AJSCardSlot::InitSlot(int32 InSlotNum)
 	TriggerBox->OnActorEndOverlap.AddDynamic(this, &AJSCardSlot::OnCardEndOverlap);
 	
 	SlotNum = InSlotNum;
+
+}
+
+void AJSCardSlot::RegisterCard()
+{
+	SlotMesh->SetCustomDepthStencilValue(0);
 }
 
 void AJSCardSlot::OnCardBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
@@ -60,10 +64,14 @@ void AJSCardSlot::OnCardEndOverlap(AActor* OverlappedActor, AActor* OtherActor)
 	AJSCard* InCard = Cast<AJSCard>(OtherActor);
 	if(nullptr != InCard)
 	{
+		UE_LOG(LogTemp, Log, TEXT("AJSCardSlot bIsPlaceable: %d"), InCard->bIsPlaceable);
+		UE_LOG(LogTemp, Log, TEXT("AJSCardSlot SlotNum: %d"), InCard-> SlotNum);
+		
 		InCard->SlotNum = -1;
 		InCard->bIsPlaceable = false;
 
 		SlotMesh->SetCustomDepthStencilValue(0);
 	}
 }
+
 

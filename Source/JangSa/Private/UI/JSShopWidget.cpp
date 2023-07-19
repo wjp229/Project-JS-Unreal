@@ -42,6 +42,24 @@ bool UJSShopWidget::ClickPurchaseCardButton(int32 InButtonNum)
 	return false;
 }
 
+void UJSShopWidget::ExitShop()
+{
+	AJSGameState* JSGameState = Cast<AJSGameState>(GetWorld()->GetGameState());
+	if(JSGameState != nullptr)
+	{
+		JSGameState->ExitShop();
+	}
+}
+
+void UJSShopWidget::FoldShop(bool bIsFolded)
+{
+	AJSGameState* JSGameState = Cast<AJSGameState>(GetWorld()->GetGameState());
+	if(JSGameState != nullptr)
+	{
+		JSGameState->FoldShop(bIsFolded);
+	}
+}
+
 void UJSShopWidget::InitCardInfoInShop_Implementation()
 {
 }

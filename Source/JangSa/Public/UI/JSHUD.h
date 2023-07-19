@@ -23,7 +23,7 @@ public:
 	void DrawMainHUD();
 	
 	// Interaction about Shop
-	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo);
+	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo, bool bIsInitPhase);
 
 	// Interaction about Card Info
 	void ShowCardInfoWidget(const FCardInfoData& InCardInfo, const bool InActive);
@@ -64,14 +64,17 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJSEventWidget> EventWidgetClass;
 
+	TObjectPtr<class UPhaseAlarmWidget> PhaseAlarmWidget;
+
 	FTimerHandle ScaleHandler;
+	FTimerHandle PhaseHandler;
 	FTimerHandle MoveHandler;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;
 
-	void SetWidgetScale(UUserWidget* InWidget, float InScaleSpeed);
+	void SetWidgetScale(UUserWidget* InWidget, float InScaleSpeed, bool IsDirectionX);
 	void SetWidgetPosition(UUserWidget* InWidget, FVector2D InitPos, float InMoveSpeed);
 
 	void CloseAllUserWidget();

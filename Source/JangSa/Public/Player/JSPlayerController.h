@@ -16,9 +16,12 @@ class JANGSA_API AJSPlayerController : public APlayerController
 
 public:
 	AJSPlayerController(const FObjectInitializer& ObjectInitializer);
+	
+	virtual void BeginPlay() override;
 
-	virtual void Tick(float DeltaSeconds) override;
-
+	UFUNCTION()
+	void SetPlayerControllerState(enum EPlayerControllerState InState);
+	
 	// Input Action Section
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess))
@@ -43,6 +46,8 @@ private:
 	AActor* GetHitActor(const FVector2d& ScreenPosition) const;
 	void SetMappingContext() const;
 
+	EPlayerControllerState ControllerState;
+
 	// Interaction Section
 private:
 	UPROPERTY(VisibleAnywhere, Category="Interaction")
@@ -54,4 +59,6 @@ private:
 
 private:
 	FVector2d GetCurrentMousePosition() const;
+
+	FTimerHandle RayHandler;
 };

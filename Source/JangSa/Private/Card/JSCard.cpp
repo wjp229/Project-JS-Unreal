@@ -53,8 +53,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 {
 	CardData = InCardData;
 	CardState = ECardState::Inventory;
-
-
+	
 	ensure(InDataAsset);
 
 	UJSCardEffectComponent* CardEffectComponent = NewObject<UJSCardEffectComponent>(this, InDataAsset->EffectComponent);
@@ -184,7 +183,7 @@ void AJSCard::SetCardStateActive(bool InActive)
 
 bool AJSCard::OnSelectActor()
 {
-	if (CardState == ECardState::Inventory)
+	if (CardState == ECardState::Inventory || !GetCardInfo().CanControlByUser)
 		return false;
 	
 	bIsGrabbed = true;
@@ -197,6 +196,9 @@ bool AJSCard::OnSelectActor()
 
 void AJSCard::OnReleaseActor()
 {
+	UE_LOG(LogTemp, Log, TEXT("AJSCard bIsPlaceable: %d"), bIsPlaceable);
+	UE_LOG(LogTemp, Log, TEXT("AJSCard SlotNum: %d"), SlotNum);
+
 	if (bIsPlaceable)
 	{
 		// Check If Card is on right place else go back to origin Place
@@ -266,6 +268,14 @@ void AJSCard::ShakeMesh()
 
 void AJSCard::SetOutline(int32 InValue)
 {
-	CaseMesh->SetCustomDepthStencilValue(InValue);
-	KeycapMesh->SetCustomDepthStencilValue(InValue);
+	if(!GetCardInfo().CanControlByUser && InValue != 251)
+	{
+		CaseMesh->SetCustomDepthStencilValue(254);
+		KeycapMesh->SetCustomDepthStencilValue(254);
+	}
+	else
+	{
+		CaseMesh->SetCustomDepthStencilValue(InValue);
+		KeycapMesh->SetCustomDepthStencilValue(InValue);
+	}
 }
