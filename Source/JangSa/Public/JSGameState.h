@@ -150,6 +150,8 @@ private:
 	void OnCheckEventQueue();
 	void OnEnterSettleCaratPhase();
 
+	FTimerHandle ActivateHandler;
+
 #pragma endregion 
 
 #pragma region Card Managing / Counting Section

@@ -91,6 +91,7 @@ void AJSHUD::InitializeShop(const TArray<FCardInfoData*> InCardInfo, bool bIsIni
 			PhaseAlarmWidget->SetVisibility(ESlateVisibility::Hidden);
 			JSShopWidget->SetVisibility(ESlateVisibility::Visible);
 			SetWidgetScale(JSShopWidget, .03f, true);
+
 		}), .002f, false, 1.5f);
 	}
 }
@@ -201,8 +202,11 @@ void AJSHUD::SetWidgetScale(UUserWidget* InWidget, float InScaleSpeed, bool IsDi
 	GetWorld()->GetTimerManager().SetTimer(ScaleHandler, FTimerDelegate::CreateLambda([this, InWidget, InScaleSpeed]()
 	{
 		float YValue = InWidget->GetRenderTransform().Scale.Y;
-		if (YValue >= 1.f) return;
-
+		if (YValue >= 1.f)
+		{
+			GetWorldTimerManager().ClearTimer(ScaleHandler);
+			return;
+		}
 		YValue += InScaleSpeed;
 		InWidget->SetRenderScale(FVector2D(1.f, YValue));
 	}), .002f, true);

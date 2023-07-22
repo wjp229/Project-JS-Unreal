@@ -46,6 +46,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=ParticleEffect)
 	TObjectPtr<class UParticleSystemComponent> ParticleEffectComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Widget)
+	TObjectPtr<class UWidgetComponent> CaratWidgetComponent;
 	
 	// Card Activating Effect Section
 public:
@@ -74,6 +77,8 @@ private:
 	ECardState CardState;
 
 	FTimerHandle GravityTimerHandler;
+	FTimerHandle WidgetTimerHandler;
+	float WidgetOffsetTime;
 
 private:
 	FVector OriginPosition;
@@ -87,6 +92,4 @@ public:
 private:
 	void ShakeMesh();
 	void SetOutline(int32 InValue);
-
-	FTimerHandle ShakeTimerHandler;
 };

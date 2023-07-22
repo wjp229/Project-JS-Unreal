@@ -7,10 +7,11 @@
 #include "Components/CapsuleComponent.h"
 #include "Data/JSCardDataAsset.h"
 #include "Event/JSEventAction.h"
-#include "Materials/MaterialInstanceDynamic.h"
 #include "UI/JSHUD.h"
 #include "JSGameState.h"
+#include "Components/WidgetComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "UI/JSCardWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
 AJSCard::AJSCard()
@@ -19,6 +20,7 @@ AJSCard::AJSCard()
 	KeycapMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Keycap Mesh"));
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
 	ParticleEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle"));
+	CaratWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>
 		CaseMeshRef(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
@@ -35,6 +37,7 @@ AJSCard::AJSCard()
 	KeycapMesh->SetSimulatePhysics(false);
 
 	CapsuleComponent->SetupAttachment(CaseMesh);
+	CaratWidgetComponent->SetupAttachment(CaseMesh);
 
 	//ParticleComponent->SetupAttachment(CaseMesh);
 
@@ -51,9 +54,11 @@ FCardInfoData AJSCard::GetCardInfo() const
 
 void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCardDataAsset* InDataAsset)
 {
+	CaratWidgetComponent->SetVisibility(false);
+
 	CardData = InCardData;
 	CardState = ECardState::Inventory;
-	
+
 	ensure(InDataAsset);
 
 	UJSCardEffectComponent* CardEffectComponent = NewObject<UJSCardEffectComponent>(this, InDataAsset->EffectComponent);
@@ -67,8 +72,8 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 	{
 		TextureMaterial->SetTextureParameterValue(FName("MainTex"), InDataAsset->Texture);
 	}
-	
-	//SetActorLabel(*GetCardInfo().Name);
+
+	SetActorLabel(*GetCardInfo().Name);
 }
 
 void AJSCard::SetCardState(ECardState InState)
@@ -101,7 +106,38 @@ void AJSCard::ActivateCardEffect(int32 InOrder)
 {
 	if (EffectComponent != nullptr)
 	{
-		EffectComponent->OnActivateEffect();
+		int ObtainedCarat = EffectComponent->OnActivateEffect();
+
+		CaratWidgetComponent->SetVisibility(true);
+
+		UJSCardWidget* Widget = Cast<UJSCardWidget>(CaratWidgetComponent->GetWidget());
+		Widget->SetText(ObtainedCarat);
+
+		FVector OriginPos = CaratWidgetComponent->GetRelativeLocation();
+
+		float OffsetValue = 250.f;
+		WidgetOffsetTime = 0.f;
+
+		WidgetTimerHandler.Invalidate();
+		GetWorld()->GetTimerManager().SetTimer(WidgetTimerHandler, FTimerDelegate::CreateLambda(
+			                                       [this, OriginPos, OffsetValue]()
+			                                       {
+				                                       if (WidgetOffsetTime >= 2.5f)
+				                                       {
+				                                       	CaratWidgetComponent->SetRelativeLocation(OriginPos);
+				                                       	CaratWidgetComponent->SetVisibility(false);
+				                                       	GetWorldTimerManager().ClearTimer(WidgetTimerHandler);
+
+				                                       	return;
+				                                       }
+			                                       	
+				                                       FVector NewPos = OriginPos + FVector(0.f, 0.f, 1.0f) * (
+					                                       FMath::Sin(WidgetOffsetTime) * OffsetValue);
+
+				                                       WidgetOffsetTime += 0.05f;
+
+				                                       CaratWidgetComponent->SetRelativeLocation(NewPos);
+			                                       }), .02f, true);
 	}
 }
 
@@ -185,7 +221,7 @@ bool AJSCard::OnSelectActor()
 {
 	if (CardState == ECardState::Inventory || !GetCardInfo().CanControlByUser)
 		return false;
-	
+
 	bIsGrabbed = true;
 	OriginPosition = GetActorLocation();
 	CaseMesh->BodyInstance.SetEnableGravity(false);
@@ -235,7 +271,7 @@ void AJSCard::OnMouseExitActor()
 	SetActiveCardInfoHUD(false);
 
 	SetActorRotation(FRotator(.0f));
-	
+
 	SetActorRelativeScale3D(OriginScale);
 
 	SetOutline(251);
@@ -268,7 +304,7 @@ void AJSCard::ShakeMesh()
 
 void AJSCard::SetOutline(int32 InValue)
 {
-	if(!GetCardInfo().CanControlByUser && InValue != 251)
+	if (!GetCardInfo().CanControlByUser && InValue != 251)
 	{
 		CaseMesh->SetCustomDepthStencilValue(254);
 		KeycapMesh->SetCustomDepthStencilValue(254);

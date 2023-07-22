@@ -16,8 +16,8 @@ public:
 	// Sets default values for this component's properties
 	UJSCardEffectComponent();
 
-	UFUNCTION(BlueprintNativeEvent)
-	void OnActivateEffect();
+	UFUNCTION(BlueprintImplementableEvent)
+	int32 OnActivateEffect();
 
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetEffectResult();

@@ -10,11 +10,6 @@ UJSCardEffectComponent::UJSCardEffectComponent()
 	// off to improve performance if you don't need them.
 }
 
-void UJSCardEffectComponent::OnActivateEffect_Implementation()
-{
-	
-}
-
 int32 UJSCardEffectComponent::GetEffectResult_Implementation()
 {
 	return 0;
