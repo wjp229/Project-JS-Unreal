@@ -132,6 +132,7 @@ private:
 public:
 	// Deprecated
 	void DprGameStart();
+	void OnEnterStartTurn();
 	void OnResetShop(bool bIsInitTurn = true) const;
 	void FoldShop(bool bIsFolded);
 	void ExitShop();
@@ -145,7 +146,6 @@ private:
 private:
 	void SpawnInitCard();
 
-	void OnEnterStartTurn();
 	void ShuffleHoldingCards();
 	void OnCheckEventQueue();
 	void OnEnterSettleCaratPhase();

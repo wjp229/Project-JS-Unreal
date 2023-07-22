@@ -61,7 +61,7 @@ void AJSTurnEventManager::CallNextEvent()
 				JSHud->CloseEventInfoWidget();
 			}
 			
-			GameState->OnResetShop();
+			GameState->OnEnterStartTurn();
 		}
 		
 		return;

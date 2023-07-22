@@ -24,7 +24,6 @@ public:
 
 	FORCEINLINE FTurnInfoData GetTurnInfo(int32 InTurn)
 	{
-		UE_LOG(LogTemp, Log, TEXT("%d"), TurnInfoDatas.Num());
 		return TurnInfoDatas.IsValidIndex(InTurn) ? TurnInfoDatas[InTurn] : FTurnInfoData();
 	}
 	FORCEINLINE int32 GetMaxTurnCount() const
