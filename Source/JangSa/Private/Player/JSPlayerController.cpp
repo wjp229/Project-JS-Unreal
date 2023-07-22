@@ -33,7 +33,6 @@ void AJSPlayerController::BeginPlay()
 
 void AJSPlayerController::SetPlayerControllerState(EPlayerControllerState InState)
 {
-	UE_LOG(LogTemp, Log, TEXT("Set to State %d"), InState);
 	ControllerState = InState;
 	
 	RayHandler.Invalidate();

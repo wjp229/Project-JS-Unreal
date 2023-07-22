@@ -8,6 +8,7 @@
 #include "UI/JSResultWidget.h"
 #include "UI/JSShopWidget.h"
 #include "UI/PhaseAlarmWidget.h"
+#include "UI/JSMainWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
 AJSHUD::AJSHUD()
@@ -18,10 +19,10 @@ AJSHUD::AJSHUD()
 		StartMenuWidget = CreateWidget<UUserWidget>(GetWorld(), StartWidgetRef.Class);
 	}
 
-	const ConstructorHelpers::FClassFinder<UUserWidget> HUDWidgetRef(TEXT("/Game/UI/BW_HUD.BW_HUD_C"));
+	const ConstructorHelpers::FClassFinder<UJSMainWidget> HUDWidgetRef(TEXT("/Game/UI/BW_HUD.BW_HUD_C"));
 	if (HUDWidgetRef.Class != nullptr)
 	{
-		MainHUDWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetRef.Class);
+		MainHUDWidget = CreateWidget<UJSMainWidget>(GetWorld(), HUDWidgetRef.Class);
 	}
 
 	const ConstructorHelpers::FClassFinder<UJSShopWidget> ShopWidgetRef(TEXT("/Game/UI/BW_ShopWindow.BW_ShopWindow_C"));
@@ -179,6 +180,11 @@ void AJSHUD::DrawMainHUD()
 
 	PhaseAlarmWidget->AddToViewport();
 	PhaseAlarmWidget->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void AJSHUD::EnableTurnEndButton()
+{
+	MainHUDWidget->EnableTurnEndButton();
 }
 
 void AJSHUD::BeginPlay()

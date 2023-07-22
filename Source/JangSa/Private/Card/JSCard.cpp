@@ -73,7 +73,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 		TextureMaterial->SetTextureParameterValue(FName("MainTex"), InDataAsset->Texture);
 	}
 
-	SetActorLabel(*GetCardInfo().Name);
+//	SetActorLabel(*GetCardInfo().Name);
 }
 
 void AJSCard::SetCardState(ECardState InState)

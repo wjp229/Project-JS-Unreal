@@ -22,13 +22,13 @@ AJSGameState::AJSGameState()
 void AJSGameState::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	
-	for(int ix = 0; ix < 49; ix++)
+
+	for (int ix = 0; ix < 49; ix++)
 	{
 		ActivatedCards.Emplace(nullptr);
 	}
 
-	if(nullptr != CardFactoryRef)
+	if (nullptr != CardFactoryRef)
 	{
 		CardActorFactory = NewObject<UJSCardFactory>(GetWorld(), CardFactoryRef);
 		CardActorFactory->InitFactory();
@@ -44,7 +44,7 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 	UE_LOG(LogTemp, Log, TEXT("Set Remain Turn"));
 	if (InRemainTurn <= 0)
 	{
-		if(!AddCurrentCarat(-GetPlayerData()->PayCarat))
+		if (!AddCurrentCarat(-GetPlayerData()->PayCarat))
 		{
 			AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 			if (nullptr != JSHud)
@@ -52,10 +52,10 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 				JSHud->ShowDefeatWidget();
 			}
 			GamePlayState = EGamePlayState::Finished;
-			
+
 			return;
 		}
-		
+
 		// Game End If Current Stage is Last Stage
 		if (GetPlayerData()->CurrentStage == UJSGameSingleton::Get().GetMaxTurnCount())
 		{
@@ -71,8 +71,6 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 
 		// Set To Next Phase
 		GetPlayerData()->CurrentStage += 1;
-
-		UE_LOG(LogTemp, Log, TEXT("CurrentStage %d"), GetPlayerData()->CurrentStage);
 		
 		SetPayTurn(UJSGameSingleton::Get().GetTurnInfo(GetPlayerData()->CurrentStage).InitPhaseTurn);
 		SetPayCarat(UJSGameSingleton::Get().GetTurnInfo(GetPlayerData()->CurrentStage).PayCarat);
@@ -80,22 +78,26 @@ void AJSGameState::SetRemainTurn(const int32 InRemainTurn)
 		NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
 
 		RefreshPlayerInfo();
-		
+
 		OnCheckEventQueue();
-		
+
 		return;
 	}
 
 	GetPlayerData()->RemainTurn = InRemainTurn;
 	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
-	//OnEnterStartTurn();
+
+	ActivateHandler.Invalidate();
+	GetWorld()->GetTimerManager().SetTimer(ActivateHandler, this, &AJSGameState::OnEnterStartTurn, .1f, false,
+	                                       1.5f);
+	NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Disabled);
 }
 
 void AJSGameState::RefreshPlayerInfo() const
 {
 	NotifyPayCarat.Broadcast(GetPlayerData()->PayCarat);
 	NotifyPayTurn.Broadcast(GetPlayerData()->PayTurn);
-	NotifyCurrentCarat.Broadcast(0);
+	NotifyCurrentCarat.Broadcast(GetPlayerData()->CurrentCarat);
 	NotifyRemainTurn.Broadcast(GetPlayerData()->RemainTurn);
 }
 
@@ -104,17 +106,17 @@ void AJSGameState::DprGameStart()
 	UE_LOG(LogTemp, Log, TEXT("Game Start"));
 
 	GamePlayState = EGamePlayState::Playing;
-	
+
 	SetRemainTurn(-1);
 
 	// Spawn Slot
-	const FVector StartSlotSpawnPosition(255.0f,470.0f,93.5f);
-	for(int ix = 0; ix < (MAX_SLOT_NUM * MAX_SLOT_NUM); ix++)
+	const FVector StartSlotSpawnPosition(255.0f, 470.0f, 93.5f);
+	for (int ix = 0; ix < (MAX_SLOT_NUM * MAX_SLOT_NUM); ix++)
 	{
 		FVector CurSlotSpawnPosition = StartSlotSpawnPosition;
 		CurSlotSpawnPosition += FVector(0.f, -10.f, 0.f) * (ix % MAX_SLOT_NUM);
 		CurSlotSpawnPosition += FVector(-10.f, 0.f, 0.f) * (ix / MAX_SLOT_NUM);
-		
+
 		AJSCardSlot* NewSlot = Cast<AJSCardSlot>(GetWorld()->SpawnActor(CardSlot, &CurSlotSpawnPosition));
 		NewSlot->InitSlot(ix);
 
@@ -128,18 +130,18 @@ void AJSGameState::SpawnInitCard()
 {
 	UE_LOG(LogTemp, Log, TEXT("Spawn Init Card"));
 
-	for(auto StartCardInfo : UJSGameSingleton::Get().GetStartCardInfos())
+	for (auto StartCardInfo : UJSGameSingleton::Get().GetStartCardInfos())
 	{
 		FVector SpawnLocation(265.0f, 400.0f, 93.1f);
 
 		AJSCard* NewCardActor = Cast<AJSCard>(CardActorFactory->SpawnCardActor(StartCardInfo->Id, &SpawnLocation));
 
-		if(StartCardInfo->FieldNum >= 0)
+		if (StartCardInfo->FieldNum >= 0)
 		{
 			FVector SlotPos;
 			HoldingCards.Emplace(NewCardActor);
 			RegisterActivateCard(NewCardActor, StartCardInfo->FieldNum, SlotPos);
-		//	NewCardActor->SetActorLocation(SlotPos + FVector(0.f, 0.f, 1.f));
+			//	NewCardActor->SetActorLocation(SlotPos + FVector(0.f, 0.f, 1.f));
 		}
 		else
 		{
@@ -153,12 +155,12 @@ void AJSGameState::SpawnInitCard()
 void AJSGameState::OnEnterStartTurn()
 {
 	UE_LOG(LogTemp, Log, TEXT("On Enter Start Turn"));
-	
-	if(GamePlayState != EGamePlayState::Playing)
+
+	if (GamePlayState != EGamePlayState::Playing)
 		return;
 
 	NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Interactable);
-	
+
 	ShuffleHoldingCards();
 	OnResetShop();
 }
@@ -198,21 +200,21 @@ void AJSGameState::ShuffleHoldingCards()
 void AJSGameState::OnCheckEventQueue()
 {
 	UE_LOG(LogTemp, Log, TEXT("On Check Event Queue"));
-	
+
 	NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Disabled);
 
 	NotifyCheckEvent.Broadcast(GetPlayerData()->CurrentStage);
 }
 
-void AJSGameState::OnResetShop(bool bIsInitTurn) const
+void AJSGameState::OnResetShop(bool bIsInitTurn) 
 {
 	UE_LOG(LogTemp, Log, TEXT("On Reset Shop"));
 
 	if (!bIsInitTurn)
 	{
 		// To do : Check to pay
-
-		//return;
+		if(!AddCurrentCarat(-2))
+			return;
 	}
 
 	NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Disabled);
@@ -228,7 +230,7 @@ void AJSGameState::OnResetShop(bool bIsInitTurn) const
 
 void AJSGameState::FoldShop(bool bIsFolded)
 {
-	if(bIsFolded)
+	if (bIsFolded)
 	{
 		NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Disabled);
 	}
@@ -241,6 +243,12 @@ void AJSGameState::FoldShop(bool bIsFolded)
 void AJSGameState::ExitShop()
 {
 	NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Selectable);
+
+	AJSHUD* JSHud = Cast<AJSHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	if (nullptr != JSHud)
+	{
+		JSHud->EnableTurnEndButton();
+	}
 }
 
 bool AJSGameState::PurchaseCard(int32 InCardNum)
@@ -266,7 +274,7 @@ bool AJSGameState::PurchaseCard(int32 InCardNum)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -280,13 +288,13 @@ void AJSGameState::OnExitTurn()
 void AJSGameState::OnEnterSettleCaratPhase()
 {
 	UE_LOG(LogTemp, Log, TEXT("On Enter Settle Carat"));
-	
+
 	int ActivationNum = 0;
-	
+
 	// Activate Each Card Effects
 	for (auto Card : ActivatedCards)
 	{
-		if(Card == nullptr)
+		if (Card == nullptr)
 		{
 			continue;
 		}
@@ -296,56 +304,52 @@ void AJSGameState::OnEnterSettleCaratPhase()
 	}
 
 	AddRemainTurn(-1);
-
-	ActivateHandler.Invalidate();
-	GetWorld()->GetTimerManager().SetTimer(ActivateHandler, this, &AJSGameState::OnEnterStartTurn, .1f, false, ActivationNum * .1f);
-	NotifyPlayerControllerState.Broadcast(EPlayerControllerState::Disabled);
 }
 
 bool AJSGameState::RegisterActivateCard(AJSCard* InCard, int32 SlotNum, FVector& SlotPosition)
 {
-	if(SlotNum >= 49)
+	if (SlotNum >= 49)
 	{
 		return false;
 	}
-	
+
 	if (!HoldingCards.Contains(InCard))
 	{
 		return false;
 	}
 
-	if(ActivatedCards[SlotNum] != nullptr)
+	if (ActivatedCards[SlotNum] != nullptr)
 	{
 		return false;
 	}
-	
+
 	HoldingCards.Remove(InCard);
 	ActivatedCards[SlotNum] = InCard;
 
-	SlotPosition = CardSlots[SlotNum]->GetActorLocation() + FVector(0.f, 0.f ,5.f);
+	SlotPosition = CardSlots[SlotNum]->GetActorLocation() + FVector(0.f, 0.f, 5.f);
 	InCard->SetActorLocation(SlotPosition);
-	
+
 	CardSlots[SlotNum]->RegisterCard();
 	//AddTurnResultCarat(InCard->GetResultCarat());
 
 	ArrangeCard();
-	
+
 	return true;
 }
 
 bool AJSGameState::UnregisterActivateCard(AJSCard* InCard)
 {
-	if(!ActivatedCards.Contains(InCard)) return false;
+	if (!ActivatedCards.Contains(InCard)) return false;
 
 	UE_LOG(LogTemp, Log, TEXT("UnRegister Card"));
-	
+
 	const int32 CardIndex = ActivatedCards.Find(InCard);
 
 	HoldingCards.Emplace(InCard);
 	ActivatedCards[CardIndex] = nullptr;
 
 	AddTurnResultCarat(-InCard->GetResultCarat());
-	
+
 	ArrangeCard();
 
 	return true;
@@ -372,7 +376,7 @@ void AJSGameState::ArrangeCard()
 
 AJSTurnEventManager* AJSGameState::GetTurnManager() const
 {
-	if(nullptr != TurnManager)
+	if (nullptr != TurnManager)
 	{
 		return Cast<AJSTurnEventManager>(TurnManager);
 	}
@@ -386,11 +390,11 @@ TArray<AJSCard*> AJSGameState::CardsInCondition(const FString InRank)
 
 	for (auto CardActor : ActivatedCards)
 	{
-		if(nullptr == CardActor)
+		if (nullptr == CardActor)
 		{
 			continue;
 		}
-		
+
 		if (CardActor->GetCardInfo().Rank.Contains(InRank))
 		{
 			CardArray.Emplace(CardActor);
@@ -405,11 +409,11 @@ int32 AJSGameState::CountCardInCardNum(int32 InCardNum)
 	int32 Count = 0;
 	for (auto CardActor : ActivatedCards)
 	{
-		if(nullptr == CardActor)
+		if (nullptr == CardActor)
 		{
 			continue;
 		}
-		
+
 		if (CardActor->GetCardInfo().Id == InCardNum)
 		{
 			Count += 1;
@@ -423,12 +427,13 @@ int32 AJSGameState::CountCardInCardCharacteristics(FString InCharacteristics)
 	int32 Count = 0;
 	for (auto CardActor : ActivatedCards)
 	{
-		if(nullptr == CardActor)
+		if (nullptr == CardActor)
 		{
 			continue;
 		}
-		
-		if (CardActor->GetCardInfo().Characteristic1.Contains(InCharacteristics) || CardActor->GetCardInfo().Characteristic2.
+
+		if (CardActor->GetCardInfo().Characteristic1.Contains(InCharacteristics) || CardActor->GetCardInfo().
+			Characteristic2.
 			Contains(InCharacteristics))
 		{
 			Count += 1;

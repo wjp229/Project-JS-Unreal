@@ -133,7 +133,7 @@ public:
 	// Deprecated
 	void DprGameStart();
 	void OnEnterStartTurn();
-	void OnResetShop(bool bIsInitTurn = true) const;
+	void OnResetShop(bool bIsInitTurn = true);
 	void FoldShop(bool bIsFolded);
 	void ExitShop();
 

@@ -21,6 +21,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DrawMainHUD();
+
+	void EnableTurnEndButton();
 	
 	// Interaction about Shop
 	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo, bool bIsInitPhase);
@@ -41,7 +43,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> StartMenuWidgetClass;
 	
-	TObjectPtr<UUserWidget> MainHUDWidget;
+	TObjectPtr<class UJSMainWidget> MainHUDWidget;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> MainHUDWidgetClass;
 	
