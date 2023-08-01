@@ -7,7 +7,7 @@
 #include "UI/JSDefeatWidget.h"
 #include "UI/JSResultWidget.h"
 #include "UI/JSShopWidget.h"
-#include "UI/PhaseAlarmWidget.h"
+#include "UI/JSPhaseAlarmWidget.h"
 #include "UI/JSMainWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -58,11 +58,11 @@ AJSHUD::AJSHUD()
 		EventWidget = CreateWidget<UJSEventWidget>(GetWorld(), EventWidgetRef.Class);
 	}
 
-	const ConstructorHelpers::FClassFinder<UPhaseAlarmWidget> PhaseAlarmRef(
+	const ConstructorHelpers::FClassFinder<UJSPhaseAlarmWidget> PhaseAlarmRef(
 		TEXT("/Game/UI/BW_PhaseAlarm.BW_PhaseAlarm_C"));
 	if (PhaseAlarmRef.Class != nullptr)
 	{
-		PhaseAlarmWidget = CreateWidget<UPhaseAlarmWidget>(GetWorld(), PhaseAlarmRef.Class);
+		PhaseAlarmWidget = CreateWidget<UJSPhaseAlarmWidget>(GetWorld(), PhaseAlarmRef.Class);
 	}
 }
 
@@ -225,7 +225,7 @@ void AJSHUD::SetWidgetPosition(UUserWidget* InWidget, FVector2D InitPos, float I
 void AJSHUD::CloseAllUserWidget()
 {
 	MainHUDWidget->SetVisibility(ESlateVisibility::Hidden);
-	JSShopWidget->SetVisibility(ESlateVisibility::Hidden);
-	CardInfoWidget->SetVisibility(ESlateVisibility::Hidden);
-	EventWidget->SetVisibility(ESlateVisibility::Hidden);
+	if(JSShopWidget != nullptr) JSShopWidget->SetVisibility(ESlateVisibility::Hidden);
+	if(CardInfoWidget!= nullptr) CardInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+	if(EventWidget!= nullptr) EventWidget->SetVisibility(ESlateVisibility::Hidden);
 }

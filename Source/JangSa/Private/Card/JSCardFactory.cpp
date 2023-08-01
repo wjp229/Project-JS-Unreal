@@ -58,7 +58,6 @@ AActor* UJSCardFactory::SpawnCardActor(int CardNum, FVector const* InLocation)
 	
 
 	AJSCard* JSSpawnedCard = Cast<AJSCard>(SpawnedCard);
-
 	if (nullptr != JSSpawnedCard)
 	{
 		JSSpawnedCard->InitCard(*UJSGameSingleton::Get().GetCardInfo(CardNum), 0, Cast<UJSCardDataAsset>(CardDataAssets[CardNum]));

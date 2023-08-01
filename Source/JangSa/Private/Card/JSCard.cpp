@@ -28,7 +28,6 @@ AJSCard::AJSCard()
 	{
 		CaseMesh->SetStaticMesh(CaseMeshRef.Object);
 	}
-
 	RootComponent = CaseMesh;
 	CaseMesh->SetRelativeScale3D(FVector(.05f, .05f, .01f));
 	CaseMesh->SetSimulatePhysics(false);
@@ -37,19 +36,12 @@ AJSCard::AJSCard()
 	KeycapMesh->SetSimulatePhysics(false);
 
 	CapsuleComponent->SetupAttachment(CaseMesh);
+
 	CaratWidgetComponent->SetupAttachment(CaseMesh);
 
-	//ParticleComponent->SetupAttachment(CaseMesh);
-
-	CardState = ECardState::Inventory;
-
 	OriginScale = CaseMesh->GetRelativeScale3D();
-}
 
-
-FCardInfoData AJSCard::GetCardInfo() const
-{
-	return CardData;
+	CardState = ECardState::Disabled;
 }
 
 void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCardDataAsset* InDataAsset)
@@ -73,7 +65,7 @@ void AJSCard::InitCard(const FCardInfoData& InCardData, int32 InObjectID, UJSCar
 		TextureMaterial->SetTextureParameterValue(FName("MainTex"), InDataAsset->Texture);
 	}
 
-//	SetActorLabel(*GetCardInfo().Name);
+	//	SetActorLabel(*GetCardInfo().Name);
 }
 
 void AJSCard::SetCardState(ECardState InState)
@@ -124,13 +116,13 @@ void AJSCard::ActivateCardEffect(int32 InOrder)
 			                                       {
 				                                       if (WidgetOffsetTime >= 2.5f)
 				                                       {
-				                                       	CaratWidgetComponent->SetRelativeLocation(OriginPos);
-				                                       	CaratWidgetComponent->SetVisibility(false);
-				                                       	GetWorldTimerManager().ClearTimer(WidgetTimerHandler);
+					                                       CaratWidgetComponent->SetRelativeLocation(OriginPos);
+					                                       CaratWidgetComponent->SetVisibility(false);
+					                                       GetWorldTimerManager().ClearTimer(WidgetTimerHandler);
 
-				                                       	return;
+					                                       return;
 				                                       }
-			                                       	
+
 				                                       FVector NewPos = OriginPos + FVector(0.f, 0.f, 1.0f) * (
 					                                       FMath::Sin(WidgetOffsetTime) * OffsetValue);
 
@@ -232,9 +224,7 @@ bool AJSCard::OnSelectActor()
 
 void AJSCard::OnReleaseActor()
 {
-	UE_LOG(LogTemp, Log, TEXT("AJSCard bIsPlaceable: %d"), bIsPlaceable);
-	UE_LOG(LogTemp, Log, TEXT("AJSCard SlotNum: %d"), SlotNum);
-
+	UE_LOG(LogTemp, Log, TEXT("IsPlaceable: %d"), bIsPlaceable);
 	if (bIsPlaceable)
 	{
 		// Check If Card is on right place else go back to origin Place

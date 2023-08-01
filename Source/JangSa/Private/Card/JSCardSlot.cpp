@@ -66,10 +66,13 @@ void AJSCardSlot::OnCardEndOverlap(AActor* OverlappedActor, AActor* OtherActor)
 	{
 		UE_LOG(LogTemp, Log, TEXT("AJSCardSlot bIsPlaceable: %d"), InCard->bIsPlaceable);
 		UE_LOG(LogTemp, Log, TEXT("AJSCardSlot SlotNum: %d"), InCard-> SlotNum);
-		
-		InCard->SlotNum = -1;
-		InCard->bIsPlaceable = false;
 
+		if(InCard->SlotNum == SlotNum)
+		{
+			InCard->SlotNum = -1;
+			InCard->bIsPlaceable = false;
+		}
+		
 		SlotMesh->SetCustomDepthStencilValue(0);
 	}
 }

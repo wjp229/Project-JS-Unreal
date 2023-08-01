@@ -24,39 +24,38 @@ public:
 
 	void EnableTurnEndButton();
 	
-	// Interaction about Shop
 	void InitializeShop(const TArray<struct FCardInfoData*> InCardInfo, bool bIsInitPhase);
-
-	// Interaction about Card Info
 	void ShowCardInfoWidget(const FCardInfoData& InCardInfo, const bool InActive);
-	
 	void ShowDefeatWidget();
-
 	void ShowResultInfoWidget(FPlayerData& InData);
-
 	void ShowEventInfoWidget(UJSEventData* InEventData);
+	
 	void CloseEventInfoWidget();
 
-	
 private:
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UUserWidget> StartMenuWidget;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> StartMenuWidgetClass;
-	
+
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSMainWidget> MainHUDWidget;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> MainHUDWidgetClass;
-	
+
 	TObjectPtr<class UJSShopWidget> JSShopWidget;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJSShopWidget> JSShopWidgetClass;
 
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSCardInfoWidget> CardInfoWidget;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJSCardInfoWidget> CardInfoWidgetClass;
 
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSDefeatWidget> DefeatWidget;
 
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UJSResultWidget> ResultWidget;
 	
 	UPROPERTY(EditAnywhere)
@@ -66,7 +65,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UJSEventWidget> EventWidgetClass;
 
-	TObjectPtr<class UPhaseAlarmWidget> PhaseAlarmWidget;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UJSPhaseAlarmWidget> PhaseAlarmWidget;
 
 	FTimerHandle ScaleHandler;
 	FTimerHandle PhaseHandler;

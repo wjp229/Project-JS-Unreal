@@ -15,14 +15,17 @@ class JANGSA_API AJSCard : public AActor, public IJSCardEffectInterface, public 
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AJSCard();
 
-	FCardInfoData GetCardInfo() const;
+	FORCEINLINE FCardInfoData GetCardInfo() { return CardData; }
+
+	/* Init Card Info and other properties including states by InCardData */
 	void InitCard(const FCardInfoData& InCardData, int32 InObjectID, class UJSCardDataAsset* InDataAsset);
 
+	// Set Card State and Limit Rotations
 	void SetCardState(ECardState InState);
 
+#pragma region Card Components & Info
 protected:
 	int CardNum;
 
@@ -49,7 +52,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Widget)
 	TObjectPtr<class UWidgetComponent> CaratWidgetComponent;
-	
+#pragma endregion
+
+#pragma region Actions
 	// Card Activating Effect Section
 public:
 	UFUNCTION()
@@ -73,12 +78,13 @@ public:
 	int32 SlotNum;
 	
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="CardState", meta=(AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=CardState, meta=(AllowPrivateAccess))
 	ECardState CardState;
 
 	FTimerHandle GravityTimerHandler;
 	FTimerHandle WidgetTimerHandler;
 	float WidgetOffsetTime;
+#pragma endregion 
 
 private:
 	FVector OriginPosition;

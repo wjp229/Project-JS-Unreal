@@ -46,7 +46,7 @@ public:
 	FNotifyPlayerControllerState NotifyPlayerControllerState;
 #pragma endregion
 
-# pragma region Player / Turn Data Section
+#pragma region Player / Turn Data Section
 public:
 	FORCEINLINE FPlayerData* GetPlayerData() const { return PlayerData; }
 

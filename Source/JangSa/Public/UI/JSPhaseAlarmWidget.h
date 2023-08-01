@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "PhaseAlarmWidget.generated.h"
+#include "JSPhaseAlarmWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class JANGSA_API UPhaseAlarmWidget : public UUserWidget
+class JANGSA_API UJSPhaseAlarmWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
